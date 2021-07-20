@@ -372,11 +372,7 @@ set updatetime=1000
 
 filetype plugin indent on
 
-set dictionary+=$HOME/.vim/c-support/wordlists/c-c++-keywords.list,
-               \$HOME/.vim/c-support/wordlists/stl_index.list
-
 set spelllang=ru_ru,en_us
-set spellfile=$HOME/.vim/spell/my.utf-8.add
 
 " set sensible textwidth for tex, rst and pandoc files
 autocmd FileType tex,rst,pandoc set textwidth=80 | set colorcolumn=81
