@@ -16,6 +16,7 @@ Plug 'sainnhe/edge'
 Plug 'franbach/miramare'
 Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/nvim-compe'
+Plug 'ludovicchabant/vim-gutentags'
 Plug 'cohama/lexima.vim'
 Plug 'machakann/vim-sandwich'
 Plug 'kshenoy/vim-signature'
@@ -243,10 +244,11 @@ let g:compe.source.buffer = v:true
 let g:compe.source.calc = v:true
 let g:compe.source.nvim_lsp = v:true
 let g:compe.source.nvim_lua = v:true
-let g:compe.source.vsnip = v:true
+let g:compe.source.vsnip = v:false
 let g:compe.source.ultisnips = v:true
-let g:compe.source.luasnip = v:true
-let g:compe.source.emoji = v:true
+let g:compe.source.luasnip = v:false
+let g:compe.source.emoji = v:false
+let g:compe.source.tags = v:false
 
 let g:lexima_no_default_rules = v:true
 call lexima#set_default_rules()
@@ -256,8 +258,8 @@ inoremap <silent><expr> <C-e>     compe#close('<C-e>')
 inoremap <silent><expr> <C-f>     compe#scroll({ 'delta': +4 })
 inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
 
-let g:UltiSnipsJumpForwardTrigger = '<C-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
+let g:UltiSnipsJumpForwardTrigger="<Tab>"
+let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 
 
 
@@ -703,7 +705,7 @@ endfun
 autocmd FileType,BufWritePost * nested
             \ if !<SID>vimdiff_mode() | call <SID>open_tagbar() | endif
 
-" setting specific ambiwidth prevents printing garbage in the first two
+" setting specific ambiwidth prevents from printing garbage in the first two
 " columns on the second row of the screen when tagbar automatically opens on
 " vim loading (the issue was introduced in vim v8.0.0567)
 set ambiwidth=single
