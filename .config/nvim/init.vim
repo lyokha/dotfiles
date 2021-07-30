@@ -1,12 +1,19 @@
-" ---- Fallback to Vim's configuration
+" vim: set fdm=marker fdl=0:
+
+" ---- Fallback to Vim's configuration {{{1
 " ----
-"set runtimepath^=~/.vim runtimepath+=~/.vim/after
-"let &packpath=&runtimepath
-"source ~/.vimrc
+let g:FallbackToVim = 0
+
+if g:FallbackToVim
+    set runtimepath^=~/.vim runtimepath+=~/.vim/after
+    let &packpath=&runtimepath
+    source ~/.vimrc
+    finish
+endif
+" }}}
 
 
-
-" --- Plugins
+" ---- Plugins {{{1
 " ----
 call plug#begin()
 Plug 'glepnir/oceanic-material'
@@ -55,10 +62,11 @@ Plug 'lyokha/vim-publish-helper'
 Plug 'lyokha/vim-right-align'
 Plug 'lyokha/vim-prev-indent'
 call plug#end()
+" }}}
 
 
-" --- Colorscheme
-" ---
+" ---- Colorscheme {{{1
+" ----
 set termguicolors
 "let g:oceanic_material_transparent_background = 1
 "let g:oceanic_material_allow_bold = 1
@@ -79,9 +87,10 @@ let g:gruvbox_material_transparent_background = 1
 let g:gruvbox_material_enable_bold = 1
 let g:gruvbox_material_enable_italic = 1
 colorscheme gruvbox-material
+" }}}
 
 
-" ---- Miscellaneous basic customizations
+" ---- Miscellaneous basic customizations {{{1
 " ----
 set nocompatible
 
@@ -114,10 +123,10 @@ set splitright
 
 let mapleader = ','
 let g:netrw_winsize = 25
+" }}}
 
 
-
-" ---- Setup language servers and related stuff
+" ---- Setup language servers and related stuff {{{1
 " ----
 lua <<EOF
   require'lspconfig'.clangd.setup{}
@@ -218,10 +227,10 @@ lua <<EOF
       end
   end
 EOF
+" }}}
 
 
-
-" ---- Completion with compe and ultisnips settings
+" ---- Completion with compe and ultisnips settings {{{1
 " ----
 let g:compe = {}
 let g:compe.enabled = v:true
@@ -260,12 +269,11 @@ inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
 
 let g:UltiSnipsJumpForwardTrigger="<Tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
+" }}}
 
 
-
-" ---- Easy navigation between tabs and buffers
+" ---- Easy navigation between tabs and buffers {{{1
 " ----
-
 set switchbuf=usetab
 " use bufhidden=delete or bufhidden=wipe to enable following <C-arrow>
 " mappings; if 'delete' is used then cursor won't move to reopen buffers, but
@@ -393,11 +401,11 @@ set wildmode=list:longest,full
 imap <C-v>ё  <C-v>u0301
 
 autocmd BufRead *.csv setlocal nomodeline
+" }}}
 
 
-
-" --- Emulate file-line plugin for any new file and file autocompletion
-" ---
+" ---- Emulate file-line plugin for any new file and file autocompletion {{{1
+" ----
 let g:loaded_file_line = 1
 
 fun! <SID>file_line(file)
@@ -423,19 +431,45 @@ fun! <SID>file_line(file)
 endfun
 
 autocmd BufNewFile * call <SID>file_line(expand('<afile>'))
+" }}}
 
 
-
-" --- Airline settings
-" ---
+" ---- Airline settings {{{1
+" ----
 let g:airline_powerline_fonts = 1
 let g:airline_theme = 'gruvbox_material'
 let g:airline#extensions#xkblayout#enabled = 0
 let g:airline#extensions#tagbar#flags = 'f'
 
+let g:airline_theme_patch_func = 'AirlineThemePatch'
+
+fun! AirlineThemePatch(palette)
+    if !has_key(a:palette.accents, 'red_bold')
+        let a:palette.accents.red_bold = ['#d70000', '', 160, '', 'bold']
+    endif
+endfun
+
+if g:DisableUnicodeSymbols
+    let s:SudoAdminFase = ''
+else
+    let s:SudoAdminFase = 0 ? '🦁' : (1 ? '🧔' : '🤓')
+endif
+
+" sudo indicator, this must work with both sudo -e and
+" alias svim='sudo HOME=$HOME nvim'
+call airline#parts#define('sudo', {
+            \ 'text': s:SudoAdminFase.'SUDO',
+            \ 'condition': '!empty($SUDO_USER) || $_ =~# "/sudo$"',
+            \ 'accent': 'red_bold',
+            \ })
+
+let g:airline_section_a =
+            \ airline#section#create_left(['mode', 'sudo', 'crypt', 'paste',
+            \ 'keymap', 'spell', 'capslock', 'xkblayout', 'iminsert'])
+" }}}
 
 
-" ---- Pandoc settings
+" ---- Pandoc settings {{{1
 " ----
 let g:pandoc#modules#disabled = ['menu', 'spell']
 let g:pandoc#syntax#codeblocks#embeds#langs = ['vim', 'tex', 'sh', 'cpp']
@@ -446,10 +480,10 @@ let g:pandoc#after#modules#enabled = ["tablemode"]
 let g:pandoc#biblio#sources = "b"
 " avoid possible folding mess on very long code blocks
 autocmd FileType pandoc syntax sync minlines=500
+" }}}
 
 
-
-" ---- Source code tags and grep settings
+" ---- Source code tags and grep settings {{{1
 " ----
 set tagstack
 
@@ -566,10 +600,10 @@ fun! <SID>win_occupy_vert_space(altwinbufft)
 endfun
 
 nmap <silent> ,U :call <SID>win_occupy_vert_space('tagbar')<CR>
+" }}}
 
 
-
-" ---- Switching to alternative source code files
+" ---- Switching to alternative source code files {{{1
 " ----
 let g:UseFswitchForAlternatives = 1
 
@@ -598,10 +632,10 @@ augroup fswitch
     autocmd BufEnter *.h let b:fswitchdst = 'cpp,cc,cxx,c++,c' |
             \ let b:fswitchlocs = '../src,./' | let b:fsnonewfiles = 'on'
 augroup END
+" }}}
 
 
-
-" ---- Commands and mappings for formatting hints highlights
+" ---- Commands and mappings for formatting hints highlights {{{1
 " ----
 let g:RightBorder = 80
 highlight FormatHints term=standout
@@ -639,7 +673,7 @@ command -bar ShowFormatHints call <SID>formathints()
 command -bar HideFormatHints call <SID>formathints_hide()
 command      HideDosEols     call <SID>doseol_hide()
 
-nmap <silent> ,h :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
+nmap <silent> ,f :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
             \ ShowFormatHints <Bar> echo "Show format hints" <Bar> else <Bar>
             \ HideFormatHints <Bar> echo "Hide format hints" <Bar> endif<CR>
 nmap          ,r :HideDosEols<CR>
@@ -655,10 +689,10 @@ autocmd BufEnter * let g:RightBorder = &textwidth > 0 ? &textwidth : 80 |
             \ endif
 " show colorcolumn when committed to svn, cvs or other VCS
 autocmd FileType svn,cvs exe "set colorcolumn=".(g:RightBorder + 1)
+" }}}
 
 
-
-" ---- Tagbar settings
+" ---- Tagbar settings {{{1
 " ----
 let g:tagbar_width = 42 + &columns % 2
 let g:tagbar_sort = 0
@@ -752,19 +786,19 @@ let g:tagbar_type_haskell = {
         \ 'instance' : 'ft'
     \ }
 \ }
+" }}}
 
 
-
-" ---- Haskell settings
+" ---- Haskell settings {{{1
 " ----
 let g:haskell_indent_if = 4
 let g:haskell_indent_case = 4
 let g:haskell_indent_before_where = 4
 let g:haskell_indent_in = 0
+" }}}
 
 
-
-" ---- Better mappings for plugin Mark
+" ---- Better mappings for plugin Mark {{{1
 " ----
 nmap <C-k><C-k> <Plug>MarkSet
 nmap <C-k>n     <Plug>MarkClear
@@ -783,10 +817,10 @@ nmap <C-k>l     :MarkLoad<CR>
 " adjust highlight priorities between plugins Mark and Illuminate
 let g:mwMaxMatchPriority = -10
 let g:Illuminate_highlightPriority = -20
+" }}}
 
 
-
-" ---- System clipboard copy-paste (copy in visual mode, paste in normal)
+" ---- System clipboard copy-paste (copy in visual mode, paste in normal) {{{1
 " ----
 if executable('xclip')
     vmap <C-c> y
@@ -795,23 +829,23 @@ if executable('xclip')
     nmap ,i :call setreg('"', system('xclip -o'))<CR>p
     nmap ,I :call setreg('"', system('xclip -o'))<CR>P
 endif
+" }}}
 
 
-
-" ---- Context plugin settings
+" ---- Context plugin settings {{{1
 " ----
 let g:context_nvim_no_redraw = 1
+" }}}
 
 
-
-" ---- Tablemode settings
+" ---- Tablemode settings {{{1
 " ----
 let g:table_mode_verbose = 1
+" }}}
 
 
-
-" ---- Automatic keyboard layout switching upon entering/leaving insert mode
-" ---- using xkb-switch utility and plugin xkbswitch
+" ---- Automatic keyboard layout switching upon entering/leaving {{{1
+" ---- insert mode using xkb-switch utility and plugin xkbswitch
 " ----
 let g:XkbSwitchEnabled = 1
 let g:XkbSwitchIMappings = ['ru']
@@ -891,10 +925,10 @@ augroup END
 
 let g:XkbSwitchSyntaxRules = [
             \ {'pat': '*.mdict', 'in': ['mdictOriginal', 'mdictTranslated']} ]
+" }}}
 
 
-
-" ---- Settings for plugins right_align and prev_indent
+" ---- Settings for plugins right_align and prev_indent {{{1
 " ----
 let g:RightAlign_RightBorder = g:RightBorder
 let g:RightAlign_ShiftRound = 1
@@ -907,4 +941,5 @@ imap <silent> <C-g><C-g>  <Plug>PrevIndent
 nmap <silent> <C-k>k      :PrevIndent<CR>
 imap <silent> <C-g>g      <Plug>AlignWith
 nmap <silent> <C-k>g      :AlignWith<CR>
+" }}}
 
