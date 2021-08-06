@@ -16,6 +16,7 @@ endif
 " ---- Plugins {{{1
 " ----
 call plug#begin()
+Plug 'ryanoasis/vim-devicons'
 Plug 'glepnir/oceanic-material'
 Plug 'marko-cerovac/material.nvim'
 Plug 'sainnhe/gruvbox-material'
@@ -68,6 +69,7 @@ call plug#end()
 " ---- Colorscheme {{{1
 " ----
 set termguicolors
+
 "let g:oceanic_material_transparent_background = 1
 "let g:oceanic_material_allow_bold = 1
 "let g:oceanic_material_allow_italic = 1
@@ -83,9 +85,17 @@ set termguicolors
 "let g:edge_transparent_background = 1
 "let g:edge_enable_italic = 1
 "colorscheme edge
+
+" seamless FloatBorder around NormalFloat for gruvbox-material colorscheme
+autocmd ColorScheme *
+            \ highlight FloatBorder
+                \ cterm=NONE ctermbg=237 ctermfg=186
+                \ gui=NONE guibg=#45403d guifg=#d7d787
+
 let g:gruvbox_material_transparent_background = 1
 let g:gruvbox_material_enable_bold = 1
 let g:gruvbox_material_enable_italic = 1
+
 colorscheme gruvbox-material
 " }}}
 
@@ -160,9 +170,9 @@ lua <<EOF
     buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
     buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+    buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>', opts)
+    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev({ popup_opts = { border = "rounded" }})<CR>', opts)
+    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next({ popup_opts = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
     buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
   end
@@ -226,6 +236,22 @@ lua <<EOF
           vim.lsp.util.set_qflist(qflist)
       end
   end
+
+  vim.lsp.handlers["textDocument/hover"] =
+    vim.lsp.with(
+    vim.lsp.handlers.hover,
+    {
+      border = "rounded"
+    }
+  )
+  
+  vim.lsp.handlers["textDocument/signatureHelp"] =
+    vim.lsp.with(
+    vim.lsp.handlers.signature_help,
+    {
+      border = "rounded"
+    }
+  )
 EOF
 " }}}
 
@@ -452,7 +478,7 @@ endfun
 if g:DisableUnicodeSymbols
     let s:SudoAdminFase = ''
 else
-    let s:SudoAdminFase = 0 ? '🦁' : (1 ? '🧔' : '🤓')
+    let s:SudoAdminFase = 0 ? '🦁' : (1 ? ' ' : '🧔')
 endif
 
 " sudo indicator, this must work with both sudo -e and
@@ -639,10 +665,10 @@ augroup END
 " ----
 let g:RightBorder = 80
 highlight FormatHints term=standout
-            \ ctermfg=250 ctermbg=229 guifg=Red guibg=White
+            \ ctermfg=244 ctermbg=229 guifg=#808080 guibg=#ffffaf
 " restore FormatHints after switching to a color scheme that may clear it off
 autocmd ColorScheme * highlight FormatHints term=standout
-            \ ctermfg=250 ctermbg=229 guifg=Red guibg=White
+            \ ctermfg=244 ctermbg=229 guifg=#808080 guibg=#ffffaf
 
 fun! <SID>formathints()
     if !exists("w:m1") || w:m1 == 0
