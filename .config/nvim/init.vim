@@ -256,7 +256,7 @@ EOF
 " }}}
 
 
-" ---- Completion with compe and ultisnips settings {{{1
+" ---- Completion with compe, lexima and ultisnips settings {{{1
 " ----
 let g:compe = {}
 let g:compe.enabled = v:true
@@ -273,6 +273,10 @@ let g:compe.max_kind_width = 100
 let g:compe.max_menu_width = 100
 let g:compe.documentation = v:true
 
+" for Cyrillic completion
+" (see https://github.com/hrsh7th/nvim-compe/issues/167)
+let g:compe.default_pattern = '\k\+'
+
 let g:compe.source = {}
 let g:compe.source.path = v:true
 let g:compe.source.buffer = v:true
@@ -287,11 +291,16 @@ let g:compe.source.tags = v:false
 
 let g:lexima_no_default_rules = v:true
 call lexima#set_default_rules()
+
+" lexima breaks some Cyrillic inputs (such as Э, э, etc.)
+autocmd FileType tex,rst,pandoc let b:lexima_disabled = 1
+            \ | call lexima#clear_rules()
+
 inoremap <silent><expr> <C-Space> compe#complete()
 inoremap <silent><expr> <CR>      compe#confirm(lexima#expand('<LT>CR>', 'i'))
 inoremap <silent><expr> <C-e>     compe#close('<C-e>')
-inoremap <silent><expr> <C-f>     compe#scroll({ 'delta': +4 })
-inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
+inoremap <silent><expr> <C-down>  compe#scroll({ 'delta': +4 })
+inoremap <silent><expr> <C-up>    compe#scroll({ 'delta': -4 })
 
 let g:UltiSnipsJumpForwardTrigger="<Tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
