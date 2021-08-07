@@ -46,6 +46,7 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
+Plug 'rhysd/git-messenger.vim'
 Plug 'simnalamburt/vim-mundo'
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
@@ -524,9 +525,6 @@ set tagstack
 
 " mapping for moving forward in the tagstack
 nmap ,t  :tag<CR>
-
-" mapping for searching the word under cursor using ack
-nmap ,g  :Ack <C-r>=expand("<cword>")<CR><CR>
 
 " functions for jumping to a tag under cursor in a special split window
 let g:TagPWinHeight = 16
