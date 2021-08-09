@@ -23,6 +23,8 @@ Plug 'sainnhe/gruvbox-material'
 Plug 'sainnhe/edge'
 Plug 'franbach/miramare'
 Plug 'neovim/nvim-lspconfig'
+Plug 'RishabhRD/popfix'
+Plug 'RishabhRD/nvim-lsputils'
 Plug 'hrsh7th/nvim-compe'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'cohama/lexima.vim'
@@ -36,6 +38,7 @@ Plug 'simrat39/symbols-outline.nvim'
 Plug 'RRethy/vim-illuminate'
 Plug 'onsails/lspkind-nvim'
 Plug 'wellle/context.vim'
+Plug 'haringsrob/nvim_context_vt'
 Plug 'preservim/tagbar'
 Plug 'preservim/nerdtree'
 Plug 'preservim/nerdcommenter'
@@ -253,6 +256,15 @@ lua <<EOF
       border = "rounded"
     }
   )
+
+  vim.lsp.handlers['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
+  vim.lsp.handlers['textDocument/references'] = require'lsputil.locations'.references_handler
+  vim.lsp.handlers['textDocument/definition'] = require'lsputil.locations'.definition_handler
+  vim.lsp.handlers['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
+  vim.lsp.handlers['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
+  vim.lsp.handlers['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
+  vim.lsp.handlers['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
+  vim.lsp.handlers['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
 EOF
 " }}}
 
@@ -865,9 +877,40 @@ endif
 " }}}
 
 
-" ---- Context plugin settings {{{1
+" ---- Context and nvim_context_vt plugins settings {{{1
 " ----
 let g:context_nvim_no_redraw = 1
+let g:context_filetype_blacklist = ['lsputil_locations_list']
+
+if g:DisableUnicodeSymbols
+    let g:ContextTrailingMarker = '<-- '
+else
+    let g:ContextTrailingMarker = '  '
+endif
+
+lua <<EOF
+local ts_utils = require'nvim-treesitter.ts_utils'
+local parsers = require'nvim-treesitter.parsers'
+local disabled_in = { 'haskell' }
+local min_size = 25
+
+require'nvim_context_vt'.setup({
+    custom_text_handler = function (node)
+        local parser_lang = parsers.get_buf_lang()
+        for _, lang in ipairs(disabled_in) do
+            if parser_lang == lang then
+                return nil
+            end
+        end
+        local start_line, _, end_line, _ = ts_utils.get_node_range(node)
+        if end_line - start_line < min_size then
+            return nil
+        end
+        return vim.g['ContextTrailingMarker'] ..
+            ts_utils.get_node_text(node)[1]
+    end
+})
+EOF
 " }}}
 
 
