@@ -174,7 +174,7 @@ lua <<EOF
     buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
     buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>', opts)
+    buf_set_keymap('n', ',e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>', opts)
     buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev({ popup_opts = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next({ popup_opts = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
@@ -536,7 +536,7 @@ autocmd FileType pandoc syntax sync minlines=500
 set tagstack
 
 " mapping for moving forward in the tagstack
-nmap ,t  :tag<CR>
+nmap ,T  :tag<CR>
 
 " functions for jumping to a tag under cursor in a special split window
 let g:TagPWinHeight = 16
@@ -884,15 +884,17 @@ let g:context_filetype_blacklist = ['lsputil_locations_list']
 
 if g:DisableUnicodeSymbols
     let g:ContextTrailingMarker = '<-- '
+    let g:ContextNewlineMarker = ' .. '
 else
     let g:ContextTrailingMarker = '  '
+    let g:ContextNewlineMarker = ' ␤ '
 endif
 
 lua <<EOF
 local ts_utils = require'nvim-treesitter.ts_utils'
 local parsers = require'nvim-treesitter.parsers'
 local disabled_in = { 'haskell' }
-local min_size = 25
+local min_node_size = 21
 
 require'nvim_context_vt'.setup({
     custom_text_handler = function (node)
@@ -903,11 +905,32 @@ require'nvim_context_vt'.setup({
             end
         end
         local start_line, _, end_line, _ = ts_utils.get_node_range(node)
-        if end_line - start_line < min_size then
+        if not (node:type() == 'function_definition')
+                and end_line - start_line < min_node_size then
             return nil
         end
-        return vim.g['ContextTrailingMarker'] ..
-            ts_utils.get_node_text(node)[1]
+        local text = ts_utils.get_node_text(node)[1]
+        if node:type() == 'function_definition' then
+            local children = ts_utils.get_named_children(node)
+            for _, c in ipairs(children) do
+                if c:type() == 'function_declarator' then
+                    local start_line_decl, _, _, _ =
+                            ts_utils.get_node_range(c)
+                    local lines = start_line_decl - start_line
+                    for i = 1, lines do
+                        text = text .. vim.g['ContextNewlineMarker']
+                                .. ts_utils.get_node_text(node)[i + 1]
+                    end
+                    break
+                end
+            end
+        else
+            if not string.match(text, '%S+%s+') then
+                text = text .. vim.g['ContextNewlineMarker']
+                        .. ts_utils.get_node_text(node)[2]
+            end
+        end
+        return vim.g['ContextTrailingMarker'] .. text
     end
 })
 EOF
