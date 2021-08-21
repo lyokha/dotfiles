@@ -197,17 +197,23 @@ lua <<EOF
   vim.g.symbols_outline = {
       highlight_hovered_item = true,
       show_guides = true,
-      auto_preview = false, -- experimental
+      auto_preview = true,
       position = 'right',
+      width = 25,
+      show_numbers = false,
+      show_relative_numbers = false,
+      show_symbol_details = true,
       keymaps = {
           close = "<Esc>",
           goto_location = "<Cr>",
           focus_location = "o",
           hover_symbol = "K",
+          toggle_preview = "q",
           rename_symbol = "r",
           code_actions = "a"
       },
-      lsp_blacklist = {}
+      lsp_blacklist = {},
+      symbol_blacklist = {}
   }
 
     -- LSP Enable diagnostics
@@ -330,6 +336,13 @@ autocmd BufEnter * if empty(&buftype) | setlocal bufhidden=delete | endif
 " this will fix bug with bufhidden=delete mentioned above
 autocmd BufEnter * if empty(&buftype) | setlocal buflisted | endif
 
+" jump to the last change on opening a buffer
+let g:JumpToLastChangeOnBufOpen = 1
+
+autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen 
+autocmd BufReadPost * if empty(&buftype) && !b:start_jump_done |
+            \ silent! normal! `. | let b:start_jump_done = 1 | endif
+
 fun! <SID>wintoggle_cmd(cmd, bufname)
     let status = bufwinnr(a:bufname)
     let lastwin = winnr('$')
@@ -398,9 +411,6 @@ let g:mundo_prefer_python3 = 1
 " set winfixwidth in Mundo windows (as it is not set in the plugin)
 autocmd BufEnter * if match(bufname('%'), '__Mundo_\%(Preview\)\=_') != -1 |
             \ setlocal winfixwidth | endif
-
-" easy visincr map
-vmap          ,i         :I<CR>
 
 " quickly remove all current highlights
 nmap          ,l         :nohl<CR>
@@ -476,6 +486,7 @@ fun! <SID>file_line(file)
         exe 'normal!' l:parts[3].'|'
     endif
     normal! zz
+    let b:start_jump_done = 1
 endfun
 
 autocmd BufNewFile * call <SID>file_line(expand('<afile>'))
