@@ -462,6 +462,16 @@ autocmd BufRead *.csv setlocal nomodeline
 " }}}
 
 
+" ---- Git-messenger settings {{{1
+" ----
+let g:git_messenger_no_default_mappings = v:true
+nmap ,g <Plug>(git-messenger)
+
+let g:git_messenger_floating_win_opts = { 'border': 'rounded' }
+let g:git_messenger_popup_content_margins = v:false
+" }}}
+
+
 " ---- Emulate file-line plugin for any new file and file autocompletion {{{1
 " ----
 let g:loaded_file_line = 1
@@ -890,6 +900,7 @@ endif
 
 " ---- Context and nvim_context_vt plugins settings {{{1
 " ----
+let g:context_enabled = 0
 let g:context_nvim_no_redraw = 1
 let g:context_filetype_blacklist = ['lsputil_locations_list']
 
@@ -924,6 +935,8 @@ require'nvim_context_vt'.setup({
         if node:type() == 'function_definition' then
             local children = ts_utils.get_named_children(node)
             for _, c in ipairs(children) do
+                -- FIXME: a function_declarator may hide deeper, for example,
+                -- inside a pointer_declarator
                 if c:type() == 'function_declarator' then
                     local start_line_decl, _, _, _ =
                             ts_utils.get_node_range(c)
