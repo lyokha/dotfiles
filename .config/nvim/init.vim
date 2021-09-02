@@ -101,6 +101,13 @@ let g:gruvbox_material_enable_bold = 1
 let g:gruvbox_material_enable_italic = 1
 
 colorscheme gruvbox-material
+
+let g:CustomTSVariableHighlight = v:true
+
+if g:CustomTSVariableHighlight
+    highlight TSVariable term=NONE
+                \ ctermfg=49 ctermbg=NONE guifg=#00ee9e guibg=NONE
+endif
 " }}}
 
 
@@ -137,6 +144,31 @@ set splitright
 
 let mapleader = ','
 let g:netrw_winsize = 25
+" }}}
+
+
+" ---- Setup treesitter {{{1
+" ----
+lua <<EOF
+  require'nvim-treesitter.configs'.setup {
+    ensure_installed = { 'bash', 'c', 'cmake', 'cpp', 'haskell', 'json',
+                         'python', 'r', 'rust', 'toml', 'vim', 'yaml' },
+    highlight = {
+      enable = true,
+      disable = { 'haskell' },
+      additional_vim_regex_highlighting = true,
+    },
+    incremental_selection = {
+      enable = true,
+      keymaps = {
+        init_selection = "sn",
+        node_incremental = "n",
+        scope_incremental = "N",
+        node_decremental = "m",
+      }
+    }
+  }
+EOF
 " }}}
 
 
