@@ -55,6 +55,7 @@ Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'psliwka/vim-smoothie'
 Plug 'bogado/file-line'
+Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'mechatroner/rainbow_csv'
@@ -476,13 +477,15 @@ filetype plugin indent on
 set spelllang=ru_ru,en_us
 
 " set sensible textwidth for tex, rst and pandoc files
-autocmd FileType tex,rst,pandoc set textwidth=80 | set colorcolumn=81
+autocmd FileType tex,rst,pandoc setlocal textwidth=80 colorcolumn=81
+" set appropriate conceallevel for tex files
+autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
-autocmd FileType pandoc set nocindent
+autocmd FileType pandoc setlocal nocindent
 
 " disable autocommenting lines following a commented line
 autocmd FileType c,cpp
-            \ set comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,f://
+            \ setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,f://
 
 set wildmenu
 set wildmode=list:longest,full
@@ -783,10 +786,12 @@ nmap <silent> ,m :if &colorcolumn == g:RightBorder + 1 <Bar>
 " different value of 'textwidth'
 autocmd BufEnter * let g:RightBorder = &textwidth > 0 ? &textwidth : 80 |
             \ let g:RightAlign_RightBorder = g:RightBorder |
-            \ if &colorcolumn | exe "set colorcolumn=".(g:RightBorder + 1) |
+            \ if &colorcolumn |
+            \ exe "setlocal colorcolumn=".(g:RightBorder + 1) |
             \ endif
 " show colorcolumn when committed to svn, cvs or other VCS
-autocmd FileType svn,cvs exe "set colorcolumn=".(g:RightBorder + 1)
+autocmd FileType svn,cvs,gitcommit,hgcommit
+            \ exe "setlocal colorcolumn=".(g:RightBorder + 1)
 " }}}
 
 
@@ -947,16 +952,23 @@ endif
 lua <<EOF
 local ts_utils = require'nvim-treesitter.ts_utils'
 local parsers = require'nvim-treesitter.parsers'
-local disabled_in = { 'haskell' }
+local disabled_in = { 'haskell', 'vim' }
 local min_node_size = 21
 
 require'nvim_context_vt'.setup({
     custom_text_handler = function (node)
         local parser_lang = parsers.get_buf_lang()
-        for _, lang in ipairs(disabled_in) do
-            if parser_lang == lang then
-                return nil
+        if vim.b.context_vt_disabled == nil then
+            for _, lang in ipairs(disabled_in) do
+                if parser_lang == lang then
+                    vim.b.context_vt_disabled = 1
+                    return nil
+                end
+                vim.b.context_vt_disabled = 0
             end
+        end
+        if vim.b.context_vt_disabled == 1 then
+            return nil
         end
         local start_line, _, end_line, _ = ts_utils.get_node_range(node)
         if not (node:type() == 'function_definition')
@@ -974,7 +986,7 @@ require'nvim_context_vt'.setup({
                             ts_utils.get_node_range(c)
                     local lines = start_line_decl - start_line
                     for i = 1, lines do
-                        text = text .. vim.g['ContextNewlineMarker']
+                        text = text .. vim.g.ContextNewlineMarker
                                 .. ts_utils.get_node_text(node)[i + 1]
                     end
                     break
@@ -982,11 +994,11 @@ require'nvim_context_vt'.setup({
             end
         else
             if not string.match(text, '%S+%s+') then
-                text = text .. vim.g['ContextNewlineMarker']
+                text = text .. vim.g.ContextNewlineMarker
                         .. ts_utils.get_node_text(node)[2]
             end
         end
-        return vim.g['ContextTrailingMarker'] .. text
+        return vim.g.ContextTrailingMarker .. text
     end
 })
 EOF
