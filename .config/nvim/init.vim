@@ -373,8 +373,11 @@ autocmd BufEnter * if empty(&buftype) | setlocal buflisted | endif
 let g:JumpToLastChangeOnBufOpen = 1
 
 autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen 
-autocmd BufReadPost * if empty(&buftype) && !b:start_jump_done |
-            \ silent! normal! `. | let b:start_jump_done = 1 | endif
+autocmd BufWinEnter *
+            \ if empty(&buftype) && exists('b:start_jump_done') &&
+                \ !b:start_jump_done |
+            \ silent! exe 'normal! `.zvzz' | let b:start_jump_done = 1 |
+            \ endif
 
 fun! <SID>wintoggle_cmd(cmd, bufname)
     let status = bufwinnr(a:bufname)
