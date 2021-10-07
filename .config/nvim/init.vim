@@ -527,6 +527,12 @@ set wildmode=list:longest,full
 imap <C-v>ё  <C-v>u0301
 
 autocmd BufRead *.csv setlocal nomodeline
+
+nmap <silent> ,vv :echo synIDattr(synID(line("."), col("."), 1), "name")<CR>
+nmap <silent> ,vf :GetFgColorUnderCursor<CR>
+nmap <silent> ,vb :GetBgColorUnderCursor<CR>
+nmap <silent> ,vt :TSPlaygroundToggle<CR>
+nmap <silent> ,vc :TSHighlightCapturesUnderCursor<CR>
 " }}}
 
 
@@ -979,30 +985,9 @@ let g:context_filetype_blacklist = ['lsputil_locations_list']
 
 lua <<EOF
 require'treesitter-context'.setup{
-    enable = false,
+    enable = true,
     throttle = true,
-    max_lines = 0,
-    patterns = {
-        -- For all filetypes
-        -- Note that setting an entry here replaces all other patterns for this entry.
-        -- By setting the 'default' entry below, you can control which nodes you want to
-        -- appear in the context window.
-        default = {
-            'class',
-            'function',
-            'method',
-            -- 'for', -- These won't appear in the context
-            -- 'while',
-            -- 'if',
-            -- 'switch',
-            -- 'case',
-        },
-        -- Example for a specific filetype.
-        -- If a pattern is missing, *open a PR* so everyone can benefit.
-        --   rust = {
-        --       'impl_item',
-        --   },
-    },
+    max_lines = 0
 }
 EOF
 
@@ -1019,6 +1004,22 @@ local ts_utils = require'nvim-treesitter.ts_utils'
 local parsers = require'nvim-treesitter.parsers'
 local disabled_in = { 'haskell', 'vim' }
 local min_node_size = 21
+
+local function find_node(node, type)
+    local children = ts_utils.get_named_children(node)
+    for _, child in ipairs(children) do
+        if child:type() == type then
+            return child
+        end
+    end
+    for _, child in ipairs(children) do
+        local deep_child = find_node(child, type)
+        if deep_child ~= nil then
+            return deep_child
+        end
+    end
+    return nil
+end
 
 require'nvim_context_vt'.setup({
     custom_text_handler = function (node)
@@ -1042,19 +1043,15 @@ require'nvim_context_vt'.setup({
         end
         local text = ts_utils.get_node_text(node)[1]
         if node:type() == 'function_definition' then
-            local children = ts_utils.get_named_children(node)
-            for _, c in ipairs(children) do
-                -- FIXME: a function_declarator may hide deeper, for example,
-                -- inside a pointer_declarator
-                if c:type() == 'function_declarator' then
-                    local start_line_decl, _, _, _ =
-                            ts_utils.get_node_range(c)
+            local decl = find_node(node, 'function_declarator')
+            if decl ~= nil then
+                local start_line_decl, _, _, _ = ts_utils.get_node_range(decl)
+                if start_line_decl ~= nil then
                     local lines = start_line_decl - start_line
                     for i = 1, lines do
                         text = text .. vim.g.ContextNewlineMarker
                                 .. ts_utils.get_node_text(node)[i + 1]
                     end
-                    break
                 end
             end
         else
