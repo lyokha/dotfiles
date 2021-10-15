@@ -134,6 +134,7 @@ set shiftwidth=4
 set shiftround
 set nojoinspaces
 set cindent
+set scrolloff=0
 set cinoptions=:0(0+2s
 set completeopt=menuone,noselect
 set foldlevel=1
@@ -986,7 +987,8 @@ let g:context_filetype_blacklist = ['lsputil_locations_list']
 lua <<EOF
 require'treesitter-context'.setup{
     enable = true,
-    throttle = true,
+    throttle = false,
+    pin = false,
     max_lines = 0
 }
 EOF
