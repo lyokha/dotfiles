@@ -400,14 +400,14 @@ autocmd BufEnter * if empty(&buftype) | setlocal bufhidden=delete | endif
 " this will fix bug with bufhidden=delete mentioned above
 autocmd BufEnter * if empty(&buftype) | setlocal buflisted | endif
 
-" jump to the last change on opening a buffer
+" jump to the last known cursor position on opening a buffer
 let g:JumpToLastChangeOnBufOpen = 1
 
 autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen 
-autocmd BufWinEnter *
+autocmd BufReadPost *
             \ if empty(&buftype) && exists('b:start_jump_done') &&
                 \ !b:start_jump_done |
-            \ silent! exe 'normal! `.zvzz' | let b:start_jump_done = 1 |
+            \ silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
             \ endif
 
 fun! <SID>wintoggle_cmd(cmd, bufname)
