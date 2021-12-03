@@ -882,7 +882,7 @@ endfun
 " automatically open tagbar on vim's start or a new tab is open if filetype
 " of the open file is supported by ctags and tagbar (not in diff mode);
 " BufWritePost shall trigger tagbar opening on the first write to a new file
-autocmd FileType,BufWritePost * nested
+autocmd FileType,BufWritePost *
             \ if !<SID>vimdiff_mode() | call <SID>open_tagbar() | endif
 
 " setting specific ambiwidth prevents from printing garbage in the first two
