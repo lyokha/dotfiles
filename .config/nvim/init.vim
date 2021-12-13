@@ -25,13 +25,17 @@ Plug 'franbach/miramare'
 Plug 'neovim/nvim-lspconfig'
 Plug 'RishabhRD/popfix'
 Plug 'RishabhRD/nvim-lsputils'
-Plug 'hrsh7th/nvim-compe'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/nvim-cmp'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'cohama/lexima.vim'
 Plug 'machakann/vim-sandwich'
 Plug 'kshenoy/vim-signature'
 Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
+Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 Plug 'simrat39/symbols-outline.nvim'
@@ -47,7 +51,12 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+if has('nvim-0.6')
+    Plug 'nvim-telescope/telescope.nvim'
+else
+    " newer commits of telescope require Neovim 0.6
+    Plug 'nvim-telescope/telescope.nvim', { 'commit': '80cdb00b' }
+endif
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 Plug 'airblade/vim-gitgutter'
@@ -136,7 +145,7 @@ set nojoinspaces
 set cindent
 set scrolloff=0
 set cinoptions=:0(0+2s
-set completeopt=menuone,noselect
+set completeopt=menu,menuone,noselect
 set foldlevel=1
 
 set mouse=a
@@ -216,12 +225,16 @@ lua <<EOF
     buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   end
 
+  local capabilities = require'cmp_nvim_lsp'.
+    update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
   local servers = { "clangd", "hls" }
   for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup {
       on_attach = on_attach,
+      capabilities = capabilities,
       flags = {
         debounce_text_changes = 150,
       }
@@ -339,51 +352,51 @@ EOF
 " }}}
 
 
-" ---- Completion with compe, lexima and ultisnips settings {{{1
+" ---- Completion with cmp, lexima and ultisnips settings {{{1
 " ----
-let g:compe = {}
-let g:compe.enabled = v:true
-let g:compe.autocomplete = v:true
-let g:compe.debug = v:false
-let g:compe.min_length = 1
-let g:compe.preselect = 'enable'
-let g:compe.throttle_time = 80
-let g:compe.source_timeout = 200
-let g:compe.resolve_timeout = 800
-let g:compe.incomplete_delay = 400
-let g:compe.max_abbr_width = 100
-let g:compe.max_kind_width = 100
-let g:compe.max_menu_width = 100
-let g:compe.documentation = v:true
+lua <<EOF
+  local cmp = require'cmp'
+  local lspkind = require'lspkind'
 
-" for Cyrillic completion
-" (see https://github.com/hrsh7th/nvim-compe/issues/167)
-let g:compe.default_pattern = '\k\+'
-
-let g:compe.source = {}
-let g:compe.source.path = v:true
-let g:compe.source.buffer = v:true
-let g:compe.source.calc = v:true
-let g:compe.source.nvim_lsp = v:true
-let g:compe.source.nvim_lua = v:true
-let g:compe.source.vsnip = v:false
-let g:compe.source.ultisnips = v:true
-let g:compe.source.luasnip = v:false
-let g:compe.source.emoji = v:false
-let g:compe.source.tags = v:false
-
-let g:lexima_no_default_rules = v:true
-call lexima#set_default_rules()
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        vim.fn["UltiSnips#Anon"](args.body)
+      end,
+    },
+    mapping = {
+      ['<C-up>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-down>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+      ['<C-space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable,
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'ultisnips' },
+    },
+    {
+      { name = 'buffer', option = { keyword_pattern = [[\k\+]] } }
+    }),
+    formatting = {
+      format = lspkind.cmp_format()
+    },
+    documentation = {
+      border = 'rounded'
+    },
+    experimental = {
+      ghost_text = false
+    }
+  })
+EOF
 
 " lexima breaks some Cyrillic inputs (such as Э, э, etc.)
 autocmd FileType tex,rst,pandoc let b:lexima_disabled = 1
             \ | call lexima#clear_rules()
-
-inoremap <silent><expr> <C-Space> compe#complete()
-inoremap <silent><expr> <CR>      compe#confirm(lexima#expand('<LT>CR>', 'i'))
-inoremap <silent><expr> <C-e>     compe#close('<C-e>')
-inoremap <silent><expr> <C-down>  compe#scroll({ 'delta': +4 })
-inoremap <silent><expr> <C-up>    compe#scroll({ 'delta': -4 })
 
 let g:UltiSnipsJumpForwardTrigger="<Tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
@@ -1052,14 +1065,20 @@ require'nvim_context_vt'.setup({
                     local lines = start_line_decl - start_line
                     for i = 1, lines do
                         text = text .. vim.g.ContextNewlineMarker
-                                .. ts_utils.get_node_text(node)[i + 1]
+                        local next_node = ts_utils.get_node_text(node)[i + 1]
+                        if next_node ~= nil then
+                            text = text .. next_node
+                        end
                     end
                 end
             end
         else
             if not string.match(text, '%S+%s+') then
                 text = text .. vim.g.ContextNewlineMarker
-                        .. ts_utils.get_node_text(node)[2]
+                local next_node = ts_utils.get_node_text(node)[2]
+                if next_node ~= nil then
+                    text = text .. next_node
+                end
             end
         end
         return vim.g.ContextTrailingMarker .. text
