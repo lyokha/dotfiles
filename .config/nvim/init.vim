@@ -51,12 +51,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
-if has('nvim-0.6')
-    Plug 'nvim-telescope/telescope.nvim'
-else
-    " newer commits of telescope require Neovim 0.6
-    Plug 'nvim-telescope/telescope.nvim', { 'commit': '80cdb00b' }
-endif
+Plug 'nvim-telescope/telescope.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 Plug 'airblade/vim-gitgutter'
@@ -1017,7 +1012,6 @@ endif
 lua <<EOF
 local ts_utils = require'nvim-treesitter.ts_utils'
 local parsers = require'nvim-treesitter.parsers'
-local disabled_in = { 'haskell', 'vim' }
 local min_node_size = 21
 
 local function find_node(node, type)
@@ -1037,20 +1031,8 @@ local function find_node(node, type)
 end
 
 require'nvim_context_vt'.setup({
+    disable_ft = { 'haskell', 'vim' },
     custom_text_handler = function (node)
-        local parser_lang = parsers.get_buf_lang()
-        if vim.b.context_vt_disabled == nil then
-            for _, lang in ipairs(disabled_in) do
-                if parser_lang == lang then
-                    vim.b.context_vt_disabled = 1
-                    return nil
-                end
-                vim.b.context_vt_disabled = 0
-            end
-        end
-        if vim.b.context_vt_disabled == 1 then
-            return nil
-        end
         local start_line, _, end_line, _ = ts_utils.get_node_range(node)
         if not (node:type() == 'function_definition')
                 and end_line - start_line < min_node_size then
