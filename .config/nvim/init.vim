@@ -140,7 +140,7 @@ set nojoinspaces
 set cindent
 set scrolloff=0
 set cinoptions=:0(0+2s
-set completeopt=menu,menuone,noselect
+set completeopt=menu
 set foldlevel=1
 
 set mouse=a
@@ -354,6 +354,9 @@ lua <<EOF
   local lspkind = require'lspkind'
 
   cmp.setup({
+    completion = {
+      completeopt = 'menu,menuone,noselect',
+    },
     snippet = {
       expand = function(args)
         vim.fn["UltiSnips#Anon"](args.body)
@@ -363,12 +366,12 @@ lua <<EOF
       ['<C-up>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
       ['<C-down>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
       ['<C-space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-      ['<C-y>'] = cmp.config.disable,
       ['<C-e>'] = cmp.mapping({
         i = cmp.mapping.abort(),
         c = cmp.mapping.close(),
       }),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+      ['<CR>'] = cmp.mapping.confirm({ select = false }),
+      ['<C-y>'] = cmp.mapping.confirm({ select = true }),
     },
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
@@ -384,7 +387,10 @@ lua <<EOF
       border = 'rounded'
     },
     experimental = {
-      ghost_text = false
+      ghost_text = false,
+      -- use native_menu to minimize effect of
+      -- https://github.com/hrsh7th/nvim-cmp/issues/328
+      native_menu = true
     }
   })
 EOF
