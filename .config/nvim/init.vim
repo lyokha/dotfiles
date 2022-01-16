@@ -210,9 +210,9 @@ lua <<EOF
     buf_set_keymap('n', 'gc', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     buf_set_keymap('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    buf_set_keymap('n', ',e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev({ popup_opts = { border = "rounded" }})<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next({ popup_opts = { border = "rounded" }})<CR>', opts)
+    buf_set_keymap('n', ',e', '<cmd>lua vim.diagnostic.open_float({ border = "rounded" })<CR>', opts)
+    buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({ float = { border = "rounded" }})<CR>', opts)
+    buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next({ float = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
     buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
     buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
@@ -259,7 +259,7 @@ lua <<EOF
       symbol_blacklist = {}
   }
 
-    -- LSP Enable diagnostics
+  -- LSP Enable diagnostics
   vim.lsp.handlers["textDocument/publishDiagnostics"] =
       vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
           virtual_text = false,
@@ -275,18 +275,7 @@ lua <<EOF
       vim.lsp.handlers[method] = function(err, method, result, client_id,
                                           bufnr, config)
           default_handler(err, method, result, client_id, bufnr, config)
-          local diagnostics = vim.lsp.diagnostic.get_all()
-          local qflist = {}
-          for bufnr, diagnostic in pairs(diagnostics) do
-              for _, d in ipairs(diagnostic) do
-                  d.bufnr = bufnr
-                  d.lnum = d.range.start.line + 1
-                  d.col = d.range.start.character + 1
-                  d.text = d.message
-                  table.insert(qflist, d)
-              end
-          end
-          vim.lsp.util.set_qflist(qflist)
+          vim.diagnostic.setqflist({ open = false })
       end
   end
 
@@ -306,43 +295,14 @@ lua <<EOF
     }
   )
 
-  if vim.fn.has('nvim-0.5.1') == 1 then
-    vim.lsp.handlers['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
-    vim.lsp.handlers['textDocument/references'] = require'lsputil.locations'.references_handler
-    vim.lsp.handlers['textDocument/definition'] = require'lsputil.locations'.definition_handler
-    vim.lsp.handlers['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
-    vim.lsp.handlers['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
-    vim.lsp.handlers['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
-    vim.lsp.handlers['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
-    vim.lsp.handlers['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
-  else
-    local bufnr = vim.api.nvim_buf_get_number(0)
-
-    vim.lsp.handlers['textDocument/codeAction'] = function(_, _, actions)
-        require('lsputil.codeAction').code_action_handler(nil, actions, nil, nil, nil)
-    end
-    vim.lsp.handlers['textDocument/references'] = function(_, _, result)
-        require('lsputil.locations').references_handler(nil, result, { bufnr = bufnr }, nil)
-    end
-    vim.lsp.handlers['textDocument/definition'] = function(_, method, result)
-        require('lsputil.locations').definition_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-    end
-    vim.lsp.handlers['textDocument/declaration'] = function(_, method, result)
-        require('lsputil.locations').declaration_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-    end
-    vim.lsp.handlers['textDocument/typeDefinition'] = function(_, method, result)
-        require('lsputil.locations').typeDefinition_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-    end
-    vim.lsp.handlers['textDocument/implementation'] = function(_, method, result)
-        require('lsputil.locations').implementation_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-    end
-    vim.lsp.handlers['textDocument/documentSymbol'] = function(_, _, result, _, bufn)
-        require('lsputil.symbols').document_handler(nil, result, { bufnr = bufn }, nil)
-    end
-    vim.lsp.handlers['textDocument/symbol'] = function(_, _, result, _, bufn)
-        require('lsputil.symbols').workspace_handler(nil, result, { bufnr = bufn }, nil)
-    end
- end
+  vim.lsp.handlers['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
+  vim.lsp.handlers['textDocument/references'] = require'lsputil.locations'.references_handler
+  vim.lsp.handlers['textDocument/definition'] = require'lsputil.locations'.definition_handler
+  vim.lsp.handlers['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
+  vim.lsp.handlers['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
+  vim.lsp.handlers['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
+  vim.lsp.handlers['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
+  vim.lsp.handlers['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
 EOF
 " }}}
 
@@ -999,12 +959,12 @@ let g:context_nvim_no_redraw = 1
 let g:context_filetype_blacklist = ['lsputil_locations_list']
 
 lua <<EOF
-require'treesitter-context'.setup{
+  require'treesitter-context'.setup {
     enable = true,
     throttle = false,
     pin = false,
     max_lines = 0
-}
+  }
 EOF
 
 if g:DisableUnicodeSymbols
@@ -1016,62 +976,60 @@ else
 endif
 
 lua <<EOF
-local ts_utils = require'nvim-treesitter.ts_utils'
-local parsers = require'nvim-treesitter.parsers'
-local min_node_size = 21
-
-local function find_node(node, type)
+  local min_node_size = 21
+  
+  local function find_node(node, type, ts_utils)
     local children = ts_utils.get_named_children(node)
     for _, child in ipairs(children) do
-        if child:type() == type then
-            return child
-        end
+      if child:type() == type then
+        return child
+      end
     end
     for _, child in ipairs(children) do
-        local deep_child = find_node(child, type)
-        if deep_child ~= nil then
-            return deep_child
-        end
+      local deep_child = find_node(child, type, ts_utils)
+      if deep_child ~= nil then
+        return deep_child
+      end
     end
     return nil
-end
-
-require'nvim_context_vt'.setup({
+  end
+  
+  require'nvim_context_vt'.setup({
     disable_ft = { 'haskell', 'vim' },
-    custom_text_handler = function (node)
-        local start_line, _, end_line, _ = ts_utils.get_node_range(node)
-        if not (node:type() == 'function_definition')
-                and end_line - start_line < min_node_size then
-            return nil
-        end
-        local text = ts_utils.get_node_text(node)[1]
-        if node:type() == 'function_definition' then
-            local decl = find_node(node, 'function_declarator')
-            if decl ~= nil then
-                local start_line_decl, _, _, _ = ts_utils.get_node_range(decl)
-                if start_line_decl ~= nil then
-                    local lines = start_line_decl - start_line
-                    for i = 1, lines do
-                        text = text .. vim.g.ContextNewlineMarker
-                        local next_node = ts_utils.get_node_text(node)[i + 1]
-                        if next_node ~= nil then
-                            text = text .. next_node
-                        end
-                    end
-                end
+    custom_parser = function(node, _, ts_utils)
+      local start_line, _, end_line, _ = ts_utils.get_node_range(node)
+      if not (node:type() == 'function_definition')
+              and end_line - start_line < min_node_size then
+        return nil
+      end
+      local text = ts_utils.get_node_text(node)[1]
+      if node:type() == 'function_definition' then
+        local decl = find_node(node, 'function_declarator', ts_utils)
+        if decl ~= nil then
+          local start_line_decl, _, _, _ = ts_utils.get_node_range(decl)
+          if start_line_decl ~= nil then
+            local lines = start_line_decl - start_line
+            for i = 1, lines do
+              text = text .. vim.g.ContextNewlineMarker
+              local next_node = ts_utils.get_node_text(node)[i + 1]
+              if next_node ~= nil then
+                text = text .. next_node
+              end
             end
-        else
-            if not string.match(text, '%S+%s+') then
-                text = text .. vim.g.ContextNewlineMarker
-                local next_node = ts_utils.get_node_text(node)[2]
-                if next_node ~= nil then
-                    text = text .. next_node
-                end
-            end
+          end
         end
-        return vim.g.ContextTrailingMarker .. text
+      else
+        if not string.match(text, '%S+%s+') then
+          text = text .. vim.g.ContextNewlineMarker
+          local next_node = ts_utils.get_node_text(node)[2]
+          if next_node ~= nil then
+            text = text .. next_node
+          end
+        end
+      end
+      return vim.g.ContextTrailingMarker .. text
     end
-})
+  })
 EOF
 " }}}
 
