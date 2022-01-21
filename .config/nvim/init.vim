@@ -348,9 +348,7 @@ lua <<EOF
     },
     experimental = {
       ghost_text = false,
-      -- use native_menu to minimize effect of
-      -- https://github.com/hrsh7th/nvim-cmp/issues/328
-      native_menu = true
+      native_menu = false
     }
   })
 EOF
