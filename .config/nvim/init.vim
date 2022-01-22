@@ -331,7 +331,7 @@ lua <<EOF
         c = cmp.mapping.close(),
       }),
       ['<CR>'] = cmp.mapping.confirm({ select = false }),
-      ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+      ['<C-right>'] = cmp.mapping.confirm({ select = true }),
     },
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
