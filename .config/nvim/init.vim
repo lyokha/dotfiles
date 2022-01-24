@@ -307,7 +307,7 @@ EOF
 " }}}
 
 
-" ---- Completion with cmp, lexima and ultisnips settings {{{1
+" ---- Completion with nvim-cmp, lexima and ultisnips settings {{{1
 " ----
 lua <<EOF
   local cmp = require'cmp'
@@ -344,7 +344,8 @@ lua <<EOF
       format = lspkind.cmp_format()
     },
     documentation = {
-      border = 'rounded'
+      border = 'rounded',
+      winhighlight = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder'
     },
     experimental = {
       ghost_text = false,
