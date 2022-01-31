@@ -975,9 +975,10 @@ else
 endif
 
 lua <<EOF
+  local ts_utils = require('nvim-treesitter.ts_utils')
   local min_node_size = 21
   
-  local function find_node(node, type, ts_utils)
+  local function find_node(node, type)
     local children = ts_utils.get_named_children(node)
     for _, child in ipairs(children) do
       if child:type() == type then
@@ -985,7 +986,7 @@ lua <<EOF
       end
     end
     for _, child in ipairs(children) do
-      local deep_child = find_node(child, type, ts_utils)
+      local deep_child = find_node(child, type)
       if deep_child ~= nil then
         return deep_child
       end
@@ -995,7 +996,7 @@ lua <<EOF
   
   require'nvim_context_vt'.setup({
     disable_ft = { 'haskell', 'vim' },
-    custom_parser = function(node, _, ts_utils)
+    custom_parser = function(node, _, _)
       local start_line, _, end_line, _ = ts_utils.get_node_range(node)
       if not (node:type() == 'function_definition')
               and end_line - start_line < min_node_size then
@@ -1003,7 +1004,7 @@ lua <<EOF
       end
       local text = ts_utils.get_node_text(node)[1]
       if node:type() == 'function_definition' then
-        local decl = find_node(node, 'function_declarator', ts_utils)
+        local decl = find_node(node, 'function_declarator')
         if decl ~= nil then
           local start_line_decl, _, _, _ = ts_utils.get_node_range(decl)
           if start_line_decl ~= nil then
