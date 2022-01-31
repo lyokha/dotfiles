@@ -336,8 +336,6 @@ lua <<EOF
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
       { name = 'ultisnips' },
-    },
-    {
       { name = 'buffer', option = { keyword_pattern = [[\k\+]] } }
     }),
     formatting = {
