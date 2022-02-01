@@ -25,6 +25,7 @@ Plug 'franbach/miramare'
 Plug 'neovim/nvim-lspconfig'
 Plug 'RishabhRD/popfix'
 Plug 'RishabhRD/nvim-lsputils'
+Plug 'hood/popui.nvim'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
@@ -184,7 +185,13 @@ EOF
 " ----
 lua <<EOF
   require'lspconfig'.clangd.setup{}
-  require'lspconfig'.hls.setup{}
+  require'lspconfig'.hls.setup{
+    settings = {
+      haskell = {
+        formattingProvider = 'ormolu'
+      }
+    }
+  }
   require'lspkind'.init()
 
   local nvim_lsp = require('lspconfig')
@@ -295,6 +302,8 @@ lua <<EOF
     }
   )
 
+  vim.ui.select = require'popui.ui-overrider'
+
   vim.lsp.handlers['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
   vim.lsp.handlers['textDocument/references'] = require'lsputil.locations'.references_handler
   vim.lsp.handlers['textDocument/definition'] = require'lsputil.locations'.definition_handler
@@ -304,6 +313,8 @@ lua <<EOF
   vim.lsp.handlers['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
   vim.lsp.handlers['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
 EOF
+
+let g:popui_border_style = "rounded"
 " }}}
 
 
@@ -994,7 +1005,7 @@ lua <<EOF
   
   require'nvim_context_vt'.setup({
     disable_ft = { 'haskell', 'vim' },
-    custom_parser = function(node, _, _)
+    custom_parser = function(node)
       local start_line, _, end_line, _ = ts_utils.get_node_range(node)
       if not (node:type() == 'function_definition')
               and end_line - start_line < min_node_size then
