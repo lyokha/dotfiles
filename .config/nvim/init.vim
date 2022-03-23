@@ -1074,7 +1074,8 @@ let g:XkbSwitchSkipFt = [ 'conque_term' ]
 let g:XkbSwitchAssistNKeymap = 1    " for commands r and f
 let g:XkbSwitchAssistSKeymap = 1    " for search lines
 let g:XkbSwitchDynamicKeymap = 1
-let g:XkbSwitchKeymapNames = {'ru' : 'russian-jcukenwin'}
+let g:XkbSwitchKeymapNames =
+            \ {'ru' : 'russian-jcukenwin', 'de' : 'german-qwertz'}
 
 " automatic keyboard layout switching in a simple dictionary in insert mode
 " (may use vimwiki or tablemode engine)
