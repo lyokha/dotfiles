@@ -1077,6 +1077,14 @@ let g:XkbSwitchDynamicKeymap = 1
 let g:XkbSwitchKeymapNames =
             \ {'ru' : 'russian-jcukenwin', 'de' : 'german-qwertz'}
 
+" quickly toggle keyboard layout for f and r commands in normal mode
+" (<C-^> also switches keyboard layout in search mode)
+nmap <silent> <C-^> :if !empty(&keymap) <Bar> if &iminsert == 0 <Bar>
+            \ setlocal iminsert=1 <Bar> echo 'set keymap' &keymap <Bar>
+            \ elseif &iminsert == 1 <Bar>
+            \ setlocal iminsert=0 <Bar> echo 'unset keymap' &keymap <Bar>
+            \ endif <Bar> endif<CR>
+
 " automatic keyboard layout switching in a simple dictionary in insert mode
 " (may use vimwiki or tablemode engine)
 let g:mdictImpl = 'tablemode'
