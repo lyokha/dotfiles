@@ -300,7 +300,7 @@ lua <<EOF
       border = "rounded"
     }
   )
-  
+
   vim.lsp.handlers["textDocument/signatureHelp"] =
     vim.lsp.with(
     vim.lsp.handlers.signature_help,
@@ -325,7 +325,7 @@ let g:popui_border_style = "rounded"
 " }}}
 
 
-" ---- Completion with nvim-cmp, lexima and ultisnips settings {{{1
+" ---- Completion with nvim-cmp and ultisnips settings {{{1
 " ----
 lua <<EOF
   local cmp = require'cmp'
@@ -370,10 +370,6 @@ lua <<EOF
   })
 EOF
 
-" lexima breaks some Cyrillic inputs (such as Э, э, etc.)
-autocmd FileType tex,rst,pandoc let b:lexima_disabled = 1
-            \ | call lexima#clear_rules()
-
 let g:UltiSnipsJumpForwardTrigger="<Tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 " }}}
@@ -392,7 +388,7 @@ autocmd BufEnter * if empty(&buftype) | setlocal buflisted | endif
 " jump to the last known cursor position on opening a buffer
 let g:JumpToLastChangeOnBufOpen = 1
 
-autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen 
+autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen
 autocmd BufReadPost *
             \ if empty(&buftype) && exists('b:start_jump_done') &&
                 \ !b:start_jump_done |
@@ -993,7 +989,7 @@ endif
 lua <<EOF
   local ts_utils = require('nvim-treesitter.ts_utils')
   local min_node_size = 21
-  
+
   local function find_node(node, type)
     local children = ts_utils.get_named_children(node)
     for _, child in ipairs(children) do
@@ -1009,7 +1005,7 @@ lua <<EOF
     end
     return nil
   end
-  
+
   require'nvim_context_vt'.setup({
     disable_ft = { 'haskell', 'vim' },
     custom_parser = function(node)
@@ -1063,10 +1059,7 @@ let g:XkbSwitchEnabled = 1
 let g:XkbSwitchIMappings = ['ru']
 let g:XkbSwitchNLayout = 'us'
 let g:XkbSwitchILayout = 'us'
-" loading xkbswitch on BufRead when bufhidden=delete will clash xkbswitch
-" function imappings_load() and plugin EnhancedJumps as soon as both will do
-" redir simultaneously!
-let g:XkbSwitchLoadOnBufRead = 0
+let g:XkbSwitchLoadOnBufRead = 1
 let g:XkbSwitchSkipIMappings =
             \ {'c'   : ['.', '>', ':', '{<CR>', '/*', '/*<CR>'],
             \  'cpp' : ['.', '>', ':', '{<CR>', '/*', '/*<CR>']}
@@ -1076,14 +1069,16 @@ let g:XkbSwitchAssistSKeymap = 1    " for search lines
 let g:XkbSwitchDynamicKeymap = 1
 let g:XkbSwitchKeymapNames =
             \ {'ru' : 'russian-jcukenwin', 'de' : 'german-qwertz'}
-
 " quickly toggle keyboard layout for f and r commands in normal mode
 " (<C-^> also switches keyboard layout in search mode)
-nmap <silent> <C-^> :if !empty(&keymap) <Bar> if &iminsert == 0 <Bar>
-            \ setlocal iminsert=1 <Bar> echo 'set keymap' &keymap <Bar>
-            \ elseif &iminsert == 1 <Bar>
-            \ setlocal iminsert=0 <Bar> echo 'unset keymap' &keymap <Bar>
-            \ endif <Bar> endif<CR>
+let g:XkbSwitchIminsertToggleKey = '<C-^>'
+
+" lexima breaks some Cyrillic inputs (such as Э, э, etc.)
+" (however, this won't happen if g:XkbSwitchLoadOnBufRead is set)
+if !g:XkbSwitchLoadOnBufRead
+    autocmd FileType tex,rst,pandoc let b:lexima_disabled = 1
+                \ | call lexima#clear_rules()
+endif
 
 " automatic keyboard layout switching in a simple dictionary in insert mode
 " (may use vimwiki or tablemode engine)
