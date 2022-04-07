@@ -567,6 +567,7 @@ autocmd BufNewFile * call <SID>file_line(expand('<afile>'))
 " ----
 let g:airline_powerline_fonts = 1
 let g:airline_theme = 'gruvbox_material'
+let g:airline_detect_iminsert = 1
 let g:airline#extensions#xkblayout#enabled = 0
 let g:airline#extensions#tagbar#flags = 'f'
 
@@ -1072,6 +1073,7 @@ let g:XkbSwitchKeymapNames =
 " quickly toggle keyboard layout for f and r commands in normal mode
 " (<C-^> also switches keyboard layout in search mode)
 let g:XkbSwitchIminsertToggleKey = '<C-^>'
+let g:XkbSwitchIminsertToggleEcho = 0
 
 " lexima breaks some Cyrillic inputs (such as Э, э, etc.)
 " (however, this won't happen if g:XkbSwitchLoadOnBufRead is set)
