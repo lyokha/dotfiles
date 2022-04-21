@@ -333,24 +333,21 @@ lua <<EOF
 
   cmp.setup({
     completion = {
-      completeopt = 'menu,menuone,noselect',
+      completeopt = 'menu,menuone,noselect'
     },
     snippet = {
       expand = function(args)
         vim.fn["UltiSnips#Anon"](args.body)
-      end,
+      end
     },
-    mapping = {
-      ['<C-up>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-      ['<C-down>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-      ['<C-space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-      ['<C-e>'] = cmp.mapping({
-        i = cmp.mapping.abort(),
-        c = cmp.mapping.close(),
-      }),
+    mapping = cmp.mapping.preset.insert({
+      ['<C-up>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-down>'] = cmp.mapping.scroll_docs(4),
+      ['<C-space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
       ['<CR>'] = cmp.mapping.confirm({ select = false }),
-      ['<C-right>'] = cmp.mapping.confirm({ select = true }),
-    },
+      ['<C-right>'] = cmp.mapping.confirm({ select = true })
+    }),
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
       { name = 'ultisnips' },
@@ -359,13 +356,14 @@ lua <<EOF
     formatting = {
       format = lspkind.cmp_format()
     },
-    documentation = {
-      border = 'rounded',
-      winhighlight = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder'
+    window = {
+      documentation = cmp.config.window.bordered({
+        border = 'rounded',
+        winhighlight = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder'
+      })
     },
     experimental = {
-      ghost_text = false,
-      native_menu = false
+      ghost_text = false
     }
   })
 EOF
