@@ -37,13 +37,12 @@ Plug 'kshenoy/vim-signature'
 Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 Plug 'nvim-treesitter/playground'
 Plug 'simrat39/symbols-outline.nvim'
 Plug 'RRethy/vim-illuminate'
 Plug 'onsails/lspkind-nvim'
-Plug 'wellle/context.vim'
-Plug 'romgrk/nvim-treesitter-context'
+Plug 'lyokha/nvim-treesitter-context'
 Plug 'haringsrob/nvim_context_vt'
 Plug 'preservim/tagbar'
 Plug 'preservim/nerdtree'
@@ -57,10 +56,11 @@ Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'rhysd/git-messenger.vim'
+Plug 'rhysd/committia.vim'
 Plug 'simnalamburt/vim-mundo'
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
-Plug 'psliwka/vim-smoothie'
+Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
 Plug 'bogado/file-line'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
@@ -530,6 +530,25 @@ let g:git_messenger_popup_content_margins = v:false
 " }}}
 
 
+" ---- Committia settings {{{1
+" ----
+let g:committia_hooks = {}
+
+fun! g:committia_hooks.edit_open(info)
+    setlocal spell
+
+    " If no commit message, start with insert mode
+    if a:info.vcs ==# 'git' && getline(1) ==# ''
+        startinsert
+    endif
+
+    " Scroll the diff window from insert mode
+    imap <buffer><C-down> <Plug>(committia-scroll-diff-down-half)
+    imap <buffer><C-up> <Plug>(committia-scroll-diff-up-half)
+endfun
+" }}}
+
+
 " ---- Emulate file-line plugin for any new file and file autocompletion {{{1
 " ----
 let g:loaded_file_line = 1
@@ -995,7 +1014,8 @@ else
 endif
 
 lua <<EOF
-  local ts_utils = require('nvim-treesitter.ts_utils')
+  local ts_utils = require'nvim-treesitter.ts_utils'
+  local ts_query = require'vim.treesitter.query'
   local min_node_size = 21
 
   local function find_node(node, type)
@@ -1022,7 +1042,11 @@ lua <<EOF
               and end_line - start_line < min_node_size then
         return nil
       end
-      local text = ts_utils.get_node_text(node)[1]
+      local node_text =
+        (vim.version().major == 0 and vim.version().minor < 7)
+          and ts_utils.get_node_text(node, 0)
+          or vim.split(ts_query.get_node_text(node, 0), '\n')
+      local text = node_text[1]
       if node:type() == 'function_definition' then
         local decl = find_node(node, 'function_declarator')
         if decl ~= nil then
@@ -1031,7 +1055,7 @@ lua <<EOF
             local lines = start_line_decl - start_line
             for i = 1, lines do
               text = text .. vim.g.ContextNewlineMarker
-              local next_node = ts_utils.get_node_text(node)[i + 1]
+              local next_node = node_text[i + 1]
               if next_node ~= nil then
                 text = text .. next_node
               end
@@ -1041,7 +1065,7 @@ lua <<EOF
       else
         if not string.match(text, '%S+%s+') then
           text = text .. vim.g.ContextNewlineMarker
-          local next_node = ts_utils.get_node_text(node)[2]
+          local next_node = node_text[2]
           if next_node ~= nil then
             text = text .. next_node
           end
