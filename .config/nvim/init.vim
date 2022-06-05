@@ -549,6 +549,26 @@ endfun
 " }}}
 
 
+" ---- Lexima settings {{{1
+" ----
+call lexima#add_rule({'char': '"', 'at': '\%#"', 'leave': 1, 'priority': 3})
+call lexima#add_rule({'char': '"',
+            \ 'at': '[({[''`]\%#\<\@!\|\>\@<!\%#[)}\]''`]',
+            \ 'input_after': '"', 'priority': 2})
+call lexima#add_rule({'char': '"', 'at': '\%#\S\|\S\%#', 'priority': 1})
+call lexima#add_rule({'char': "'", 'at': '\%#''', 'leave': 1, 'priority': 3})
+call lexima#add_rule({'char': "'",
+            \ 'at': '[({["`]\%#\<\@!\|\>\@<!\%#[)}\]"`]',
+            \ 'input_after': "'", 'priority': 2})
+call lexima#add_rule({'char': "'", 'at': '\%#\S\|\S\%#', 'priority': 1})
+call lexima#add_rule({'char': '`', 'at': '\%#`', 'leave': 1, 'priority': 3})
+call lexima#add_rule({'char': '`',
+            \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
+            \ 'input_after': '`', 'priority': 2})
+call lexima#add_rule({'char': '`', 'at': '\%#\S\|\S\%#', 'priority': 1})
+" }}}
+
+
 " ---- Emulate file-line plugin for any new file and file autocompletion {{{1
 " ----
 let g:loaded_file_line = 1
