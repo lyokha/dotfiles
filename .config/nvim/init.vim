@@ -61,6 +61,7 @@ Plug 'simnalamburt/vim-mundo'
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
+Plug 'danilamihailov/beacon.nvim'
 Plug 'bogado/file-line'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
@@ -228,10 +229,10 @@ lua <<EOF
     buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({ float = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next({ float = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-    buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+    buf_set_keymap('n', ',F', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+    buf_set_keymap('n', ',wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+    buf_set_keymap('n', ',wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+    buf_set_keymap('n', ',wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   end
 
   local capabilities = require'cmp_nvim_lsp'.
@@ -517,6 +518,11 @@ nmap <silent> ,vf :GetFgColorUnderCursor<CR>
 nmap <silent> ,vb :GetBgColorUnderCursor<CR>
 nmap <silent> ,vt :TSPlaygroundToggle<CR>
 nmap <silent> ,vc :TSHighlightCapturesUnderCursor<CR>
+
+" Beacon settings
+let g:beacon_enable = 1
+let g:beacon_show_jumps = 0
+nmap <silent> <space> :Beacon<CR>
 " }}}
 
 
