@@ -557,21 +557,13 @@ endfun
 
 " ---- Lexima settings {{{1
 " ----
-call lexima#add_rule({'char': '"', 'at': '\%#"', 'leave': 1, 'priority': 3})
-call lexima#add_rule({'char': '"',
-            \ 'at': '[({[''`]\%#\<\@!\|\>\@<!\%#[)}\]''`]',
-            \ 'input_after': '"', 'priority': 2})
-call lexima#add_rule({'char': '"', 'at': '\%#\S\|\S\%#', 'priority': 1})
-call lexima#add_rule({'char': "'", 'at': '\%#''', 'leave': 1, 'priority': 3})
-call lexima#add_rule({'char': "'",
-            \ 'at': '[({["`]\%#\<\@!\|\>\@<!\%#[)}\]"`]',
-            \ 'input_after': "'", 'priority': 2})
-call lexima#add_rule({'char': "'", 'at': '\%#\S\|\S\%#', 'priority': 1})
-call lexima#add_rule({'char': '`', 'at': '\%#`', 'leave': 1, 'priority': 3})
-call lexima#add_rule({'char': '`',
-            \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
-            \ 'input_after': '`', 'priority': 2})
-call lexima#add_rule({'char': '`', 'at': '\%#\S\|\S\%#', 'priority': 1})
+let g:lexima_no_default_rules = 1
+
+" load lexima rules on the first switch to insert mode after autocmd
+" InsertEnter of plugin vim-xkbswitch was done: this is to avoid translating
+" insert mappings with Э, э, etc., which will break normal entering of such
+" characters; to fulfill this, the rules are declared and enabled with
+" autocmd InsertEnter in after/plugin/lexima.vim
 " }}}
 
 
@@ -1131,13 +1123,6 @@ let g:XkbSwitchKeymapNames =
 " (<C-^> also switches keyboard layout in search mode)
 let g:XkbSwitchIminsertToggleKey = '<C-^>'
 let g:XkbSwitchIminsertToggleEcho = 0
-
-" lexima breaks some Cyrillic inputs (such as Э, э, etc.)
-" (however, this won't happen if g:XkbSwitchLoadOnBufRead is set)
-if !g:XkbSwitchLoadOnBufRead
-    autocmd FileType tex,rst,pandoc let b:lexima_disabled = 1
-                \ | call lexima#clear_rules()
-endif
 
 " automatic keyboard layout switching in a simple dictionary in insert mode
 " (may use vimwiki or tablemode engine)
