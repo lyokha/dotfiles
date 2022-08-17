@@ -1,4 +1,5 @@
 fun! <SID>custom_lexima_rules()
+    " quotes
     call lexima#add_rule({'char': '"',
                 \ 'at': '\%#"', 'leave': 1, 'priority': 3})
     call lexima#add_rule({'char': '"',
@@ -17,13 +18,20 @@ fun! <SID>custom_lexima_rules()
                 \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
                 \ 'input_after': '`', 'priority': 2})
     call lexima#add_rule({'char': '`', 'at': '\%#\S\|\S\%#', 'priority': 1})
-    " in Haskell, change $ <-> () is normal and functions do not require ()
+
+    " brackets
     call lexima#add_rule({'char': '(',
                 \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
-                \ 'input_after': ')', 'priority': 2,
-                \ 'filetype': 'haskell'})
-    call lexima#add_rule({'char': '(', 'at': '\%#\S\|\S\%#', 'priority': 1,
-                \ 'filetype': 'haskell'})
+                \ 'input_after': ')', 'priority': 2})
+    call lexima#add_rule({'char': '(', 'at': '\%#\S\|\S\%#', 'priority': 1})
+    call lexima#add_rule({'char': '{',
+                \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
+                \ 'input_after': '}', 'priority': 2})
+    call lexima#add_rule({'char': '{', 'at': '\%#\S\|\S\%#', 'priority': 1})
+    call lexima#add_rule({'char': '[',
+                \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
+                \ 'input_after': ']', 'priority': 2})
+    call lexima#add_rule({'char': '[', 'at': '\%#\S\|\S\%#', 'priority': 1})
 endfun
 
 let s:lexima_loaded = 0
