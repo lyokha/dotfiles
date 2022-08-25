@@ -21,17 +21,17 @@ fun! <SID>custom_lexima_rules()
 
     " brackets
     call lexima#add_rule({'char': '(',
-                \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
+                \ 'at': '[({["'']\%#\<\@!\|\%#[)}\]"'']',
                 \ 'input_after': ')', 'priority': 2})
-    call lexima#add_rule({'char': '(', 'at': '\%#\S\|\S\%#', 'priority': 1})
+    call lexima#add_rule({'char': '(', 'at': '\%#\S', 'priority': 1})
     call lexima#add_rule({'char': '{',
-                \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
+                \ 'at': '[({["'']\%#\<\@!\|\%#[)}\]"'']',
                 \ 'input_after': '}', 'priority': 2})
-    call lexima#add_rule({'char': '{', 'at': '\%#\S\|\S\%#', 'priority': 1})
+    call lexima#add_rule({'char': '{', 'at': '\%#\S', 'priority': 1})
     call lexima#add_rule({'char': '[',
-                \ 'at': '[({["'']\%#\<\@!\|\>\@<!\%#[)}\]"'']',
+                \ 'at': '[({["'']\%#\<\@!\|\%#[)}\]"'']',
                 \ 'input_after': ']', 'priority': 2})
-    call lexima#add_rule({'char': '[', 'at': '\%#\S\|\S\%#', 'priority': 1})
+    call lexima#add_rule({'char': '[', 'at': '\%#\S', 'priority': 1})
 endfun
 
 let s:lexima_loaded = 0
