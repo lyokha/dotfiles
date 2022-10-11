@@ -102,9 +102,9 @@ set termguicolors
 
 " seamless FloatBorder around NormalFloat for gruvbox-material colorscheme
 autocmd ColorScheme *
-            \ highlight FloatBorder
-                \ cterm=NONE ctermbg=237 ctermfg=186
-                \ gui=NONE guibg=#45403d guifg=#d7d787
+            \ highlight FloatBorder term=NONE
+                \ cterm=NONE ctermfg=186 ctermbg=237
+                \ gui=NONE guifg=#d7d787 guibg=#45403d
 
 let g:gruvbox_material_transparent_background = 1
 let g:gruvbox_material_enable_bold = 1
@@ -116,14 +116,16 @@ let g:CustomTSVariableHighlight = 1
 
 if g:CustomTSVariableHighlight
     highlight TSVariable term=NONE
-                \ ctermfg=49 ctermbg=NONE guifg=#00ee9e guibg=NONE
+                \ cterm=NONE ctermfg=49 ctermbg=NONE
+                \ gui=NONE guifg=#00ee9e guibg=NONE
 endif
 
 let g:CustomMatchParenHighlight = 1
 
 if g:CustomMatchParenHighlight
     highlight MatchParen term=NONE
-                \ cterm=NONE guifg=#99ccee guibg=NONE guisp=NONE gui=bold
+                \ cterm=bold ctermfg=110 ctermbg=NONE
+                \ gui=bold guifg=#99ccee guibg=NONE
 endif
 " }}}
 
@@ -863,10 +865,12 @@ augroup END
 " ----
 let g:RightBorder = 80
 highlight FormatHints term=standout
-            \ ctermfg=244 ctermbg=229 guifg=#808080 guibg=#ffffaf
+            \ cterm=NONE ctermfg=244 ctermbg=229
+            \ gui=NONE guifg=#808080 guibg=#ffffaf
 " restore FormatHints after switching to a color scheme that may clear it off
 autocmd ColorScheme * highlight FormatHints term=standout
-            \ ctermfg=244 ctermbg=229 guifg=#808080 guibg=#ffffaf
+            \ cterm=NONE ctermfg=244 ctermbg=229
+            \ gui=NONE guifg=#808080 guibg=#ffffaf
 
 fun! <SID>formathints()
     if !exists("w:m1") || w:m1 == 0
