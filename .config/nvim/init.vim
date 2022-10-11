@@ -112,11 +112,18 @@ let g:gruvbox_material_enable_italic = 1
 
 colorscheme gruvbox-material
 
-let g:CustomTSVariableHighlight = v:true
+let g:CustomTSVariableHighlight = 1
 
 if g:CustomTSVariableHighlight
     highlight TSVariable term=NONE
                 \ ctermfg=49 ctermbg=NONE guifg=#00ee9e guibg=NONE
+endif
+
+let g:CustomMatchParenHighlight = 1
+
+if g:CustomMatchParenHighlight
+    highlight MatchParen term=NONE
+                \ cterm=NONE guifg=#99ccee guibg=NONE guisp=NONE gui=bold
 endif
 " }}}
 
@@ -171,7 +178,7 @@ lua <<EOF
     highlight = {
       enable = true,
       disable = { 'latex', 'markdown' },
-      additional_vim_regex_highlighting = true,
+      additional_vim_regex_highlighting = false,
     },
     incremental_selection = {
       enable = true,
