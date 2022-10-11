@@ -164,11 +164,13 @@ let g:cursorhold_updatetime = 100
 " ----
 lua <<EOF
   require'nvim-treesitter.configs'.setup {
-    ensure_installed = { 'bash', 'c', 'cmake', 'cpp', 'haskell', 'json',
-                         'python', 'r', 'rust', 'toml', 'vim', 'yaml' },
+    ensure_installed = {
+      'bash', 'c', 'cmake', 'cpp', 'haskell', 'json', 'latex', 'lua',
+      'markdown', 'python', 'r', 'rust', 'toml', 'vim', 'yaml'
+    },
     highlight = {
       enable = true,
-      disable = { 'haskell' },
+      disable = { 'latex', 'markdown' },
       additional_vim_regex_highlighting = true,
     },
     incremental_selection = {
@@ -339,19 +341,17 @@ lua <<EOF
 
   vim.lsp.handlers["textDocument/hover"] =
     vim.lsp.with(
-    vim.lsp.handlers.hover,
-    {
-      border = "rounded"
-    }
-  )
+      vim.lsp.handlers.hover,
+      {
+        border = "rounded"
+      })
 
   vim.lsp.handlers["textDocument/signatureHelp"] =
     vim.lsp.with(
-    vim.lsp.handlers.signature_help,
-    {
-      border = "rounded"
-    }
-  )
+      vim.lsp.handlers.signature_help,
+      {
+        border = "rounded"
+      })
 
   vim.ui.select = require'popui.ui-overrider'
 
@@ -1062,7 +1062,21 @@ lua <<EOF
     enable = true,
     throttle = false,
     pin = false,
-    max_lines = 0
+    max_lines = 0,
+    patterns = {
+      haskell = {
+        'adt'
+      },
+      json = {
+        'pair'
+      },
+      rust = {
+        'impl_item', 'struct', 'enum'
+      },
+      yaml = {
+        'block_mapping_pair'
+      }
+    }
   }
 EOF
 
