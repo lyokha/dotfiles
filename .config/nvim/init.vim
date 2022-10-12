@@ -124,8 +124,8 @@ let g:CustomMatchParenHighlight = 1
 
 if g:CustomMatchParenHighlight
     highlight MatchParen term=NONE
-                \ cterm=bold ctermfg=110 ctermbg=NONE
-                \ gui=bold guifg=#99ccee guibg=NONE
+                \ cterm=bold ctermfg=121 ctermbg=NONE
+                \ gui=bold guifg=#99ffcc guibg=NONE
 endif
 " }}}
 
@@ -940,8 +940,9 @@ fun! <SID>vimdiff_mode()
     endif
     " check if vim runs as vimdiff using system command ps
     " (for every new tab though it is not normally necessary)
-    let t:VimdiffMode = split(
-                \ system( "ps -o command= -p " . getpid() ) )[0] =~ 'vimdiff'
+    let cmd = split(system("ps -o command= -p " . getpid()))
+    let t:VimdiffMode = cmd[0] == 'vimdiff' ||
+                \ cmd[0] == 'nvim' && index(cmd, "-d") != -1
     return t:VimdiffMode
 endfun
 
