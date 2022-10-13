@@ -571,6 +571,9 @@ nmap <silent> ,vb :GetBgColorUnderCursor<CR>
 nmap <silent> ,vt :TSPlaygroundToggle<CR>
 nmap <silent> ,vc :TSHighlightCapturesUnderCursor<CR>
 
+let g:NERDSpaceDelims = 1
+let g:NERDDefaultAlign = 'left'
+
 " Beacon settings
 let g:beacon_enable = 1
 let g:beacon_show_jumps = 0
@@ -934,18 +937,6 @@ endif
 " switch to a normal buffer when leaving a tab
 autocmd TabLeave * if &filetype == 'tagbar' | wincmd p | endif
 
-fun! <SID>vimdiff_mode()
-    if exists('t:VimdiffMode')
-        return t:VimdiffMode
-    endif
-    " check if vim runs as vimdiff using system command ps
-    " (for every new tab though it is not normally necessary)
-    let cmd = split(system("ps -o command= -p " . getpid()))
-    let t:VimdiffMode = cmd[0] == 'vimdiff' ||
-                \ cmd[0] == 'nvim' && index(cmd, "-d") != -1
-    return t:VimdiffMode
-endfun
-
 let g:tagbar_win_ft_skip = ['fuf', 'tagbar', 'startify']
 
 fun! <SID>open_tagbar()
@@ -965,10 +956,9 @@ fun! <SID>open_tagbar()
 endfun
 
 " automatically open tagbar on vim's start or a new tab is open if filetype
-" of the open file is supported by ctags and tagbar (not in diff mode);
+" of the open file is supported by ctags and tagbar (if not in diff mode);
 " BufWritePost shall trigger tagbar opening on the first write to a new file
-autocmd FileType,BufWritePost *
-            \ if !<SID>vimdiff_mode() | call <SID>open_tagbar() | endif
+autocmd BufEnter,BufWritePost * if !&diff | call <SID>open_tagbar() | endif
 
 " setting specific ambiwidth prevents from printing garbage in the first two
 " columns on the second row of the screen when tagbar automatically opens on
