@@ -17,6 +17,7 @@ endif
 " ----
 call plug#begin()
 Plug 'ryanoasis/vim-devicons'
+Plug 'kyazdani42/nvim-web-devicons'
 Plug 'glepnir/oceanic-material'
 Plug 'marko-cerovac/material.nvim'
 Plug 'sainnhe/gruvbox-material'
@@ -52,6 +53,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-file-browser.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 Plug 'airblade/vim-gitgutter'
@@ -169,6 +171,14 @@ let g:cursorhold_updatetime = 100
 " }}}
 
 
+" ---- Setup telescope {{{1
+" ----
+lua <<EOF
+  require'telescope'.load_extension 'file_browser'
+EOF
+" }}}
+
+
 " ---- Setup treesitter {{{1
 " ----
 lua <<EOF
@@ -180,7 +190,7 @@ lua <<EOF
     highlight = {
       enable = true,
       disable = { 'latex', 'markdown' },
-      additional_vim_regex_highlighting = false,
+      additional_vim_regex_highlighting = { 'haskell' },
     },
     incremental_selection = {
       enable = true,
@@ -487,10 +497,10 @@ nmap <silent> <C-down>   :wincmd j<CR>
 nmap <silent> ,<left>    :tabp<CR>
 nmap <silent> ,<right>   :tabn<CR>
 nmap <silent> <C-p><C-p> :Telescope find_files<CR>
-nmap <silent> <C-p>b     :Telescope file_browser<CR>
+nmap <silent> <C-p>f     :Telescope file_browser<CR>
 nmap <silent> <C-p>g     :Telescope live_grep<CR>
 nmap <silent> <C-p>s     :Telescope treesitter<CR>
-nmap <silent> <C-p>h     :Telescope help_tags<CR>
+nmap <silent> <C-p>m     :Telescope marks<CR>
 
 " toggle commands for tagbar, mundo, nerdtree and other are also here
 nmap <silent> <C-p>t     :call
@@ -575,8 +585,9 @@ let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
 
 " Beacon settings
-let g:beacon_enable = 1
+let g:beacon_enable = 0
 let g:beacon_show_jumps = 0
+autocmd VimEnter * if !&diff | let g:beacon_enable = 1 | endif
 nmap <silent> <space> :Beacon<CR>
 " }}}
 
@@ -937,16 +948,17 @@ endif
 " switch to a normal buffer when leaving a tab
 autocmd TabLeave * if &filetype == 'tagbar' | wincmd p | endif
 
-let g:tagbar_win_ft_skip = ['fuf', 'tagbar', 'startify']
+let g:tagbar_win_ft_skip = ['tagbar', 'startify']
 
-fun! <SID>open_tagbar()
-    if bufwinnr('__Tagbar__') != -1
+fun! <SID>open_tagbar(buf_enter)
+    if a:buf_enter && exists('b:open_tagbar_done')
         return
     endif
-    if index(g:tagbar_win_ft_skip, &filetype) != -1
-        return
-    endif
-    if exists('t:winhidden') && exists('t:winhidden["__Tagbar__"]')
+    let b:open_tagbar_done = 1
+    if bufwinnr('__Tagbar__') != -1 ||
+                \ &diff ||
+                \ index(g:tagbar_win_ft_skip, &filetype) != -1 ||
+                \ exists('t:winhidden') && exists('t:winhidden["__Tagbar__"]')
         return
     endif
     if empty(&buftype)
@@ -957,8 +969,9 @@ endfun
 
 " automatically open tagbar on vim's start or a new tab is open if filetype
 " of the open file is supported by ctags and tagbar (if not in diff mode);
+autocmd BufEnter * call <SID>open_tagbar(1)
 " BufWritePost shall trigger tagbar opening on the first write to a new file
-autocmd BufEnter,BufWritePost * if !&diff | call <SID>open_tagbar() | endif
+autocmd BufWritePost * call <SID>open_tagbar(0)
 
 " setting specific ambiwidth prevents from printing garbage in the first two
 " columns on the second row of the screen when tagbar automatically opens on
