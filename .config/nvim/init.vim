@@ -104,7 +104,7 @@ set termguicolors
 
 " seamless FloatBorder around NormalFloat for gruvbox-material colorscheme
 autocmd ColorScheme *
-            \ highlight FloatBorder term=NONE
+            \ highlight FloatBorder
                 \ cterm=NONE ctermfg=186 ctermbg=237
                 \ gui=NONE guifg=#d7d787 guibg=#45403d
 
@@ -114,18 +114,25 @@ let g:gruvbox_material_enable_italic = 1
 
 colorscheme gruvbox-material
 
-let g:CustomTSVariableHighlight = 1
+let g:CustomTSHighlights = 1
 
-if g:CustomTSVariableHighlight
-    highlight TSVariable term=NONE
+if g:CustomTSHighlights
+    highlight TSVariable
                 \ cterm=NONE ctermfg=49 ctermbg=NONE
                 \ gui=NONE guifg=#00ee9e guibg=NONE
+    highlight TSConstant
+                \ cterm=NONE ctermfg=49 ctermbg=NONE
+                \ gui=italic guifg=#00ee9e guibg=NONE
+    highlight TSProperty
+                \ cterm=NONE ctermfg=49 ctermbg=NONE
+                \ gui=NONE guifg=#00d990 guibg=NONE
+    highlight link TSParameter TSVariable
 endif
 
 let g:CustomMatchParenHighlight = 1
 
 if g:CustomMatchParenHighlight
-    highlight MatchParen term=NONE
+    highlight MatchParen
                 \ cterm=bold ctermfg=121 ctermbg=NONE
                 \ gui=bold guifg=#99ffcc guibg=NONE
 endif
