@@ -1138,32 +1138,29 @@ lua <<EOF
               and end_line - start_line < min_node_size then
         return nil
       end
-      local node_text =
-        (vim.version().major == 0 and vim.version().minor < 7)
-          and ts_utils.get_node_text(node, 0)
-          or vim.split(ts_query.get_node_text(node, 0), '\n')
+      local node_text = vim.split(ts_query.get_node_text(node, 0), '\n')
       local text = node_text[1]
       if node:type() == 'function_definition' then
         local decl = find_node(node, 'function_declarator')
         if decl ~= nil then
           local start_line_decl, _, _, _ = ts_utils.get_node_range(decl)
           if start_line_decl ~= nil then
-            local lines = start_line_decl - start_line
-            for i = 1, lines do
+            local offset = start_line_decl - start_line
+            for i = 1, offset do
               text = text .. vim.g.ContextNewlineMarker
               local next_node = node_text[i + 1]
               if next_node ~= nil then
-                text = text .. next_node
+                text = text .. string.gsub(next_node, '^%s+', '')
               end
             end
           end
         end
       else
-        if not string.match(text, '%S+%s+') then
+        if not string.match(text, '%S+%s+') and #node_text > 1 then
           text = text .. vim.g.ContextNewlineMarker
           local next_node = node_text[2]
           if next_node ~= nil then
-            text = text .. next_node
+            text = text .. string.gsub(next_node, '^%s+', '')
           end
         end
       end
