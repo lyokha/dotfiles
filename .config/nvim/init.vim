@@ -192,7 +192,7 @@ lua <<EOF
   require'nvim-treesitter.configs'.setup {
     ensure_installed = {
       'bash', 'c', 'cmake', 'cpp', 'haskell', 'json', 'latex', 'lua',
-      'markdown', 'python', 'r', 'rust', 'toml', 'vim', 'yaml'
+      'markdown', 'perl', 'python', 'r', 'rust', 'toml', 'vim', 'yaml'
     },
     highlight = {
       enable = true,
@@ -216,17 +216,9 @@ EOF
 " ---- Setup language servers and related stuff {{{1
 " ----
 lua <<EOF
-  require'lspconfig'.clangd.setup{}
-  require'lspconfig'.hls.setup{
-    settings = {
-      haskell = {
-        formattingProvider = 'fourmolu'
-      }
-    }
-  }
-  require'lspkind'.init()
-
   local nvim_lsp = require'lspconfig'
+
+  require'lspkind'.init()
 
   -- Use an on_attach function to only map the following keys
   -- after the language server attaches to the current buffer
@@ -244,41 +236,61 @@ lua <<EOF
     -- Use LSP as the handler for formatexpr
     buf_set_option('formatexpr', 'v:lua.vim.lsp.formatexpr()')
 
-    -- Mappings.
+    -- Mappings
     local opts = { noremap = true, silent = true }
 
     -- See `:help vim.lsp.*` for documentation on any of the below functions
-    buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-    buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    buf_set_keymap('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    buf_set_keymap('n', 'gn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    buf_set_keymap('n', 'gc', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-    buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    buf_set_keymap('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    buf_set_keymap('n', ',e', '<cmd>lua vim.diagnostic.open_float({ border = "rounded" })<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({ float = { border = "rounded" }})<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next({ float = { border = "rounded" }})<CR>', opts)
-    buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    buf_set_keymap('n', ',F', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-    buf_set_keymap('n', ',wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', ',wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', ',wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+    buf_set_keymap('n', 'gD',
+                   '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+    buf_set_keymap('n', 'gd',
+                   '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    buf_set_keymap('n', 'gi',
+                   '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+    buf_set_keymap('n', 'gt',
+                   '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+    buf_set_keymap('n', 'gn',
+                   '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+    buf_set_keymap('n', 'gc',
+                   '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+    buf_set_keymap('n', 'gr',
+                   '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+    buf_set_keymap('n', 'gs',
+                   '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+    buf_set_keymap('n', ',e',
+                   '<cmd>lua vim.diagnostic.open_float(' ..
+                     '{ border = "rounded" })<CR>', opts)
+    buf_set_keymap('n', '[d',
+                   '<cmd>lua vim.diagnostic.goto_prev(' ..
+                     '{ float = { border = "rounded" }})<CR>', opts)
+    buf_set_keymap('n', ']d',
+                   '<cmd>lua vim.diagnostic.goto_next(' ..
+                     '{ float = { border = "rounded" }})<CR>', opts)
+    buf_set_keymap('n', 'K',
+                   '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+    buf_set_keymap('n', ',F',
+                   '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', opts)
+    buf_set_keymap('n', ',wa',
+                   '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+    buf_set_keymap('n', ',wr',
+                   '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+    buf_set_keymap('n', ',wl',
+                   '<cmd>lua print(vim.inspect(' ..
+                     'vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   end
 
   local capabilities = require'cmp_nvim_lsp'.default_capabilities()
 
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
-  local servers = { "clangd", "hls" }
+  local servers = { "clangd", "hls", "perlpls", "rust_analyzer" }
   for _, lsp in ipairs(servers) do
-    nvim_lsp[lsp].setup {
+    nvim_lsp[lsp].setup({
       on_attach = on_attach,
       capabilities = capabilities,
       flags = {
         debounce_text_changes = 150,
       }
-    }
+    })
   end
 
   -- symbols-outline.nvim
@@ -380,14 +392,22 @@ lua <<EOF
 
   vim.ui.select = require'popui.ui-overrider'
 
-  vim.lsp.handlers['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
-  vim.lsp.handlers['textDocument/references'] = require'lsputil.locations'.references_handler
-  vim.lsp.handlers['textDocument/definition'] = require'lsputil.locations'.definition_handler
-  vim.lsp.handlers['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
-  vim.lsp.handlers['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
-  vim.lsp.handlers['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
-  vim.lsp.handlers['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
-  vim.lsp.handlers['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
+  vim.lsp.handlers['textDocument/codeAction'] =
+    require'lsputil.codeAction'.code_action_handler
+  vim.lsp.handlers['textDocument/references'] =
+    require'lsputil.locations'.references_handler
+  vim.lsp.handlers['textDocument/definition'] =
+    require'lsputil.locations'.definition_handler
+  vim.lsp.handlers['textDocument/declaration'] =
+    require'lsputil.locations'.declaration_handler
+  vim.lsp.handlers['textDocument/typeDefinition'] =
+    require'lsputil.locations'.typeDefinition_handler
+  vim.lsp.handlers['textDocument/implementation'] =
+    require'lsputil.locations'.implementation_handler
+  vim.lsp.handlers['textDocument/documentSymbol'] =
+    require'lsputil.symbols'.document_handler
+  vim.lsp.handlers['workspace/symbol'] =
+    require'lsputil.symbols'.workspace_handler
 EOF
 
 let g:popui_border_style = "rounded"
