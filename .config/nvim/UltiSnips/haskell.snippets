@@ -1,0 +1,18 @@
+snippet info
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  ${1:`!v substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
+-- Copyright   :  (c) ${2:`git config --get user.user`} ${3:`date '+%Y'`}
+-- License     :  BSD-style
+--
+-- Maintainer  :  ${4:`git config --get user.email`}
+-- Stability   :  ${5:experimental}
+-- Portability :  ${6:portable}
+--
+-- ${7:Description}
+--
+-----------------------------------------------------------------------------
+
+${0}
+endsnippet
+
