@@ -178,6 +178,28 @@ let g:cursorhold_updatetime = 100
 " }}}
 
 
+" ---- System clipboard copy and paste {{{1
+" ----
+if !empty($DISPLAY) && executable('xclip')
+    let g:clipboard = { 'name': 'xclip-preferred',
+                      \ 'copy':
+                      \     {'*': 'xclip -selection primary -r -quiet -i',
+                      \      '+': 'xclip -selection clipboard -r -quiet -i'},
+                      \ 'paste':
+                      \     {'*': 'xclip -selection primary -o',
+                      \      '+': 'xclip -selection clipboard -o'},
+                      \ 'cache_enabled': 1 }
+endif
+
+" easy mappings for the primary (*) and the clipboard (+) selections
+vmap <silent> <C-c> "*y:call setreg('+', getreg('*', 1))<CR>
+nmap <silent> ,i    "*p
+nmap <silent> ,I    "*P
+nmap <silent> ,y    "+p
+nmap <silent> ,Y    "+P
+" }}}
+
+
 " ---- Setup telescope {{{1
 " ----
 lua <<EOF
@@ -1077,18 +1099,6 @@ nmap <C-k>l     :MarkLoad<CR>
 " adjust highlight priorities between plugins Mark and Illuminate
 let g:mwMaxMatchPriority = -10
 let g:Illuminate_highlightPriority = -20
-" }}}
-
-
-" ---- System clipboard copy-paste (copy in visual mode, paste in normal) {{{1
-" ----
-if executable('xclip')
-    vmap <C-c> y
-            \ :call system('xclip -i -selection clipboard', getreg('"'))<CR>
-            \ :call system('xclip -i', getreg('"'))<CR>
-    nmap ,i :call setreg('"', system('xclip -o'))<CR>p
-    nmap ,I :call setreg('"', system('xclip -o'))<CR>P
-endif
 " }}}
 
 
