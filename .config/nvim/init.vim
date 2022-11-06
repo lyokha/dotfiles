@@ -31,6 +31,8 @@ Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/nvim-cmp'
+Plug 'kevinhwang91/promise-async'
+Plug 'kevinhwang91/nvim-ufo'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'cohama/lexima.vim'
 Plug 'machakann/vim-sandwich'
@@ -129,11 +131,23 @@ if g:CustomTSHighlights
     highlight link TSParameter TSVariable
 endif
 
+let g:CustomFoldedHighlights = 1
+
+if g:CustomFoldedHighlights
+    highlight Folded
+                \ cterm=NONE ctermfg=NONE ctermbg=238
+                \ gui=NONE guifg=NONE guibg=#332f2d
+endif
+
+highlight FoldAnno
+            \ cterm=NONE ctermfg=79 ctermbg=NONE
+            \ gui=NONE guifg=#3d8a70 guibg=NONE
+
 let g:CustomMatchParenHighlight = 1
 
 if g:CustomMatchParenHighlight
     highlight MatchParen
-                \ cterm=bold ctermfg=121 ctermbg=NONE
+                \ cterm=bold ctermfg=122 ctermbg=NONE
                 \ gui=bold guifg=#99ffcc guibg=NONE
 endif
 " }}}
@@ -162,7 +176,8 @@ set cindent
 set scrolloff=0
 set cinoptions=:0(0+2s
 set completeopt=menu
-set foldlevel=1
+set foldcolumn=0
+set foldlevelstart=99
 
 set mouse=a
 set hlsearch
@@ -301,6 +316,10 @@ lua <<EOF
   end
 
   local capabilities = require'cmp_nvim_lsp'.default_capabilities()
+  capabilities.textDocument.foldingRange = {
+    dynamicRegistration = false,
+    lineFoldingOnly = true
+  }
 
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
@@ -314,6 +333,89 @@ lua <<EOF
       }
     })
   end
+
+  local ufo_ft_map = {
+    lsp = { 'c', 'cpp', 'haskell', 'rust', 'perl' },
+    disabled = { 'pandoc', 'markdown' }
+  }
+
+  local ufo_virt_text = function(virtText, lnum, endLnum, width, truncate)
+    local newVirtText = {}
+    local suffix = ('  %d '):format(endLnum - lnum)
+    local sufWidth = vim.fn.strdisplaywidth(suffix)
+    local targetWidth = width - sufWidth
+    local curWidth = 0
+    for _, chunk in ipairs(virtText) do
+      local chunkText = chunk[1]
+      local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+      if targetWidth > curWidth + chunkWidth then
+        table.insert(newVirtText, chunk)
+      else
+        chunkText = truncate(chunkText, targetWidth - curWidth)
+        local hlGroup = chunk[2]
+        table.insert(newVirtText, {chunkText, hlGroup})
+        chunkWidth = vim.fn.strdisplaywidth(chunkText)
+        -- str width returned from truncate() may be less than 2nd argument,
+        -- need padding
+        if curWidth + chunkWidth < targetWidth then
+            suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
+        end
+        break
+      end
+      curWidth = curWidth + chunkWidth
+    end
+    table.insert(newVirtText, {suffix, 'FoldAnno'})
+    return newVirtText
+  end
+
+  require'ufo'.setup({
+    provider_selector = function(bufnr, filetype, buftype)
+      if buftype == 'nofile' then
+        return ''
+      end
+      local function contains(tbl, val)
+        for i = 1, #tbl do
+           if tbl[i] == val then 
+              return true
+           end
+        end
+        return false
+      end
+      local ret = ''
+      if contains(ufo_ft_map['disabled'], filetype) then
+        return ''
+      elseif contains(ufo_ft_map['lsp'], filetype) then
+        ret = { 'lsp', 'treesitter' }
+      else
+        ret = { 'treesitter', 'indent' }
+      end
+      vim.opt_local.foldlevel = 99
+      vim.keymap.set('n', 'zR', require'ufo'.openAllFolds,
+                     { buffer = true })
+      vim.keymap.set('n', 'zM', require'ufo'.closeAllFolds,
+                     { buffer = true })
+      vim.keymap.set('n', 'zr', require'ufo'.openFoldsExceptKinds,
+                     { buffer = true })
+      vim.keymap.set('n', 'zm', require'ufo'.closeFoldsWith,
+                     { buffer = true })
+      return ret
+    end,
+    fold_virt_text_handler = ufo_virt_text,
+    close_fold_kinds = { 'comment', 'imports' },
+    preview = {
+        win_config = {
+          border = 'rounded',
+          winhighlight = 'NormalFloat:Folded,FloatBorder:Folded',
+          winblend = 0
+        }
+      }
+  })
+
+  vim.keymap.set('n', 'zK',
+    function()
+      require'ufo'.peekFoldedLinesUnderCursor()
+    end
+  )
 
   -- symbols-outline.nvim
   require("symbols-outline").setup({
@@ -610,6 +712,9 @@ autocmd FileType tex,rst,pandoc setlocal textwidth=80 colorcolumn=81
 autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
 autocmd FileType pandoc setlocal nocindent
+" apply original folds when switching from another buffer
+" (FIXME: it's not clear why folding fails without this)
+autocmd FileType pandoc normal! zx
 
 " disable autocommenting lines following a commented line
 autocmd FileType c,cpp
@@ -762,10 +867,12 @@ autocmd BufWinEnter,VimEnter * if !s:airline_loaded |
 let g:pandoc#modules#disabled = ['menu', 'spell']
 let g:pandoc#syntax#codeblocks#embeds#langs = ['vim', 'tex', 'sh', 'cpp']
 let g:pandoc#formatting#textwidth = 80
+let g:pandoc#folding#mode = 'stacked'
+let g:pandoc#folding#level = 1
 let g:pandoc#folding#fold_fenced_codeblocks = 1
 let g:pandoc#folding#fdc = 0
-let g:pandoc#after#modules#enabled = ["tablemode"]
-let g:pandoc#biblio#sources = "b"
+let g:pandoc#after#modules#enabled = ['tablemode']
+let g:pandoc#biblio#sources = 'b'
 " avoid possible folding mess on very long code blocks
 autocmd FileType pandoc syntax sync minlines=500
 " }}}
@@ -1161,7 +1268,7 @@ lua <<EOF
   end
 
   require'nvim_context_vt'.setup({
-    disable_ft = { 'haskell', 'vim' },
+    disable_ft = { 'haskell', 'vim', 'pandoc', 'markdown' },
     custom_parser = function(node)
       local start_line, _, end_line, _ = ts_utils.get_node_range(node)
       if not (node:type() == 'function_definition')
