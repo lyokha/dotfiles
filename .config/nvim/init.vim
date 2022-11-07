@@ -712,9 +712,9 @@ autocmd FileType tex,rst,pandoc setlocal textwidth=80 colorcolumn=81
 autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
 autocmd FileType pandoc setlocal nocindent
-" apply original folds when switching from another buffer
-" (FIXME: it's not clear why folding fails without this)
-autocmd FileType pandoc normal! zx
+" FIXME: after loading markdown/pandoc files with telescope using the preview
+" window, expected folds won't trigger (probably, this is a bug); to work this
+" around, type zx in normal mode or use autocmd FileType pandoc normal! zx
 
 " disable autocommenting lines following a commented line
 autocmd FileType c,cpp
