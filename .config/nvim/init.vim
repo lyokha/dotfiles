@@ -217,7 +217,25 @@ nmap <silent> ,Y    "+P
 
 " ---- Setup telescope {{{1
 " ----
+
+" after loading markdown/pandoc files with telescope, expected folds won't
+" trigger (see https://github.com/nvim-telescope/telescope.nvim/issues/559);
+" one of proposed workarounds is leaving insert mode before exiting telescope
+
 lua <<EOF
+  require'telescope'.setup {
+    defaults = {
+      mappings = {
+        i = {
+          ["<CR>"] = function()
+            vim.cmd.stopinsert()
+            vim.cmd.call [[feedkeys("\<CR>")]]
+          end
+        }
+      }
+    }
+  }
+
   require'telescope'.load_extension 'file_browser'
 EOF
 " }}}
@@ -712,9 +730,6 @@ autocmd FileType tex,rst,pandoc setlocal textwidth=80 colorcolumn=81
 autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
 autocmd FileType pandoc setlocal nocindent
-" FIXME: after loading markdown/pandoc files with telescope using the preview
-" window, expected folds won't trigger (probably, this is a bug); to work this
-" around, type zx in normal mode or use autocmd FileType pandoc normal! zx
 
 " disable autocommenting lines following a commented line
 autocmd FileType c,cpp
