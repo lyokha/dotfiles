@@ -241,15 +241,13 @@ lua <<EOF
   end
 
   require'telescope'.setup {
-    pickers = {
-      find_files = {
-        mappings = {
-          i = {
-            ["<CR>"]  = function() stopinsert [["\<CR>"]] end,
-            ["<C-x>"] = function() stopinsert [["\<C-x>"]] end,
-            ["<C-v>"] = function() stopinsert [["\<C-v>"]] end,
-            ["<C-t>"] = function() stopinsert [["\<C-t>"]] end
-          }
+    defaults = {
+      mappings = {
+        i = {
+          ["<CR>"]  = function() stopinsert [["\<CR>"]] end,
+          ["<C-x>"] = function() stopinsert [["\<C-x>"]] end,
+          ["<C-v>"] = function() stopinsert [["\<C-v>"]] end,
+          ["<C-t>"] = function() stopinsert [["\<C-t>"]] end
         }
       }
     },
