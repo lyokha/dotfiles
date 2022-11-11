@@ -223,31 +223,35 @@ nmap <silent> ,Y    "+P
 " one of proposed workarounds is leaving insert mode before exiting telescope
 
 lua <<EOF
-  local function stopinsert(keys)
-    vim.cmd.stopinsert()
-    vim.cmd.call('feedkeys(' .. keys .. ')')
-  end
-
-  local function stopinsert_fb(keys, mode, prompt_bufnr)
-    local entry = require'telescope.actions.state'.get_selected_entry()
-    if entry and not entry.Path:is_dir() then
-      stopinsert(keys)
-    elseif mode == 1 then
-      require'telescope.actions'.select_default()
-    elseif mode == 2 then
-      require'telescope'.extensions.file_browser.actions.
-        change_cwd(prompt_bufnr)
+  local function stopinsert(callback)
+    return function(prompt_bufnr)
+      vim.cmd.stopinsert()
+      vim.schedule(function() callback(prompt_bufnr) end)
     end
   end
+
+  local function stopinsert_fb(callback, callback_dir)
+    return function(prompt_bufnr)
+      local entry = require'telescope.actions.state'.get_selected_entry()
+      if entry and not entry.Path:is_dir() then
+        stopinsert(callback)(prompt_bufnr)
+      elseif callback_dir then
+        callback_dir(prompt_bufnr)
+      end
+    end
+  end
+
+  local actions = require'telescope.actions'
+  local actions_fb = require'telescope'.extensions.file_browser.actions
 
   require'telescope'.setup {
     defaults = {
       mappings = {
         i = {
-          ["<CR>"]  = function() stopinsert [["\<CR>"]] end,
-          ["<C-x>"] = function() stopinsert [["\<C-x>"]] end,
-          ["<C-v>"] = function() stopinsert [["\<C-v>"]] end,
-          ["<C-t>"] = function() stopinsert [["\<C-t>"]] end
+          ["<CR>"]  = stopinsert(actions.select_default),
+          ["<C-x>"] = stopinsert(actions.select_horizontal),
+          ["<C-v>"] = stopinsert(actions.select_vertical),
+          ["<C-t>"] = stopinsert(actions.select_tab)
         }
       }
     },
@@ -255,12 +259,12 @@ lua <<EOF
       file_browser = {
         mappings = {
           i = {
-            ["<CR>"]  = function() stopinsert_fb([["\<CR>"]], 1) end,
-            ["<C-x>"] = function() stopinsert_fb([["\<C-x>"]], 0) end,
-            ["<C-v>"] = function() stopinsert_fb([["\<C-v>"]], 0) end,
-            ["<C-t>"] = function(prompt_bufnr)
-              stopinsert_fb([["\<C-t>"]], 2, prompt_bufnr)
-            end
+            ["<CR>"]  = stopinsert_fb(actions.select_default,
+                                      actions.select_default),
+            ["<C-x>"] = stopinsert_fb(actions.select_horizontal),
+            ["<C-v>"] = stopinsert_fb(actions.select_vertical),
+            ["<C-t>"] = stopinsert_fb(actions.select_tab,
+                                      actions_fb.change_cwd)
           }
         }
       }
