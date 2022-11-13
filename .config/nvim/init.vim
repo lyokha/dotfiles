@@ -233,10 +233,12 @@ lua <<EOF
   local function stopinsert_fb(callback, callback_dir)
     return function(prompt_bufnr)
       local entry = require'telescope.actions.state'.get_selected_entry()
-      if entry and not entry.Path:is_dir() then
-        stopinsert(callback)(prompt_bufnr)
-      elseif callback_dir then
-        callback_dir(prompt_bufnr)
+      if entry then
+        if not entry.Path:is_dir() then
+          stopinsert(callback)(prompt_bufnr)
+        elseif callback_dir then
+          callback_dir(prompt_bufnr)
+        end
       end
     end
   end
@@ -1153,6 +1155,8 @@ endif
 " switch to a normal buffer when leaving a tab
 autocmd TabLeave * if &filetype == 'tagbar' | wincmd p | endif
 
+autocmd BufNewFile,BufReadPre *.snippets let b:tagbar_ignore = 1
+
 let g:tagbar_win_ft_skip = ['tagbar', 'startify']
 
 fun! <SID>open_tagbar(buf_enter)
@@ -1371,13 +1375,10 @@ let g:XkbSwitchEnabled = 1
 let g:XkbSwitchIMappings = ['ru']
 let g:XkbSwitchNLayout = 'us'
 let g:XkbSwitchILayout = 'us'
-let g:XkbSwitchLoadOnBufRead = 1
 let g:XkbSwitchSkipIMappings =
             \ {'c'   : ['.', '>', ':', '{<CR>', '/*', '/*<CR>'],
             \  'cpp' : ['.', '>', ':', '{<CR>', '/*', '/*<CR>']}
-let g:XkbSwitchSkipFt = [ 'conque_term' ]
 let g:XkbSwitchAssistNKeymap = 1    " for commands r and f
-let g:XkbSwitchAssistSKeymap = 1    " for search lines
 let g:XkbSwitchDynamicKeymap = 1
 let g:XkbSwitchKeymapNames =
             \ {'ru' : 'russian-jcukenwin', 'de' : 'german-qwertz'}
