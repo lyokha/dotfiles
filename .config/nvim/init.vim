@@ -18,6 +18,7 @@ endif
 call plug#begin()
 Plug 'ryanoasis/vim-devicons'
 Plug 'kyazdani42/nvim-web-devicons'
+Plug 'goolord/alpha-nvim'
 Plug 'glepnir/oceanic-material'
 Plug 'marko-cerovac/material.nvim'
 Plug 'sainnhe/gruvbox-material'
@@ -70,6 +71,7 @@ Plug 'bogado/file-line'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'dpelle/vim-LanguageTool'
 Plug 'mechatroner/rainbow_csv'
 Plug 'derekwyatt/vim-fswitch'
 Plug 'dhruvasagar/vim-table-mode'
@@ -215,6 +217,40 @@ nmap <silent> ,Y    "+P
 " }}}
 
 
+" ---- Setup alpha-nvim {{{1
+" ----
+lua <<EOF
+  local theta = require'alpha.themes.theta'
+  local dashboard = require'alpha.themes.dashboard'
+
+  theta.buttons.val = {
+    { type = "text", val = "Quick links",
+      opts = { hl = "SpecialComment", position = "center" }
+    },
+    { type = "padding", val = 1 },
+    dashboard.button("e", "  New file", "<cmd>enew<CR>"),
+    dashboard.button("CTRL-p p", "  Find file",
+                     "<cmd>Telescope find_files<CR>"),
+    dashboard.button("CTRL-P g", "  Live grep",
+                     "<cmd>Telescope live_grep<CR>"),
+    dashboard.button("c", "  Configuration",
+                     "<cmd>e ~/.config/nvim/init.vim<CR>"),
+    dashboard.button("u", "  Update plugins", "<cmd>PlugUpdate<CR>"),
+    dashboard.button("q", "  Quit", "<cmd>qa<CR>"),
+    { type = "padding", val = 2 },
+    { type = "text", val = "File browser",
+      opts = { hl = "SpecialComment", position = "center" }
+    },
+    { type = "padding", val = 1 },
+    dashboard.button("CTRL-p f", "  File browser",
+                     "<cmd>Telescope file_browser<CR>")
+  }
+
+  require'alpha'.setup(theta.config)
+EOF
+" }}}
+
+
 " ---- Setup telescope {{{1
 " ----
 
@@ -302,6 +338,9 @@ lua <<EOF
     }
   }
 EOF
+
+" note that doxygen highlighting does not work with treesitter
+let g:load_doxygen_syntax = 1
 " }}}
 
 
@@ -789,7 +828,7 @@ nmap <silent> ,vc :TSHighlightCapturesUnderCursor<CR>
 let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
 
-" Beacon settings
+" beacon settings
 let g:beacon_enable = 0
 let g:beacon_show_jumps = 0
 autocmd VimEnter * if !&diff | let g:beacon_enable = 1 | endif
@@ -1157,7 +1196,7 @@ autocmd TabLeave * if &filetype == 'tagbar' | wincmd p | endif
 
 autocmd BufNewFile,BufReadPre *.snippets let b:tagbar_ignore = 1
 
-let g:tagbar_win_ft_skip = ['tagbar', 'startify']
+let g:tagbar_win_ft_skip = ['tagbar', 'alpha']
 
 fun! <SID>open_tagbar(buf_enter)
     if a:buf_enter && exists('b:open_tagbar_done')
@@ -1365,6 +1404,13 @@ EOF
 " ---- Tablemode settings {{{1
 " ----
 let g:table_mode_verbose = 1
+" }}}
+
+
+" ---- LanguageTool settings {{{1
+" ----
+let g:languagetool_jar =
+            \ '/usr/share/LanguageTool/languagetool-commandline.jar'
 " }}}
 
 
