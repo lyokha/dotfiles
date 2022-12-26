@@ -1512,3 +1512,20 @@ imap <silent> <C-g>g      <Plug>AlignWith
 nmap <silent> <C-k>g      :AlignWith<CR>
 " }}}
 
+
+" ---- Settings for plugin publish_helper {{{1
+" ----
+let g:PhHighlightEngine = 'treesitter'
+let g:PhLinenrAsTblColumn = 1
+let g:PhHtmlPreAttrs =
+            \ 'style="white-space: pre-wrap; background: #2E3436; '.
+            \ 'padding: 12px; font-size: 16px"'
+let g:PhLinenrColumnAttrs =
+            \ 'style="font-size: 16px; color: #82766C; background: #2E3436"'
+let g:PhLinenrColumnBorderAttrs = '1px solid'
+let g:PhLinenrColumnWidth = '2.5em'
+let g:PhLinenrFgColor = '#204A87'
+let g:PhLinenrTblBgColor = '#2E3436'
+let g:PhLinenrTblBorderSpacing = '12px'
+" }}}
+
