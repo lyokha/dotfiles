@@ -1433,6 +1433,34 @@ let g:XkbSwitchKeymapNames =
 let g:XkbSwitchIminsertToggleKey = '<C-^>'
 let g:XkbSwitchIminsertToggleEcho = 0
 
+let g:XkbSwitchIEnterHook = 'XkbSwitchIEnterHook'
+
+highlight link BeaconNLayout Cursor
+highlight BeaconOtherLayout guibg=#87ff5f ctermbg=119  " #5f00af is also good
+
+fun! XkbSwitchRevertBeaconHighlight(id)
+    highlight! link Beacon BeaconDefault
+endfun
+
+let g:HighlightIEnterHookNLayout = 1
+
+fun! XkbSwitchIEnterHook(old, new)
+    if &ft == '_mdict_'
+        return
+    endif
+    let nlayout = a:new == g:XkbSwitchNLayout
+    if nlayout && !g:HighlightIEnterHookNLayout
+        return
+    endif
+    let save_beacon_size = g:beacon_size
+    let g:beacon_size = 20
+    let beacon_bg = nlayout ? 'BeaconNLayout' : 'BeaconOtherLayout'
+    exe 'highlight! link Beacon '.beacon_bg
+    Beacon
+    let g:beacon_size = save_beacon_size
+    call timer_start(500, 'XkbSwitchRevertBeaconHighlight')
+endfun
+
 " automatic keyboard layout switching in a simple dictionary in insert mode
 " (may use vimwiki or tablemode engine)
 let g:mdictImpl = 'tablemode'
@@ -1483,6 +1511,7 @@ augroup mdict
         autocmd BufNewFile         *.mdict VimwikiTable 2 2
         autocmd BufNewFile         *.mdict delete | startinsert
     elseif g:mdictImpl == 'tablemode'
+        autocmd BufNewFile,BufRead *.mdict setlocal ft=_mdict_
         autocmd BufNewFile,BufRead *.mdict let g:table_mode_auto_align = 0
         autocmd BufNewFile,BufRead *.mdict TableModeEnable
         autocmd BufNewFile,BufRead *.mdict call <SID>mdict_syntax_load()
