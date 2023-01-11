@@ -24,6 +24,7 @@ Plug 'marko-cerovac/material.nvim'
 Plug 'sainnhe/gruvbox-material'
 Plug 'sainnhe/edge'
 Plug 'franbach/miramare'
+Plug 'fladson/vim-kitty'
 Plug 'neovim/nvim-lspconfig'
 Plug 'RishabhRD/popfix'
 Plug 'RishabhRD/nvim-lsputils'
@@ -160,9 +161,15 @@ endif
 set nocompatible
 
 set ruler
-
 set showcmd
-set title
+
+" setting title glitches in Fedora 37,
+" see https://github.com/neovim/neovim/issues/18573,
+" but it still works in kitty!
+if $TERM == 'xterm-kitty'
+    set title
+    set titlestring=%=%<%f%=%m
+endif
 
 " always show statusline
 set laststatus=2
@@ -1424,7 +1431,7 @@ let g:XkbSwitchILayout = 'us'
 let g:XkbSwitchSkipIMappings =
             \ {'c'   : ['.', '>', ':', '{<CR>', '/*', '/*<CR>'],
             \  'cpp' : ['.', '>', ':', '{<CR>', '/*', '/*<CR>']}
-let g:XkbSwitchAssistNKeymap = 1    " for commands r and f
+let g:XkbSwitchAssistNKeymap = 1    " for commands f and r
 let g:XkbSwitchDynamicKeymap = 1
 let g:XkbSwitchKeymapNames =
             \ {'ru' : 'russian-jcukenwin', 'de' : 'german-qwertz'}
