@@ -60,7 +60,7 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-file-browser.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
-Plug 'airblade/vim-gitgutter'
+Plug 'lewis6991/gitsigns.nvim'
 Plug 'rhysd/git-messenger.vim'
 Plug 'rhysd/committia.vim'
 Plug 'simnalamburt/vim-mundo'
@@ -843,13 +843,78 @@ nmap <silent> <space> :Beacon<CR>
 " }}}
 
 
-" ---- Git-messenger settings {{{1
+" ---- Git-related plugins settings {{{1
 " ----
 let g:git_messenger_no_default_mappings = v:true
 nmap ,g <Plug>(git-messenger)
 
 let g:git_messenger_floating_win_opts = { 'border': 'rounded' }
 let g:git_messenger_popup_content_margins = v:false
+
+nmap <silent> ,ha   :GV<CR>
+nmap <silent> ,hf   :GV!<CR>
+
+lua <<EOF
+  require('gitsigns').setup {
+    signs = {
+      add          = { text = '│' },
+      change       = { text = '│' },
+      delete       = { text = '_' },
+      topdelete    = { text = '‾' },
+      changedelete = { text = '~' },
+      untracked    = { text = '┆' }
+    },
+    attach_to_untracked = false,
+    current_line_blame = false,
+    sign_priority = 6,
+    preview_config = {
+      border = 'rounded',
+      style = 'minimal',
+      relative = 'cursor',
+      row = 0,
+      col = 1
+    },
+    on_attach = function(bufnr)
+      local gs = package.loaded.gitsigns
+
+      local function map(mode, l, r, opts)
+        opts = opts or {}
+        opts.buffer = bufnr
+        vim.keymap.set(mode, l, r, opts)
+      end
+
+      -- Navigation
+      map('n', ']c', function()
+        if vim.wo.diff then return ']c' end
+        vim.schedule(function() gs.next_hunk() end)
+        return '<Ignore>'
+      end, {expr=true})
+
+      map('n', '[c', function()
+        if vim.wo.diff then return '[c' end
+        vim.schedule(function() gs.prev_hunk() end)
+        return '<Ignore>'
+      end, {expr=true})
+
+      -- Actions
+      map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
+      map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+      map('n', '<leader>hS', gs.stage_buffer)
+      map('n', '<leader>hu', gs.undo_stage_hunk)
+      map('n', '<leader>hR', gs.reset_buffer)
+      map('n', '<leader>hp', gs.preview_hunk)
+      map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+      map('n', '<leader>tb', gs.toggle_current_line_blame)
+      map('n', '<leader>hd', gs.diffthis)
+      map('n', '<leader>hD', function() gs.diffthis('~') end)
+      map('n', '<leader>td', gs.toggle_deleted)
+      map('n', '<leader>tw', gs.toggle_word_diff)
+
+      -- Text object
+      map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+    end
+  }
+EOF
 " }}}
 
 
@@ -1141,7 +1206,7 @@ autocmd ColorScheme * highlight FormatHints term=standout
 
 fun! <SID>formathints()
     if !exists("w:m1") || w:m1 == 0
-        let w:m1 = matchadd('FormatHints', '\%>'.g:RightBorder.'v.\+', -1)
+        let w:m1 = matchadd('FormatHints', '\%>'.b:RightBorder.'v.\+', -1)
         let w:m2 = matchadd('FormatHints', '[\t]', -1)
         let w:m3 = matchadd('FormatHints', '[\t \r]\+$', -1)
     endif
@@ -1172,20 +1237,22 @@ nmap <silent> ,f :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
             \ ShowFormatHints <Bar> echo "Show format hints" <Bar> else <Bar>
             \ HideFormatHints <Bar> echo "Hide format hints" <Bar> endif<CR>
 nmap          ,r :HideDosEols<CR>
-nmap <silent> ,m :if &colorcolumn == g:RightBorder + 1 <Bar>
-            \ set colorcolumn= <Bar> elseif !&colorcolumn <Bar>
-            \ exe "set colorcolumn=".(g:RightBorder + 1) <Bar> endif<CR>
+nmap <silent> ,m :if &colorcolumn == b:RightBorder + 1 <Bar>
+            \ setlocal colorcolumn= <Bar> elseif !&colorcolumn <Bar>
+            \ exe "setlocal colorcolumn=".(b:RightBorder + 1) <Bar> endif<CR>
 
 " adjust colorcolumn and g:RightAlign_RightBorder when entering a buffer with
 " different value of 'textwidth'
-autocmd BufEnter * let g:RightBorder = &textwidth > 0 ? &textwidth : 80 |
-            \ let g:RightAlign_RightBorder = g:RightBorder |
-            \ if &colorcolumn |
-            \ exe "setlocal colorcolumn=".(g:RightBorder + 1) |
-            \ endif
-" show colorcolumn when committed to svn, cvs or other VCS
+autocmd BufEnter *
+        \ let b:RightBorder = &textwidth > 0 ? &textwidth : g:RightBorder |
+        \ let g:RightAlign_RightBorder = b:RightBorder |
+        \ if &colorcolumn |
+        \ exe "setlocal colorcolumn=".(b:RightBorder + 1) |
+        \ endif
+
+" show colorcolumn when committing to svn, cvs or other VCS
 autocmd FileType svn,cvs,gitcommit,hgcommit
-            \ exe "setlocal colorcolumn=".(g:RightBorder + 1)
+            \ setlocal textwidth=80 colorcolumn=81
 " }}}
 
 
