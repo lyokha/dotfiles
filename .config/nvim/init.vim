@@ -1437,7 +1437,7 @@ lua <<EOF
   require'nvim_context_vt'.setup({
     disable_ft = { 'haskell', 'vim', 'pandoc', 'markdown' },
     custom_parser = function(node)
-      local start_line, _, end_line, _ = ts_utils.get_node_range(node)
+      local start_line, _, end_line, _ = vim.treesitter.get_node_range(node)
       if not (node:type() == 'function_definition')
               and end_line - start_line < min_node_size then
         return nil
@@ -1447,7 +1447,7 @@ lua <<EOF
       if node:type() == 'function_definition' then
         local decl = find_node(node, 'function_declarator')
         if decl ~= nil then
-          local start_line_decl, _, _, _ = ts_utils.get_node_range(decl)
+          local start_line_decl, _, _, _ = vim.treesitter.get_node_range(decl)
           if start_line_decl ~= nil then
             local offset = start_line_decl - start_line
             for i = 1, offset do
