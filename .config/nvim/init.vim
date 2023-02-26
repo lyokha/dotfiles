@@ -1357,14 +1357,13 @@ let g:haskell_indent_in = 0
 " ---- Better mappings for plugin Mark {{{1
 " ----
 nmap <C-k><C-k> <Plug>MarkSet
-nmap <C-k>n     <Plug>MarkClear
 nmap <C-k>r     <Plug>MarkRegex
 vmap <C-k><C-k> <Plug>MarkSet
 vmap <C-k>r     <Plug>MarkRegex
-nmap <C-k>*     <Plug>MarkSearchCurrentNext
-nmap <C-k>#     <Plug>MarkSearchCurrentPrev
-nmap <C-k>/     <Plug>MarkSearchAnyNext
-nmap <C-k>?     <Plug>MarkSearchAnyPrev
+nmap <C-k>n     <Plug>MarkSearchCurrentNext
+nmap <C-k>p     <Plug>MarkSearchCurrentPrev
+nmap <C-k>]     <Plug>MarkSearchAnyNext
+nmap <C-k>[     <Plug>MarkSearchAnyPrev
 nmap <C-k>c     <Plug>MarkAllClear
 nmap <C-k>t     <Plug>MarkToggle
 nmap <C-k>s     :MarkSave<CR>
