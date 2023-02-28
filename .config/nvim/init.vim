@@ -295,7 +295,7 @@ lua <<EOF
         i = {
           ["<CR>"]  = stopinsert(actions.select_default),
           ["<C-x>"] = stopinsert(actions.select_horizontal),
-          ["<C-v>"] = stopinsert(actions.select_vertical),
+          ["<C-j>"] = stopinsert(actions.select_vertical),
           ["<C-t>"] = stopinsert(actions.select_tab)
         }
       }
@@ -307,7 +307,7 @@ lua <<EOF
             ["<CR>"]  = stopinsert_fb(actions.select_default,
                                       actions.select_default),
             ["<C-x>"] = stopinsert_fb(actions.select_horizontal),
-            ["<C-v>"] = stopinsert_fb(actions.select_vertical),
+            ["<C-j>"] = stopinsert_fb(actions.select_vertical),
             ["<C-t>"] = stopinsert_fb(actions.select_tab,
                                       actions_fb.change_cwd)
           }
@@ -1163,20 +1163,11 @@ let g:gutentags_exclude_filetypes = ['svn', 'cvs', 'gitcommit', 'hgcommit']
 
 " ---- Switching to alternative source code files {{{1
 " ----
-let g:UseFswitchForAlternatives = 1
-
-if g:UseFswitchForAlternatives
-    let loaded_alternateFile = 1
-    nmap ,aa  :FSHere<CR>
-    nmap ,as  :FSSplitAbove<CR>
-    nmap ,av  :FSSplitRight<CR>
-else
-    let g:disable_fswitch = 1
-    nmap ,aa  :A<CR>
-    nmap ,as  :AS<CR>
-    nmap ,av  :AV<CR>
-    nmap ,at  :AT<CR>
-endif
+nmap ,aa  :FSHere<CR>
+nmap ,as  :FSSplitAbove<CR>
+nmap ,ax  :FSSplitAbove<CR>
+nmap ,av  :FSSplitRight<CR>
+nmap ,aj  :FSSplitRight<CR>
 
 " fswitch settings for opening buffers
 augroup fswitch
