@@ -69,6 +69,7 @@ Plug 'inkarkat/vim-mark'
 Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
 Plug 'danilamihailov/beacon.nvim'
 Plug 'bogado/file-line'
+Plug 'uga-rosa/ccc.nvim'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
@@ -831,6 +832,8 @@ nmap <silent> ,vf :GetFgColorUnderCursor<CR>
 nmap <silent> ,vb :GetBgColorUnderCursor<CR>
 nmap <silent> ,vt :TSPlaygroundToggle<CR>
 nmap <silent> ,vc :TSHighlightCapturesUnderCursor<CR>
+nmap <silent> ,vm :CccHighlighterToggle<CR>
+nmap <silent> ,vp :CccPick<CR>
 
 let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
