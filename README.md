@@ -3,7 +3,7 @@ Dotfiles
 
 My personal dotfiles collection.
 
-- `.bashrc.d/prompt.sh` --- bash prompt and window title lines. Files from
+- `.bashrc.d/prompt.sh` &mdash; bash prompt and window title lines. Files from
   directory `.bashrc.d/` are supposed to be sourced from `.bashrc` in a
   for-loop like
 
@@ -16,12 +16,12 @@ My personal dotfiles collection.
   The prompt uses the powerline arrows and requires installation of
   [Nerd fonts](https://github.com/ryanoasis/nerd-fonts).
 
-- `.config/kitty/kitty.conf` --- configuration for
+- `.config/kitty/kitty.conf` &mdash; configuration for
   [kitty](https://github.com/kovidgoyal/kitty) which includes custom fonts and
   tab titles.
 
-- `.config/nvim/` --- configuration files for Neovim.
+- `.config/nvim/` &mdash; configuration files for Neovim.
 
-- `.vimrc.pandoc` --- Vim/Neovim configuration for using with Pandoc filter
+- `.vimrc.pandoc` &mdash; Vim/Neovim configuration for using with Pandoc filter
   [vimhl](https://github.com/lyokha/vim-publish-helper).
 
