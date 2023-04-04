@@ -25,3 +25,7 @@ My personal dotfiles collection.
 - `.vimrc.pandoc` &mdash; Vim/Neovim configuration for using with Pandoc filter
   [vimhl](https://github.com/lyokha/vim-publish-helper).
 
+- `.config/fourmolu.yaml` &mdash; configuration for
+  [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell souce code
+  formatter.
+

@@ -164,13 +164,11 @@ set nocompatible
 set ruler
 set showcmd
 
-" setting title glitches in Fedora 37,
-" see https://github.com/neovim/neovim/issues/18573,
-" but it still works in kitty!
-if $TERM == 'xterm-kitty'
-    set title
-    set titlestring=%=%<%f%=%m
-endif
+" note that setting title causes glitches in terminals using ncurses 6.3,
+" see https://github.com/neovim/neovim/issues/18573
+set title
+set titlestring=\ %<%{pathshorten(expand(\"%\"),1)}\ %m
+set titlelen=0
 
 " always show statusline
 set laststatus=2
@@ -991,6 +989,7 @@ let g:airline_detect_iminsert = 1
 let g:airline#extensions#keymap#enabled = 0
 let g:airline#extensions#xkblayout#enabled = 0
 let g:airline#extensions#tagbar#flags = 'f'
+let g:airline#extensions#tabline#enabled = 0
 
 let g:airline_theme_patch_func = 'AirlineThemePatch'
 
