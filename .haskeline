@@ -1,0 +1,4 @@
+editMode: Emacs
+maxHistorySize: Just 200
+historyDuplicates: IgnoreAll
+

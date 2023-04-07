@@ -1,0 +1,17 @@
+$include /etc/inputrc
+
+set colored-stats On
+set visible-stats On
+set mark-symlinked-directories On
+
+# put in .dir_colors a line such as
+# *readline-colored-completion-prefix 01;38;5;140
+# to set the color of colored-completion-prefix
+set colored-completion-prefix On
+set completion-prefix-display-length 3
+set completion-ignore-case On
+set completion-map-case On
+set skip-completed-text On
+
+set revert-all-at-newline On
+

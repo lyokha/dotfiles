@@ -1,0 +1,4 @@
+:set prompt "\ESC[38;5;208m%s> \ESC[m"
+:set prompt-cont "\ESC[38;5;130m%s| \ESC[m"
+:seti -XOverloadedStrings
+
