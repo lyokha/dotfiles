@@ -367,6 +367,9 @@ lua <<EOF
       vim.api.nvim_buf_set_option(bufnr, ...)
     end
 
+    -- Uncomment the next line to disable LSP semantic tokens highlights
+    -- client.server_capabilities.semanticTokensProvider = nil
+
     -- Use LSP as the handler for omnifunc
     buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
@@ -542,10 +545,10 @@ lua <<EOF
       toggle_preview = "q",
       rename_symbol = "r",
       code_actions = "a",
-      fold = "h",
-      unfold = "l",
-      fold_all = "W",
-      unfold_all = "E",
+      fold = "-",
+      unfold = "+",
+      fold_all = "=",
+      unfold_all = "O",
       fold_reset = "R",
     },
     lsp_blacklist = {},
@@ -1406,8 +1409,8 @@ else
 endif
 
 lua <<EOF
+  local ts = require'vim.treesitter'
   local ts_utils = require'nvim-treesitter.ts_utils'
-  local ts_query = require'vim.treesitter.query'
   local min_node_size = 21
 
   local function find_node(node, type)
@@ -1429,17 +1432,17 @@ lua <<EOF
   require'nvim_context_vt'.setup({
     disable_ft = { 'haskell', 'vim', 'pandoc', 'markdown' },
     custom_parser = function(node)
-      local start_line, _, end_line, _ = vim.treesitter.get_node_range(node)
+      local start_line, _, end_line, _ = ts.get_node_range(node)
       if not (node:type() == 'function_definition')
               and end_line - start_line < min_node_size then
         return nil
       end
-      local node_text = vim.split(ts_query.get_node_text(node, 0), '\n')
+      local node_text = vim.split(ts.get_node_text(node, 0), '\n')
       local text = node_text[1]
       if node:type() == 'function_definition' then
         local decl = find_node(node, 'function_declarator')
         if decl ~= nil then
-          local start_line_decl, _, _, _ = vim.treesitter.get_node_range(decl)
+          local start_line_decl, _, _, _ = ts.get_node_range(decl)
           if start_line_decl ~= nil then
             local offset = start_line_decl - start_line
             for i = 1, offset do

@@ -10,7 +10,7 @@ set mark-symlinked-directories On
 set colored-completion-prefix On
 set completion-prefix-display-length 3
 set completion-ignore-case On
-set completion-map-case On
+set completion-map-case Off
 set skip-completed-text On
 
 set revert-all-at-newline On
