@@ -115,7 +115,7 @@ autocmd ColorScheme *
                 \ gui=NONE guifg=#d7d787 guibg=#45403d
 
 let g:gruvbox_material_transparent_background = 1
-let g:gruvbox_material_enable_bold = 1
+let g:gruvbox_material_enable_bold = 0
 let g:gruvbox_material_enable_italic = 1
 
 colorscheme gruvbox-material
@@ -123,16 +123,21 @@ colorscheme gruvbox-material
 let g:CustomTSHighlights = 1
 
 if g:CustomTSHighlights
+    highlight TSFunction
+                \ cterm=NONE ctermfg=192 ctermbg=NONE
+                \ gui=NONE guifg=#c1d173 guibg=NONE
+    highlight link TSFunctionCall TSFunction
     highlight TSVariable
                 \ cterm=NONE ctermfg=49 ctermbg=NONE
                 \ gui=NONE guifg=#00ee9e guibg=NONE
+    highlight link TSParameter TSVariable
     highlight TSConstant
                 \ cterm=NONE ctermfg=49 ctermbg=NONE
                 \ gui=italic guifg=#00ee9e guibg=NONE
     highlight TSProperty
                 \ cterm=NONE ctermfg=49 ctermbg=NONE
                 \ gui=NONE guifg=#00d990 guibg=NONE
-    highlight link TSParameter TSVariable
+    highlight link TSField TSProperty
 endif
 
 let g:CustomFoldedHighlights = 1
@@ -198,6 +203,9 @@ let mapleader = ','
 let g:netrw_winsize = 25
 
 let g:cursorhold_updatetime = 100
+
+" editorconfig clashes with file_line()
+let g:editorconfig = v:false
 " }}}
 
 
@@ -1411,7 +1419,13 @@ endif
 lua <<EOF
   local ts = require'vim.treesitter'
   local ts_utils = require'nvim-treesitter.ts_utils'
+  local context_vt_utils = require'nvim_context_vt.utils'
   local min_node_size = 21
+
+  local function is_ft_function(node, ft)
+    return ft == 'haskell' and node:type() == 'function'
+        or ft == 'rust' and node:type() == 'function_item'
+  end
 
   local function find_node(node, type)
     local children = ts_utils.get_named_children(node)
@@ -1430,16 +1444,17 @@ lua <<EOF
   end
 
   require'nvim_context_vt'.setup({
-    disable_ft = { 'haskell', 'vim', 'pandoc', 'markdown' },
-    custom_parser = function(node)
+    disable_ft = { 'bash', 'haskell', 'markdown', 'pandoc', 'perl' },
+    custom_parser = function(node, ft)
+      local is_function_definition = node:type() == 'function_definition'
+      local is_function = is_function_definition or is_ft_function(node, ft)
       local start_line, _, end_line, _ = ts.get_node_range(node)
-      if not (node:type() == 'function_definition')
-              and end_line - start_line < min_node_size then
+      if not is_function and end_line - start_line < min_node_size then
         return nil
       end
       local node_text = vim.split(ts.get_node_text(node, 0), '\n')
       local text = node_text[1]
-      if node:type() == 'function_definition' then
+      if is_function_definition then
         local decl = find_node(node, 'function_declarator')
         if decl ~= nil then
           local start_line_decl, _, _, _ = ts.get_node_range(decl)
@@ -1464,6 +1479,12 @@ lua <<EOF
         end
       end
       return vim.g.ContextTrailingMarker .. text
+    end,
+    custom_validator = function(node, ft, opts)
+      if node:type() == 'for_loop' then
+        return true
+      end
+      return context_vt_utils.default_validator(node, ft, opts)
     end
   })
 EOF

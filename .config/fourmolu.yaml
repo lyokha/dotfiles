@@ -1,8 +1,16 @@
 indentation: 4
+column-limit: 80
+function-arrows: leading
 comma-style: leading
-record-brace-space: true
+import-export-style: leading
 indent-wheres: false
-diff-friendly-import-export: true # 'false' uses Ormolu-style lists
-respectful: true # don't be too opinionated about newlines etc.
-haddock-style: single-line # '--' vs. '{-'
-newlines-between-decls: 1 # number of newlines between top-level declarations
+record-brace-space: true
+newlines-between-decls: 1
+haddock-style: single-line
+haddock-style-module:
+let-style: auto
+in-style: right-align
+single-constraint-parens: auto
+unicode: never
+respectful: true
+fixities: []
