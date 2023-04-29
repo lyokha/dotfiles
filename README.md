@@ -29,5 +29,5 @@ My personal dotfiles collection.
   [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
   formatter.
 
-- `.dir_colors` &mdash; configuration for *dircolors* and colored *ls*.
+- `.dir_colors` &mdash; configuration for dircolors and colored ls.
 
