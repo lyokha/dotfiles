@@ -1,0 +1,330 @@
+# Configuration file for dircolors, a utility to help you set the
+# LS_COLORS environment variable used by GNU ls with the --color option.
+
+# Copyright (C) 1996-2022 Free Software Foundation, Inc.
+# Copying and distribution of this file, with or without modification,
+# are permitted provided the copyright notice and this notice are preserved.
+
+# The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
+# slackware version of dircolors) are recognized but ignored.
+
+# Global config options can be specified before TERM or COLORTERM entries
+
+# For compatibility, the pattern "^COLOR.*none" is recognized as a way to
+# disable colorization.  See https://bugzilla.redhat.com/1349579 for details.
+
+# Below are TERM or COLORTERM entries, which can be glob patterns, which
+# restrict following config to systems with matching environment variables.
+
+COLORTERM ?*
+TERM Eterm
+TERM ansi
+TERM *color*
+TERM con[0-9]*x[0-9]*
+TERM cons25
+TERM console
+TERM cygwin
+TERM *direct*
+TERM dtterm
+TERM gnome
+TERM hurd
+TERM jfbterm
+TERM konsole
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mlterm
+TERM putty
+TERM rxvt*
+TERM screen*
+TERM st
+TERM terminator
+TERM tmux*
+TERM vt100
+TERM xterm*
+
+# Below are the color init strings for the basic file types. A color init
+# string consists of one or more of the following numeric codes:
+# Attribute codes:
+# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
+# Text color(8 colors mode) codes:
+# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
+# Background color(8 colors mode) codes:
+# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
+# Text color(256 colors mode) codes:
+# Valid syntax for text 256color is 38;5;<color number> , where color number
+# is number between 0 and 255.
+# You may find following command useful to search the best one for you:
+# for ((x=0; x<=255; x++));do echo -e "${x}:\033[38;5;${x}mcolor\033[000m";done
+# Background color(256 colors mode) codes:
+# Valid syntax for background 256color is 48;5;<color number> , where
+# color number is number between 0 and 255.
+# You may find following command useful to search the best one for you:
+# for ((x=0; x<=255; x++));do echo -e "${x}:\033[48;5;${x}mcolor\033[000m";done
+
+#NORMAL                  00                  # global default, no color code at all
+#FILE                    00                  # regular file, use no color at all
+
+RESET                   0                   # reset to "normal" color
+DIR                     38;5;27             # directory
+LINK                    38;5;51             # symbolic link (If you set this to 'target' instead of a
+                                            # numerical value, the color is as for the file pointed to.)
+MULTIHARDLINK           44;38;5;15          # regular file with more than one link
+FIFO                    40;38;5;11          # pipe
+SOCK                    38;5;13             # socket
+DOOR                    38;5;5              # door
+BLK                     48;5;232;38;5;11    # block device driver
+CHR                     48;5;232;38;5;3     # character device driver
+ORPHAN                  48;5;232;38;5;9     # symlink to nonexistent file, or non-stat'able file
+MISSING                 05;48;5;232;38;5;15 # ... and the files they point to
+SETUID                  48;5;196;38;5;15    # file that is setuid (u+s)
+SETGID                  48;5;11;38;5;16     # file that is setgid (g+s)
+CAPABILITY              48;5;196;38;5;226   # file with capability (very expensive to lookup)
+STICKY_OTHER_WRITABLE   48;5;10;38;5;16     # dir that is sticky and other-writable (+t,o+w)
+OTHER_WRITABLE          48;5;10;38;5;21     # dir that is other-writable (o+w) and not sticky
+STICKY                  48;5;21;38;5;15     # dir with the sticky bit set (+t) and not other-writable
+
+# This is for files with execute permission:
+EXEC                    00;38;5;226
+
+# Readline colored-completion-prefix color:
+*readline-colored-completion-prefix     01;38;5;140
+
+# List any file extensions like '.gz' or '.tar' that you would like ls
+# to colorize below. Put the extension, a space, and the color init string.
+# (and any comments you want to add after a '#')
+
+# If you use DOS-style suffixes, you may want to uncomment the following:
+#.cmd                    00;38;5;226         # executables (bright green)
+#.exe                    00;38;5;226
+#.com                    00;38;5;226
+#.btm                    00;38;5;226
+#.bat                    00;38;5;226
+# Or if you want to color scripts even if they do not have the
+# executable bit actually set.
+#.sh                     00;38;5;226
+#.csh                    00;38;5;226
+
+ #scripts
+.sh                     00;38;5;214
+.csh                    00;38;5;214
+.bash                   00;38;5;214
+.zsh                    00;38;5;214
+.tcl                    00;38;5;214
+.pl                     00;38;5;214
+.pm                     00;38;5;214
+.py                     00;38;5;214
+
+ # archives or compressed (bright red)
+.tar                    00;38;5;160
+.tgz                    00;38;5;160
+.arc                    00;38;5;160
+.arj                    00;38;5;160
+.taz                    00;38;5;160
+.lha                    00;38;5;160
+.lz4                    00;38;5;160
+.lzh                    00;38;5;160
+.lzma                   00;38;5;160
+.tlz                    00;38;5;160
+.txz                    00;38;5;160
+.tzo                    00;38;5;160
+.t7z                    00;38;5;160
+.zip                    00;38;5;160
+.z                      00;38;5;160
+.dz                     00;38;5;160
+.gz                     00;38;5;160
+.lrz                    00;38;5;160
+.lz                     00;38;5;160
+.lzo                    00;38;5;160
+.xz                     00;38;5;160
+.zst                    00;38;5;160
+.tzst                   00;38;5;160
+.bz2                    00;38;5;160
+.bz                     00;38;5;160
+.tbz                    00;38;5;160
+.tbz2                   00;38;5;160
+.tz                     00;38;5;160
+.deb                    00;38;5;160
+.rpm                    00;38;5;160
+.jar                    00;38;5;160
+.war                    00;38;5;160
+.ear                    00;38;5;160
+.sar                    00;38;5;160
+.rar                    00;38;5;160
+.alz                    00;38;5;160
+.ace                    00;38;5;160
+.zoo                    00;38;5;160
+.cpio                   00;38;5;160
+.7z                     00;38;5;160
+.rz                     00;38;5;160
+.cab                    00;38;5;160
+.wim                    00;38;5;160
+.swm                    00;38;5;160
+.dwm                    00;38;5;160
+.esd                    00;38;5;160
+
+ # image formats
+.avif                   00;38;5;198
+.jpg                    00;38;5;198
+.jpeg                   00;38;5;198
+.gif                    00;38;5;198
+.bmp                    00;38;5;198
+.pbm                    00;38;5;198
+.pgm                    00;38;5;198
+.ppm                    00;38;5;198
+.tga                    00;38;5;198
+.xbm                    00;38;5;198
+.xpm                    00;38;5;198
+.tif                    00;38;5;198
+.tiff                   00;38;5;198
+.png                    00;38;5;198
+.svg                    00;38;5;198
+.svgz                   00;38;5;198
+.mng                    00;38;5;198
+.pcx                    00;38;5;198
+.webp                   00;38;5;198
+.xcf                    00;38;5;198
+.xwd                    00;38;5;198
+.cgm                    00;38;5;198
+.emf                    00;38;5;198
+
+ # movie formats
+.mjpg                   00;38;5;199
+.mjpeg                  00;38;5;199
+.mov                    00;38;5;199
+.mpg                    00;38;5;199
+.mpeg                   00;38;5;199
+.m2v                    00;38;5;199
+.mkv                    00;38;5;199
+.webm                   00;38;5;199
+.ogm                    00;38;5;199
+.mp4                    00;38;5;199
+.m4v                    00;38;5;199
+.mp4v                   00;38;5;199
+.vob                    00;38;5;199
+.qt                     00;38;5;199
+.nuv                    00;38;5;199
+.wmv                    00;38;5;199
+.asf                    00;38;5;199
+.rm                     00;38;5;199
+.rmvb                   00;38;5;199
+.flc                    00;38;5;199
+.avi                    00;38;5;199
+.fli                    00;38;5;199
+.flv                    00;38;5;199
+.gl                     00;38;5;199
+.dl                     00;38;5;199
+.yuv                    00;38;5;199
+.ogv                    00;38;5;199
+.ogx                    00;38;5;199
+.m1v                    00;38;5;199
+.divx                   00;38;5;199
+
+ # audio formats
+.aac                    00;38;5;111
+.au                     00;38;5;111
+.flac                   00;38;5;111
+.m4a                    00;38;5;111
+.mid                    00;38;5;111
+.midi                   00;38;5;111
+.mka                    00;38;5;111
+.mp3                    00;38;5;111
+.mpc                    00;38;5;111
+.ogg                    00;38;5;111
+.ra                     00;38;5;111
+.wav                    00;38;5;111
+.oga                    00;38;5;111
+.opus                   00;38;5;111
+.spx                    00;38;5;111
+.xspf                   00;38;5;111
+
+ # backup files
+*~                      00;38;5;244
+*#                      00;38;5;244
+.bak                    00;38;5;244
+.old                    00;38;5;244
+.orig                   00;38;5;244
+.part                   00;38;5;244
+.rej                    00;38;5;244
+.swp                    00;38;5;244
+.tmp                    00;38;5;244
+.dpkg-dist              00;38;5;244
+.dpkg-old               00;38;5;244
+.ucf-dist               00;38;5;244
+.ucf-new                00;38;5;244
+.ucf-old                00;38;5;244
+.rpmnew                 00;38;5;244
+.rpmorig                00;38;5;244
+.rpmsave                00;38;5;244
+
+ # program source files
+.cc                     00;38;5;119
+.cpp                    00;38;5;119
+.cxx                    00;38;5;119
+.c++                    00;38;5;119
+.c                      00;38;5;108
+.f                      00;38;5;108
+.h                      00;38;5;229
+.hh                     00;38;5;229
+.hpp                    00;38;5;229
+.hs                     00;38;5;228
+.rs                     00;38;5;228
+.go                     00;38;5;228
+.r                      00;38;5;228
+.awk                    00;38;5;228
+.vim                    00;38;5;120
+.tex                    00;38;5;120
+.md                     00;38;5;120
+.patch                  00;38;5;28
+.diff                   00;38;5;28
+.make                   00;38;5;230
+.cmake                  00;38;5;230
+*akefile                00;38;5;230
+
+ # compiled object files
+.o                      00;38;5;30
+.pyc                    00;38;5;30
+.class                  00;38;5;30
+.i                      00;38;5;30
+.ii                     00;38;5;30
+.s                      00;38;5;30
+.hi                     00;38;5;30
+.dyn_hi                 00;38;5;30
+.dyn_o                  00;38;5;30
+.d                      00;38;5;30
+.a                      00;38;5;29
+
+ # documents
+.pdf                    00;38;5;217
+.ps                     00;38;5;217
+.ppt                    00;38;5;217
+.pptx                   00;38;5;217
+.rtf                    00;38;5;217
+.doc                    00;38;5;217
+.docx                   00;38;5;217
+.xls                    00;38;5;217
+.xlsx                   00;38;5;217
+.odt                    00;38;5;217
+.ods                    00;38;5;217
+.odp                    00;38;5;217
+.epub                   00;38;5;217
+.dia                    00;38;5;217
+.txt                    00;38;5;150
+.htm                    00;38;5;150
+.html                   00;38;5;150
+.shtml                  00;38;5;150
+.xml                    00;38;5;150
+.csv                    00;38;5;150
+.conf                   00;38;5;150
+.yaml                   00;38;5;150
+.json                   00;38;5;150
+.toml                   00;38;5;150
+.ini                    00;38;5;150
+.cabal                  00;38;5;150
+
+ # logs
+.log                    00;38;5;144
+
+# Subsequent TERM or COLORTERM entries, can be used to add / override
+# config specific to those matching environment variables.
+

@@ -26,6 +26,8 @@ My personal dotfiles collection.
   [vimhl](https://github.com/lyokha/vim-publish-helper).
 
 - `.config/fourmolu.yaml` &mdash; configuration for
-  [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell souce code
+  [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
   formatter.
+
+- `.dir_colors` &mdash; configuration for *dircolors* and colored *ls*.
 
