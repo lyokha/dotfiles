@@ -13,8 +13,12 @@ My personal dotfiles collection.
   done
   ```
 
-  The prompt uses the powerline arrows and requires installation of
+  The prompt uses the Powerline arrows and requires installation of
   [Nerd fonts](https://github.com/ryanoasis/nerd-fonts).
+
+- `.config/fourmolu.yaml` &mdash; configuration for
+  [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
+  formatter.
 
 - `.config/kitty/kitty.conf` &mdash; configuration for
   [kitty](https://github.com/kovidgoyal/kitty) which includes custom fonts and
@@ -22,12 +26,16 @@ My personal dotfiles collection.
 
 - `.config/nvim/` &mdash; configuration files for Neovim.
 
+- `.dir_colors` &mdash; configuration for dircolors and colored ls.
+
+- `.ghci` &mdash; configuration for GHCi, the GHC REPL.
+
+- `.haskeline` &mdash; configuration for
+  [haskeline](https://github.com/judah/haskeline), the Haskell variant of
+  readline which is used in GHCi.
+
+- `.inputrc` &mdash; configuration for readline.
+
 - `.vimrc.pandoc` &mdash; Vim/Neovim configuration for using with Pandoc filter
   [vimhl](https://github.com/lyokha/vim-publish-helper).
-
-- `.config/fourmolu.yaml` &mdash; configuration for
-  [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
-  formatter.
-
-- `.dir_colors` &mdash; configuration for dircolors and colored ls.
 
