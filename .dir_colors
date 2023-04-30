@@ -110,10 +110,6 @@ EXEC                    00;38;5;226
 .csh                    00;38;5;214
 .bash                   00;38;5;214
 .zsh                    00;38;5;214
-.tcl                    00;38;5;214
-.pl                     00;38;5;214
-.pm                     00;38;5;214
-.py                     00;38;5;214
 
  # archives or compressed (bright red)
 .tar                    00;38;5;160
@@ -238,7 +234,7 @@ EXEC                    00;38;5;226
 .spx                    00;38;5;111
 .xspf                   00;38;5;111
 
- # backup files
+ # backup files, logs, locks, tags
 *~                      00;38;5;244
 *#                      00;38;5;244
 .bak                    00;38;5;244
@@ -256,6 +252,9 @@ EXEC                    00;38;5;226
 .rpmnew                 00;38;5;244
 .rpmorig                00;38;5;244
 .rpmsave                00;38;5;244
+.log                    00;38;5;244
+.lock                   00;38;5;244
+*tags                   00;38;5;244
 
  # program source files
 .cc                     00;38;5;119
@@ -268,18 +267,34 @@ EXEC                    00;38;5;226
 .hh                     00;38;5;229
 .hpp                    00;38;5;229
 .hs                     00;38;5;228
+.lhs                    00;38;5;228
+.hsc                    00;38;5;228
 .rs                     00;38;5;228
+.js                     00;38;5;228
 .go                     00;38;5;228
 .r                      00;38;5;228
+.tcl                    00;38;5;228
+.pl                     00;38;5;228
+.pm                     00;38;5;228
+.py                     00;38;5;228
+.rb                     00;38;5;228
+.erb                    00;38;5;228
+.lua                    00;38;5;228
 .awk                    00;38;5;228
 .vim                    00;38;5;120
 .tex                    00;38;5;120
 .md                     00;38;5;120
+.markdown               00;38;5;120
+.rst                    00;38;5;120
 .patch                  00;38;5;28
 .diff                   00;38;5;28
+.in                     00;38;5;230
+.am                     00;38;5;230
+.ac                     00;38;5;230
+.m4                     00;38;5;230
 .make                   00;38;5;230
 .cmake                  00;38;5;230
-*akefile                00;38;5;230
+*makefile               00;38;5;230
 
  # compiled object files
 .o                      00;38;5;30
@@ -292,6 +307,7 @@ EXEC                    00;38;5;226
 .dyn_hi                 00;38;5;30
 .dyn_o                  00;38;5;30
 .d                      00;38;5;30
+.bin                    00;38;5;30
 .a                      00;38;5;29
 
  # documents
@@ -314,16 +330,16 @@ EXEC                    00;38;5;226
 .html                   00;38;5;150
 .shtml                  00;38;5;150
 .xml                    00;38;5;150
+.css                    00;38;5;150
 .csv                    00;38;5;150
 .conf                   00;38;5;150
+.yml                    00;38;5;150
 .yaml                   00;38;5;150
 .json                   00;38;5;150
 .toml                   00;38;5;150
 .ini                    00;38;5;150
 .cabal                  00;38;5;150
-
- # logs
-.log                    00;38;5;144
+.spec                   00;38;5;150
 
 # Subsequent TERM or COLORTERM entries, can be used to add / override
 # config specific to those matching environment variables.
