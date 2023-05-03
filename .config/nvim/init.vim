@@ -237,27 +237,38 @@ lua <<EOF
   local theta = require'alpha.themes.theta'
   local dashboard = require'alpha.themes.dashboard'
 
+  local function adjust_cursor(button, cursor)
+    button["opts"]["cursor"] = cursor
+    return button
+  end
+
   theta.buttons.val = {
     { type = "text", val = "Quick links",
       opts = { hl = "SpecialComment", position = "center" }
     },
     { type = "padding", val = 1 },
-    dashboard.button("e", "  New file", "<cmd>enew<CR>"),
-    dashboard.button("CTRL-p p", "  Find file",
-                     "<cmd>Telescope find_files<CR>"),
-    dashboard.button("CTRL-P g", "  Live grep",
-                     "<cmd>Telescope live_grep<CR>"),
+    adjust_cursor(
+      dashboard.button("e", "󰈔  New file", "<cmd>enew<CR>"), 6),
+    adjust_cursor(
+      dashboard.button("CTRL-p p", "󰈞  Find file",
+                       "<cmd>Telescope find_files<CR>"), 6),
+    adjust_cursor(
+      dashboard.button("CTRL-P g", "󰊄  Live grep",
+                       "<cmd>Telescope live_grep<CR>"), 6),
     dashboard.button("c", "  Configuration",
                      "<cmd>e ~/.config/nvim/init.vim<CR>"),
-    dashboard.button("u", "  Update plugins", "<cmd>PlugUpdate<CR>"),
-    dashboard.button("q", "  Quit", "<cmd>qa<CR>"),
+    adjust_cursor(
+      dashboard.button("u", "󰚰  Update plugins", "<cmd>PlugUpdate<CR>"), 6),
+    adjust_cursor(
+      dashboard.button("q", "󰅚  Quit", "<cmd>qa<CR>"), 6),
     { type = "padding", val = 2 },
     { type = "text", val = "File browser",
       opts = { hl = "SpecialComment", position = "center" }
     },
     { type = "padding", val = 1 },
-    dashboard.button("CTRL-p f", "  File browser",
-                     "<cmd>Telescope file_browser<CR>")
+    adjust_cursor(
+      dashboard.button("CTRL-p f", "󰉓  File browser",
+                       "<cmd>Telescope file_browser<CR>"), 6)
   }
 
   require'alpha'.setup(theta.config)
@@ -452,7 +463,7 @@ lua <<EOF
 
   local ufo_virt_text = function(virtText, lnum, endLnum, width, truncate)
     local newVirtText = {}
-    local suffix = ('  %d '):format(endLnum - lnum)
+    local suffix = (' 󰏢 %d '):format(endLnum - lnum)
     local sufWidth = vim.fn.strdisplaywidth(suffix)
     local targetWidth = width - sufWidth
     local curWidth = 0
@@ -562,24 +573,24 @@ lua <<EOF
     lsp_blacklist = {},
     symbol_blacklist = {},
     symbols = {
-      File = {icon = "", hl = "TSURI"},
-      Module = {icon = "", hl = "TSNamespace"},
-      Namespace = {icon = "", hl = "TSNamespace"},
-      Package = {icon = "", hl = "TSNamespace"},
+      File = {icon = "󰈔", hl = "TSURI"},
+      Module = {icon = "󰆧", hl = "TSNamespace"},
+      Namespace = {icon = "󰅪", hl = "TSNamespace"},
+      Package = {icon = "󰏗", hl = "TSNamespace"},
       Class = {icon = "𝓒", hl = "TSType"},
       Method = {icon = "ƒ", hl = "TSMethod"},
       Property = {icon = "", hl = "TSMethod"},
-      Field = {icon = "", hl = "TSField"},
+      Field = {icon = "󰆨", hl = "TSField"},
       Constructor = {icon = "", hl = "TSConstructor"},
       Enum = {icon = "ℰ", hl = "TSType"},
-      Interface = {icon = "ﰮ", hl = "TSType"},
+      Interface = {icon = "󰜰", hl = "TSType"},
       Function = {icon = "", hl = "TSFunction"},
       Variable = {icon = "", hl = "TSConstant"},
       Constant = {icon = "", hl = "TSConstant"},
       String = {icon = "𝓐", hl = "TSString"},
       Number = {icon = "#", hl = "TSNumber"},
       Boolean = {icon = "⊨", hl = "TSBoolean"},
-      Array = {icon = "", hl = "TSConstant"},
+      Array = {icon = "󰅪", hl = "TSConstant"},
       Object = {icon = "⦿", hl = "TSType"},
       Key = {icon = "🔐", hl = "TSType"},
       Null = {icon = "NULL", hl = "TSType"},
