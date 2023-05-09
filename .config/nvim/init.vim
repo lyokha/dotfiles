@@ -237,38 +237,27 @@ lua <<EOF
   local theta = require'alpha.themes.theta'
   local dashboard = require'alpha.themes.dashboard'
 
-  local function adjust_cursor(button, cursor)
-    button["opts"]["cursor"] = cursor
-    return button
-  end
-
   theta.buttons.val = {
     { type = "text", val = "Quick links",
       opts = { hl = "SpecialComment", position = "center" }
     },
     { type = "padding", val = 1 },
-    adjust_cursor(
-      dashboard.button("e", "󰈔  New file", "<cmd>enew<CR>"), 6),
-    adjust_cursor(
-      dashboard.button("CTRL-p p", "󰈞  Find file",
-                       "<cmd>Telescope find_files<CR>"), 6),
-    adjust_cursor(
-      dashboard.button("CTRL-P g", "󰊄  Live grep",
-                       "<cmd>Telescope live_grep<CR>"), 6),
+    dashboard.button("e", "󰈔  New file", "<cmd>enew<CR>"),
+    dashboard.button("CTRL-p p", "󰈞  Find file",
+                     "<cmd>Telescope find_files<CR>"),
+    dashboard.button("CTRL-P g", "󰊄  Live grep",
+                     "<cmd>Telescope live_grep<CR>"),
     dashboard.button("c", "  Configuration",
                      "<cmd>e ~/.config/nvim/init.vim<CR>"),
-    adjust_cursor(
-      dashboard.button("u", "󰚰  Update plugins", "<cmd>PlugUpdate<CR>"), 6),
-    adjust_cursor(
-      dashboard.button("q", "󰅚  Quit", "<cmd>qa<CR>"), 6),
+    dashboard.button("u", "󰚰  Update plugins", "<cmd>PlugUpdate<CR>"),
+    dashboard.button("q", "󰅚  Quit", "<cmd>qa<CR>"),
     { type = "padding", val = 2 },
     { type = "text", val = "File browser",
       opts = { hl = "SpecialComment", position = "center" }
     },
     { type = "padding", val = 1 },
-    adjust_cursor(
-      dashboard.button("CTRL-p f", "󰉓  File browser",
-                       "<cmd>Telescope file_browser<CR>"), 6)
+    dashboard.button("CTRL-p f", "󰉓  File browser",
+                     "<cmd>Telescope file_browser<CR>")
   }
 
   require'alpha'.setup(theta.config)
