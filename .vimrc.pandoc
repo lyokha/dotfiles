@@ -10,9 +10,9 @@ if has('nvim')
         set runtimepath^=~/.vim runtimepath+=~/.vim/after
         let &packpath=&runtimepath
     else
-        set runtimepath+=~/.config/nvim/plugged/nvim-treesitter
-        set runtimepath+=~/.config/nvim/plugged/gruvbox-material
-        set runtimepath+=~/.config/nvim/plugged/vim-publish-helper
+        set runtimepath+=~/.local/share/nvim/plugged/nvim-treesitter
+        set runtimepath+=~/.local/share/nvim/plugged/gruvbox-material
+        set runtimepath+=~/.local/share/nvim/plugged/vim-publish-helper
         set background=light
         colorscheme gruvbox-material
         let g:VimhlColorschemeWasChosen = 1
