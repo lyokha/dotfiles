@@ -717,7 +717,7 @@ autocmd BufReadPost *
             \ silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
             \ endif
 
-fun! <SID>wintoggle_cmd(cmd, bufname)
+fun! s:wintoggle_cmd(cmd, bufname)
     let status = bufwinnr(a:bufname)
     let lastwin = winnr('$')
     let i = 1
@@ -965,7 +965,7 @@ let g:lexima_no_default_rules = 1
 " ----
 let g:loaded_file_line = 1
 
-fun! <SID>file_line(file)
+fun! s:file_line(file)
     let l:parts = matchlist(a:file, '\(.\{-1,}\):\(\d\+\)\%(:\(\d\+\)\)\?$')
     if empty(l:parts) || !filereadable(l:parts[1])
         if !empty(glob(escape(a:file, '[]*?').'*')) && empty(&buftype)
@@ -988,7 +988,7 @@ fun! <SID>file_line(file)
     let b:start_jump_done = 1
 endfun
 
-autocmd BufNewFile * call <SID>file_line(expand('<afile>'))
+autocmd BufNewFile * call s:file_line(expand('<afile>'))
 " }}}
 
 
@@ -1064,7 +1064,7 @@ nmap ,T  :tag<CR>
 " functions for jumping to a tag under cursor in a special split window
 let g:TagPWinHeight = 16
 
-fun! <SID>open_tag(tag)
+fun! s:open_tag(tag)
     if empty(a:tag)
         return
     endif
@@ -1113,7 +1113,7 @@ fun! <SID>open_tag(tag)
     endif
 endfun
 
-fun! <SID>close_tag_win()
+fun! s:close_tag_win()
     let lastwin = winnr('$')
     let curwin = winnr()
     let i = 1
@@ -1149,7 +1149,7 @@ nmap <silent> ,qw :call <SID>close_tag_win()<CR>
 " |    |    |  |    |         |  |       |    |    |  |
 " --------------    --------------       --------------
 "
-fun! <SID>win_occupy_vert_space(altwinbufft)
+fun! s:win_occupy_vert_space(altwinbufft)
     let curwinwidth = winwidth(0)
     let curwin = winnr()
     wincmd l
@@ -1208,7 +1208,7 @@ autocmd ColorScheme * highlight FormatHints term=standout
             \ cterm=NONE ctermfg=244 ctermbg=229
             \ gui=NONE guifg=#808080 guibg=#ffffaf
 
-fun! <SID>formathints()
+fun! s:formathints()
     if !exists("w:m1") || w:m1 == 0
         let w:m1 = matchadd('FormatHints', '\%>'.b:RightBorder.'v.\+', -1)
         let w:m2 = matchadd('FormatHints', '[\t]', -1)
@@ -1216,7 +1216,7 @@ fun! <SID>formathints()
     endif
 endfun
 
-fun! <SID>formathints_hide()
+fun! s:formathints_hide()
     if exists("w:m1") && w:m1 > 0
         silent! call matchdelete(w:m1)
         silent! call matchdelete(w:m2)
@@ -1227,15 +1227,15 @@ fun! <SID>formathints_hide()
     endif
 endfun
 
-fun! <SID>doseol_hide()
+fun! s:doseol_hide()
     " hide ^M symbols in DOS files (they are still visible on a
     " transparent screen)
     match Ignore /\r$/
 endfun
 
-command -bar ShowFormatHints call <SID>formathints()
-command -bar HideFormatHints call <SID>formathints_hide()
-command      HideDosEols     call <SID>doseol_hide()
+command -bar ShowFormatHints call s:formathints()
+command -bar HideFormatHints call s:formathints_hide()
+command      HideDosEols     call s:doseol_hide()
 
 nmap <silent> ,f :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
             \ ShowFormatHints <Bar> echo "Show format hints" <Bar> else <Bar>
@@ -1276,7 +1276,7 @@ autocmd BufNewFile,BufReadPre *.snippets let b:tagbar_ignore = 1
 
 let g:tagbar_win_ft_skip = ['tagbar', 'alpha']
 
-fun! <SID>open_tagbar(buf_enter)
+fun! s:open_tagbar(buf_enter)
     if a:buf_enter && exists('b:open_tagbar_done')
         return
     endif
@@ -1290,14 +1290,14 @@ fun! <SID>open_tagbar(buf_enter)
     if empty(&buftype)
         setlocal buflisted
     endif
-    call <SID>wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__')
+    call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__')
 endfun
 
 " automatically open tagbar on vim's start or a new tab is open if filetype
 " of the open file is supported by ctags and tagbar (if not in diff mode);
-autocmd BufEnter * call <SID>open_tagbar(1)
+autocmd BufEnter * call s:open_tagbar(1)
 " BufWritePost shall trigger tagbar opening on the first write to a new file
-autocmd BufWritePost * call <SID>open_tagbar(0)
+autocmd BufWritePost * call s:open_tagbar(0)
 
 " setting specific ambiwidth prevents from printing garbage in the first two
 " columns on the second row of the screen when tagbar automatically opens on
@@ -1558,7 +1558,7 @@ let g:mdictBaseColors = {'original':   [189, '#d7d7ff'],
                        \ 'translated': [194, '#d7ffd7'],
                        \ 'extra':      [191, '#d7ff5f']}
 
-fun! <SID>mdict_syntax_set_colors(colors)
+fun! s:mdict_syntax_set_colors(colors)
     let colors = deepcopy(a:colors)
     if exists('g:colors_name') && g:colors_name == 'lucius' &&
                 \ g:lucius_style == 'light'
@@ -1574,15 +1574,15 @@ fun! <SID>mdict_syntax_set_colors(colors)
                 \ ' guifg='.colors['extra'][1]
 endfun
 
-fun! <SID>mdict_syntax_load()
+fun! s:mdict_syntax_load()
     syntax match mdictOriginal '\(^|\)\@1<=[^|]*' containedin=Table
                 \ contains=TableBorder,mdictExtra
     syntax match mdictTranslated '\(.|\)\@2<=[^|]*' containedin=Table
                 \ contains=mdictExtra
     syntax match mdictExtra '([^()]*)' contained
 
-    call <SID>mdict_syntax_set_colors(g:mdictBaseColors)
-    autocmd ColorScheme * call <SID>mdict_syntax_set_colors(g:mdictBaseColors)
+    call s:mdict_syntax_set_colors(g:mdictBaseColors)
+    autocmd ColorScheme * call s:mdict_syntax_set_colors(g:mdictBaseColors)
 
     hi link mdictOriginal   mdictOriginalHl
     hi link mdictTranslated mdictTranslatedHl
@@ -1604,7 +1604,7 @@ augroup mdict
         autocmd BufNewFile,BufRead *.mdict setlocal ft=_mdict_
         autocmd BufNewFile,BufRead *.mdict let g:table_mode_auto_align = 0
         autocmd BufNewFile,BufRead *.mdict TableModeEnable
-        autocmd BufNewFile,BufRead *.mdict call <SID>mdict_syntax_load()
+        autocmd BufNewFile,BufRead *.mdict call s:mdict_syntax_load()
         " convenient imaps <C-Up> and <C-Down> to insert bars into the table
         autocmd BufNewFile,BufRead *.mdict imap <C-up> <Bar><Space>
         autocmd BufNewFile,BufRead *.mdict imap <C-down> <Bar>
