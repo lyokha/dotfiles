@@ -1061,113 +1061,13 @@ set tagstack
 " mapping for moving forward in the tagstack
 nmap ,T  :tag<CR>
 
-" functions for jumping to a tag under cursor in a special split window
-let g:TagPWinHeight = 16
-
-fun! s:open_tag(tag)
-    if empty(a:tag)
-        return
-    endif
-    " BEWARE: command :(s)tag may produce a bigger list than the following
-    " call to function taglist()
-    if empty(taglist('^'.a:tag.'$'))
-        echohl WarningMsg
-        echo "No tag '".a:tag."' found"
-        echohl None
-        return
-    endif
-    let split = 's'
-    let lastwin = winnr('$')
-    let curwin = winnr()
-    let i = 1
-    let save_cursor = []
-    while i <= lastwin
-        let pwin = getwinvar(i, 'tagpwin')
-        if pwin
-            " move to the dedicated window: we can return then back if needed
-            " (e.g. when user presses just Enter on a list of tags)
-            if i != curwin
-                exe i."wincmd w"
-                let save_cursor = getpos('.')
-            endif
-            let split = ''
-            break
-        endif
-        let i += 1
-    endwhile
-    " FIXME: in case of exception when executing command :(s)tag the cursor
-    " may stay in the original window
-    exe split."tag ".a:tag
-    if empty(split) && i != curwin
-        " if we stay on same position then return to original window; a better
-        " solution would be checking changes in tagstack but it seems to be
-        " inaccessible from vim scripts
-        if save_cursor == getpos('.')
-            exe curwin."wincmd w"
-        endif
-    endif
-    if split == 's' && lastwin < winnr('$')
-        exe g:TagPWinHeight."wincmd _"
-        set winfixheight
-        let w:tagpwin = 1
-    endif
-endfun
-
-fun! s:close_tag_win()
-    let lastwin = winnr('$')
-    let curwin = winnr()
-    let i = 1
-    while i <= lastwin
-        let pwin = getwinvar(i, 'tagpwin')
-        if pwin
-            if i != curwin
-                exe i."wincmd w"
-                wincmd q
-                let dstwin = curwin > i ? curwin - 1 : curwin
-                exe dstwin."wincmd w"
-            else
-                wincmd q
-            endif
-            break
-        endif
-        let i += 1
-    endwhile
-endfun
-
 " mappings for opening/closing various preview windows
-nmap <silent> ,,  :call <SID>open_tag('<C-r>=expand("<cword>")<CR>')<CR>
+nmap <silent> ,,  :call init#open_tag('<C-r>=expand("<cword>")<CR>')<CR>
 nmap ,qo          :botright copen<CR>
 nmap ,qq          :cclose<CR>
-nmap <silent> ,qw :call <SID>close_tag_win()<CR>
+nmap <silent> ,qw :call init#close_tag_win()<CR>
 
-" mapping for making rightmost window left to tagbar occupy all vertical space
-"
-" --------------    --------------       --------------
-" |         |tb|    |    | W  |tb|       |    | W  |tb|
-" |---------|  | OR |---------|  | === \ |----|    |  |
-" |    | W  |  |    |         |  | === / |    |    |  |
-" |    |    |  |    |         |  |       |    |    |  |
-" --------------    --------------       --------------
-"
-fun! s:win_occupy_vert_space(altwinbufft)
-    let curwinwidth = winwidth(0)
-    let curwin = winnr()
-    wincmd l
-    if !empty(a:altwinbufft) && a:altwinbufft != &ft
-        exe curwin."wincmd w"
-        return
-    endif
-    let altwinwidth = winwidth(0)
-    exe curwin."wincmd w"
-    wincmd L
-    wincmd h
-    wincmd L
-    exe altwinwidth."wincmd |"
-    wincmd h
-    exe curwinwidth."wincmd |"
-endfun
-
-nmap <silent> ,U :call <SID>win_occupy_vert_space('tagbar')<CR>
+nmap <silent> ,U :call init#win_occupy_vert_space('tagbar')<CR>
 
 " gutentags settings
 let g:gutentags_exclude_filetypes = ['svn', 'cvs', 'gitcommit', 'hgcommit']
@@ -1208,34 +1108,9 @@ autocmd ColorScheme * highlight FormatHints term=standout
             \ cterm=NONE ctermfg=244 ctermbg=229
             \ gui=NONE guifg=#808080 guibg=#ffffaf
 
-fun! s:formathints()
-    if !exists("w:m1") || w:m1 == 0
-        let w:m1 = matchadd('FormatHints', '\%>'.b:RightBorder.'v.\+', -1)
-        let w:m2 = matchadd('FormatHints', '[\t]', -1)
-        let w:m3 = matchadd('FormatHints', '[\t \r]\+$', -1)
-    endif
-endfun
-
-fun! s:formathints_hide()
-    if exists("w:m1") && w:m1 > 0
-        silent! call matchdelete(w:m1)
-        silent! call matchdelete(w:m2)
-        silent! call matchdelete(w:m3)
-        let w:m1 = 0
-        let w:m2 = 0
-        let w:m3 = 0
-    endif
-endfun
-
-fun! s:doseol_hide()
-    " hide ^M symbols in DOS files (they are still visible on a
-    " transparent screen)
-    match Ignore /\r$/
-endfun
-
-command -bar ShowFormatHints call s:formathints()
-command -bar HideFormatHints call s:formathints_hide()
-command      HideDosEols     call s:doseol_hide()
+command -bar ShowFormatHints call init#formathints()
+command -bar HideFormatHints call init#formathints_hide()
+command      HideDosEols     call init#doseol_hide()
 
 nmap <silent> ,f :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
             \ ShowFormatHints <Bar> echo "Show format hints" <Bar> else <Bar>
@@ -1558,37 +1433,6 @@ let g:mdictBaseColors = {'original':   [189, '#d7d7ff'],
                        \ 'translated': [194, '#d7ffd7'],
                        \ 'extra':      [191, '#d7ff5f']}
 
-fun! s:mdict_syntax_set_colors(colors)
-    let colors = deepcopy(a:colors)
-    if exists('g:colors_name') && g:colors_name == 'lucius' &&
-                \ g:lucius_style == 'light'
-        let colors['original']   = [26,  '#005fd7']
-        let colors['translated'] = [22,  '#005f00']
-        let colors['extra']      = [167, '#d75f5f']
-    endif
-    exe 'hi mdictOriginalHl term=standout ctermfg='.colors['original'][0].
-                \ ' guifg='.colors['original'][1]
-    exe 'hi mdictTranslatedHl term=standout ctermfg='.colors['translated'][0].
-                \ ' guifg='.colors['translated'][1]
-    exe 'hi mdictExtraHl term=standout ctermfg='.colors['extra'][0].
-                \ ' guifg='.colors['extra'][1]
-endfun
-
-fun! s:mdict_syntax_load()
-    syntax match mdictOriginal '\(^|\)\@1<=[^|]*' containedin=Table
-                \ contains=TableBorder,mdictExtra
-    syntax match mdictTranslated '\(.|\)\@2<=[^|]*' containedin=Table
-                \ contains=mdictExtra
-    syntax match mdictExtra '([^()]*)' contained
-
-    call s:mdict_syntax_set_colors(g:mdictBaseColors)
-    autocmd ColorScheme * call s:mdict_syntax_set_colors(g:mdictBaseColors)
-
-    hi link mdictOriginal   mdictOriginalHl
-    hi link mdictTranslated mdictTranslatedHl
-    hi link mdictExtra      mdictExtraHl
-endfun
-
 augroup mdict
     au!
     autocmd BufNewFile,BufRead *.mdict setlocal textwidth=0 | EnableXkbSwitch
@@ -1604,7 +1448,7 @@ augroup mdict
         autocmd BufNewFile,BufRead *.mdict setlocal ft=_mdict_
         autocmd BufNewFile,BufRead *.mdict let g:table_mode_auto_align = 0
         autocmd BufNewFile,BufRead *.mdict TableModeEnable
-        autocmd BufNewFile,BufRead *.mdict call s:mdict_syntax_load()
+        autocmd BufNewFile,BufRead *.mdict call init#mdict_syntax_load()
         " convenient imaps <C-Up> and <C-Down> to insert bars into the table
         autocmd BufNewFile,BufRead *.mdict imap <C-up> <Bar><Space>
         autocmd BufNewFile,BufRead *.mdict imap <C-down> <Bar>
