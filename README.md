@@ -36,6 +36,8 @@ My personal dotfiles collection.
 
 - `.inputrc` &mdash; configuration for readline.
 
+- `.local/bin/` &mdash; miscellaneous scripts.
+
 - `.vimrc.pandoc` &mdash; Vim/Neovim configuration for using with Pandoc filter
   [vimhl](https://github.com/lyokha/vim-publish-helper).
 
