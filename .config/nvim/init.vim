@@ -19,11 +19,7 @@ call plug#begin()
 Plug 'ryanoasis/vim-devicons'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'goolord/alpha-nvim'
-Plug 'glepnir/oceanic-material'
-Plug 'marko-cerovac/material.nvim'
 Plug 'sainnhe/gruvbox-material'
-Plug 'sainnhe/edge'
-Plug 'franbach/miramare'
 Plug 'fladson/vim-kitty'
 Plug 'neovim/nvim-lspconfig'
 Plug 'RishabhRD/popfix'
@@ -91,22 +87,6 @@ call plug#end()
 " ---- Colorscheme {{{1
 " ----
 set termguicolors
-
-"let g:oceanic_material_transparent_background = 1
-"let g:oceanic_material_allow_bold = 1
-"let g:oceanic_material_allow_italic = 1
-"colorscheme oceanic_material
-"let g:material_disable_background = 1
-"let g:material_style = 'darker'
-"colorscheme material
-"let g:miramare_transparent_background = 1
-"let g:miramare_enable_italic = 1
-"let g:miramare_enable_bold = 1
-"colorscheme miramare
-"let g:edge_style = 'neon'
-"let g:edge_transparent_background = 1
-"let g:edge_enable_italic = 1
-"colorscheme edge
 
 " seamless FloatBorder around NormalFloat for gruvbox-material colorscheme
 autocmd ColorScheme *
