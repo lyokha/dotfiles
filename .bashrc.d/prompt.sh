@@ -13,7 +13,9 @@ function prompt_gitdir
 
 function prompt_wdir
 {
-    if [ -z "$PROMPT_GIT_TOPLEVEL" ] || [ "$PROMPT_GIT_TOPLEVEL" != "$PWD" ]
+    if [ "$PWD" = / ]; then
+        echo " /"
+    elif [ -z "$PROMPT_GIT_TOPLEVEL" ] || [ "$PROMPT_GIT_TOPLEVEL" != "$PWD" ]
     then
         [ "$HOME" = "$PWD" ] && echo " ~" || echo " ${PWD##*/}"
     fi
