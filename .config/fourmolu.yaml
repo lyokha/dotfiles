@@ -11,6 +11,7 @@ haddock-style-module:
 let-style: auto
 in-style: right-align
 single-constraint-parens: auto
+single-deriving-parens: auto
 unicode: never
 respectful: true
 fixities: []
