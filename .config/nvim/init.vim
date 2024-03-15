@@ -491,14 +491,16 @@ lua <<EOF
       return ret
     end,
     fold_virt_text_handler = ufo_virt_text,
-    close_fold_kinds = { 'comment', 'imports' },
+    close_fold_kinds_for_ft = {
+      default = { 'comment', 'imports' }
+    },
     preview = {
-        win_config = {
-          border = 'rounded',
-          winhighlight = 'NormalFloat:Folded,FloatBorder:Folded',
-          winblend = 0
-        }
+      win_config = {
+        border = 'rounded',
+        winhighlight = 'NormalFloat:Folded,FloatBorder:Folded',
+        winblend = 0
       }
+    }
   })
 
   vim.keymap.set('n', 'zK',
