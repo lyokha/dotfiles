@@ -148,10 +148,55 @@ set nocompatible
 set ruler
 set showcmd
 
+" let g:StaticTitleIcon = ""
+
+fun! GetTitleText()
+    let l:showtagbar = &filetype == 'tagbar' &&
+                \ (!exists('t:wintoggle_tagbar_done') ||
+                \ exists('t:winhidden[t:tagbar_buf_name]'))
+    let l:bufname = l:showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
+    let l:icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
+    if empty(l:icon)
+        if &filetype == 'nerdtree'
+            let l:icon = ""
+        elseif &filetype == 'alpha'
+            let l:icon = "󰀫"
+        elseif index(["tagbar", "Outline"], &filetype) != -1 && !l:showtagbar
+            let l:icon = "󰅴"
+        elseif index(["Mundo", "MundoDiff"], &filetype) != -1
+            let l:icon = ""
+        elseif &filetype == 'TelescopePrompt'
+            let l:icon = ""
+        else
+            let l:icon = v:lua.require'nvim-web-devicons'
+                        \.get_icon(fnamemodify(l:bufname, ':t'),
+                        \ fnamemodify(l:bufname, ':e'))
+            if l:icon == v:null
+                let l:icon = ""
+            endif
+        endif
+    endif
+    let l:text = pathshorten(l:bufname, 1)
+    if empty(l:text)
+        return l:icon
+    endif
+    " NOTE: below is the Unicode En Space!
+    return l:icon . ' ' . l:text
+endfun
+
+fun! GetTitleModified()
+    if &filetype == 'tagbar' &&
+                \ (!exists('t:wintoggle_tagbar_done') ||
+                \ exists('t:winhidden[t:tagbar_buf_name]'))
+        return ''
+    endif
+    return '%m'
+endfun
+
 " note that setting title causes glitches in terminals using ncurses 6.3,
 " see https://github.com/neovim/neovim/issues/18573
 set title
-set titlestring=\ %<%{pathshorten(expand(\"%\"),1)}\ %m
+set titlestring=%{GetTitleText()}%{%GetTitleModified()%}
 set titlelen=0
 
 " always show statusline
@@ -699,7 +744,9 @@ autocmd BufReadPost *
             \ endif
 
 fun! s:wintoggle_cmd(cmd, bufname)
-    let status = bufwinnr(a:bufname)
+    let l:bufname = a:bufname == '__Tagbar__*' && 
+                \ exists('t:tagbar_buf_name') ? t:tagbar_buf_name : a:bufname
+    let status = bufwinnr(l:bufname)
     let lastwin = winnr('$')
     let i = 1
     while i <= lastwin
@@ -712,14 +759,18 @@ fun! s:wintoggle_cmd(cmd, bufname)
         let i += 1
     endwhile
     exe a:cmd
-    if (bufwinnr(a:bufname) != status)
+    if (l:bufname == '__Tagbar__*' && exists('t:tagbar_buf_name'))
+        let t:wintoggle_tagbar_done = 1
+        let l:bufname = t:tagbar_buf_name
+    endif
+    if (bufwinnr(l:bufname) != status)
         wincmd =
         if !exists('t:winhidden')
             let t:winhidden = {}
         endif
-        exe "if bufwinnr('".a:bufname."') == -1 | let t:winhidden['".
-                    \ a:bufname."'] = 1 | elseif exists('t:winhidden[\"".
-                    \ a:bufname."\"]') | unlet t:winhidden['".a:bufname.
+        exe "if bufwinnr('".l:bufname."') == -1 | let t:winhidden['".
+                    \ l:bufname."'] = 1 | elseif exists('t:winhidden[\"".
+                    \ l:bufname."\"]') | unlet t:winhidden['".l:bufname.
                     \ "'] | endif"
     endif
     let lastwin = winnr('$')
@@ -746,13 +797,13 @@ nmap <silent> <C-p>m     :Telescope marks<CR>
 
 " toggle commands for tagbar, mundo, nerdtree and other are also here
 nmap <silent> <C-p>t     :call
-            \ <SID>wintoggle_cmd('TagbarToggle', '__Tagbar__')<CR>
+            \ <SID>wintoggle_cmd('TagbarToggle', '__Tagbar__*')<CR>
 nmap <silent> <C-p>u     :call
             \ <SID>wintoggle_cmd('MundoToggle', '__Mundo__')<CR>
 nmap <silent> <C-p>e     :call
             \ <SID>wintoggle_cmd('NERDTreeToggle', 'NERD_tree_*')<CR>
 nmap <silent> <C-p>o     :call
-            \ <SID>wintoggle_cmd('SymbolsOutline', '__Tagbar__')<CR>
+            \ <SID>wintoggle_cmd('SymbolsOutline', 'OUTLINE')<CR>
 " go to bottom-right window (tagbar etc.)
 nmap <silent> <C-p>[     :wincmd b<CR>
 
@@ -1137,16 +1188,14 @@ fun! s:open_tagbar(buf_enter)
         return
     endif
     let b:open_tagbar_done = 1
-    if bufwinnr('__Tagbar__') != -1 ||
-                \ &diff ||
-                \ index(g:tagbar_win_ft_skip, &filetype) != -1 ||
-                \ exists('t:winhidden') && exists('t:winhidden["__Tagbar__"]')
+    if &diff || index(g:tagbar_win_ft_skip, &filetype) != -1 ||
+                \ exists('t:winhidden[t:tagbar_buf_name]')
         return
     endif
     if empty(&buftype)
         setlocal buflisted
     endif
-    call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__')
+    call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__*')
 endfun
 
 " automatically open tagbar on vim's start or a new tab is open if filetype
