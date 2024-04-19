@@ -29,9 +29,6 @@ fun! init#get_title_text()
         endif
     endif
     let l:text = pathshorten(l:bufname, 1)
-    if empty(l:text)
-        return l:icon
-    endif
     " NOTE: below is the Unicode En Space!
     return l:icon . ' ' . l:text
 endfun
