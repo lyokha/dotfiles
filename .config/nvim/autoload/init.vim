@@ -1,5 +1,52 @@
 " vim: set fdm=marker fdl=0:
 
+" ---- Functions for rendering window titles {{{1
+" ----
+fun! init#get_title_text()
+    let l:showtagbar = &filetype == 'tagbar' &&
+                \ (!exists('t:wintoggle_tagbar_done') ||
+                \ exists('t:winhidden[t:tagbar_buf_name]'))
+    let l:bufname = l:showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
+    let l:icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
+    if empty(l:icon)
+        if &filetype == 'nerdtree'
+            let l:icon = ""
+        elseif &filetype == 'alpha'
+            let l:icon = "󰀫"
+        elseif index(["tagbar", "Outline"], &filetype) != -1 && !l:showtagbar
+            let l:icon = "󰅴"
+        elseif index(["Mundo", "MundoDiff"], &filetype) != -1
+            let l:icon = ""
+        elseif &filetype == 'TelescopePrompt'
+            let l:icon = ""
+        else
+            let l:icon = v:lua.require'nvim-web-devicons'
+                        \.get_icon(fnamemodify(l:bufname, ':t'),
+                        \ fnamemodify(l:bufname, ':e'))
+            if l:icon == v:null
+                let l:icon = ""
+            endif
+        endif
+    endif
+    let l:text = pathshorten(l:bufname, 1)
+    if empty(l:text)
+        return l:icon
+    endif
+    " NOTE: below is the Unicode En Space!
+    return l:icon . ' ' . l:text
+endfun
+
+fun! init#get_title_modified()
+    if &filetype == 'tagbar' &&
+                \ (!exists('t:wintoggle_tagbar_done') ||
+                \ exists('t:winhidden[t:tagbar_buf_name]'))
+        return ''
+    endif
+    return '%m'
+endfun
+" }}}
+
+
 " ---- Functions for jumping to a tag under cursor in a split window {{{1
 " ----
 let s:TagPWinHeight = 16

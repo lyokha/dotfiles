@@ -150,53 +150,10 @@ set showcmd
 
 " let g:StaticTitleIcon = ""
 
-fun! GetTitleText()
-    let l:showtagbar = &filetype == 'tagbar' &&
-                \ (!exists('t:wintoggle_tagbar_done') ||
-                \ exists('t:winhidden[t:tagbar_buf_name]'))
-    let l:bufname = l:showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
-    let l:icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
-    if empty(l:icon)
-        if &filetype == 'nerdtree'
-            let l:icon = ""
-        elseif &filetype == 'alpha'
-            let l:icon = "󰀫"
-        elseif index(["tagbar", "Outline"], &filetype) != -1 && !l:showtagbar
-            let l:icon = "󰅴"
-        elseif index(["Mundo", "MundoDiff"], &filetype) != -1
-            let l:icon = ""
-        elseif &filetype == 'TelescopePrompt'
-            let l:icon = ""
-        else
-            let l:icon = v:lua.require'nvim-web-devicons'
-                        \.get_icon(fnamemodify(l:bufname, ':t'),
-                        \ fnamemodify(l:bufname, ':e'))
-            if l:icon == v:null
-                let l:icon = ""
-            endif
-        endif
-    endif
-    let l:text = pathshorten(l:bufname, 1)
-    if empty(l:text)
-        return l:icon
-    endif
-    " NOTE: below is the Unicode En Space!
-    return l:icon . ' ' . l:text
-endfun
-
-fun! GetTitleModified()
-    if &filetype == 'tagbar' &&
-                \ (!exists('t:wintoggle_tagbar_done') ||
-                \ exists('t:winhidden[t:tagbar_buf_name]'))
-        return ''
-    endif
-    return '%m'
-endfun
-
 " note that setting title causes glitches in terminals using ncurses 6.3,
 " see https://github.com/neovim/neovim/issues/18573
 set title
-set titlestring=%{GetTitleText()}%{%GetTitleModified()%}
+set titlestring=%{init#get_title_text()}%{%init#get_title_modified()%}
 set titlelen=0
 
 " always show statusline
@@ -759,11 +716,11 @@ fun! s:wintoggle_cmd(cmd, bufname)
         let i += 1
     endwhile
     exe a:cmd
-    if (l:bufname == '__Tagbar__*' && exists('t:tagbar_buf_name'))
-        let t:wintoggle_tagbar_done = 1
-        let l:bufname = t:tagbar_buf_name
+    if (l:bufname == '__Tagbar__*')
+        let l:bufname = exists('t:tagbar_buf_name') ? t:tagbar_buf_name : ''
     endif
-    if (bufwinnr(l:bufname) != status)
+    if (!empty(l:bufname) && bufwinnr(l:bufname) != status)
+        let t:wintoggle_tagbar_done = 1
         wincmd =
         if !exists('t:winhidden')
             let t:winhidden = {}
