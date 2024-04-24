@@ -3,8 +3,8 @@ Dotfiles
 
 My personal dotfiles collection.
 
-- `.bashrc.d/prompt.sh` &mdash; bash prompt and window title lines. Files from
-  directory `.bashrc.d/` are supposed to be sourced from `.bashrc` in a
+- `.bashrc.d/01-prompt.sh` &mdash; bash prompt and window title lines. Files
+  from directory `.bashrc.d/` are supposed to be sourced from `.bashrc` in a
   for-loop like
 
   ```sh
@@ -15,6 +15,8 @@ My personal dotfiles collection.
 
   The prompt uses the Powerline arrows and requires installation of
   [Nerd fonts](https://github.com/ryanoasis/nerd-fonts).
+
+- `.bashrc.d/04-kitty.sh` &mdash; integration of kitty and bash.
 
 - `.config/fourmolu.yaml` &mdash; configuration for
   [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
