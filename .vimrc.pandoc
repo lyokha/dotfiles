@@ -2,11 +2,18 @@ set nocompatible
 
 filetype off    " filetype is set by vimhl
 
-let g:VimhlUseDotVimSettings = 0
+let g:VimhlNvimUseDotVimSettings = 0
+let g:VimhlNvimUseTreesitter = 1
+let g:VimhlNvimLoadPandocPlugin = 1
+
 let g:VimhlColorschemeWasChosen = 0
 
+if has('termguicolors')
+    set termguicolors
+endif
+
 if has('nvim')
-    if g:VimhlUseDotVimSettings
+    if g:VimhlNvimUseDotVimSettings
         set runtimepath^=~/.vim runtimepath+=~/.vim/after
         let &packpath=&runtimepath
     else
@@ -14,8 +21,20 @@ if has('nvim')
         set runtimepath+=~/.local/share/nvim/plugged/gruvbox-material
         set runtimepath+=~/.local/share/nvim/plugged/vim-publish-helper
         set background=light
+        " let g:gruvbox_material_enable_bold = 0
+        " let g:gruvbox_material_enable_italic = 1
         colorscheme gruvbox-material
+        if g:VimhlNvimUseTreesitter
+            lua require'nvim-treesitter.configs'.setup
+                        \ { highlight = { enable = true } }
+            runtime plugin/nvim-treesitter.lua
+            let g:PhHighlightEngine = 'treesitter'
+        endif
         let g:VimhlColorschemeWasChosen = 1
+        if g:VimhlNvimLoadPandocPlugin
+            set runtimepath+=~/.local/share/nvim/plugged/vim-pandoc-syntax
+            runtime plugin/pandoc.vim
+        endif
     endif
 endif
 
@@ -60,7 +79,12 @@ endif
 
 runtime plugin/publish_helper.vim
 
-if exists('g:PhHtmlEngine') && g:PhHtmlEngine == 'tohtml'
+if g:PhHtmlEngine == 'tohtml'
+    if g:PhHighlightEngine == 'treesitter'
+        " TOhtml does not currently support treesitter in Neovim
+        " (see https://github.com/nvim-treesitter/nvim-treesitter/issues/1049)
+        TSDisable highlight
+    endif
     runtime plugin/tohtml.vim
     let g:html_no_progress = 1
     let g:html_ignore_folding = 1
