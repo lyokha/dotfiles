@@ -27,7 +27,7 @@ if has('nvim')
             lua require'nvim-treesitter.configs'.setup
                         \ { highlight = {
                             \ enable = true,
-                            \ additional_vim_regex_highlighting = true } }
+                            \ additional_vim_regex_highlighting = false } }
             runtime plugin/nvim-treesitter.lua
             let g:PhHighlightEngine = 'treesitter'
         endif
