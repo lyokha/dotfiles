@@ -315,7 +315,8 @@ lua <<EOF
   require'nvim-treesitter.configs'.setup {
     ensure_installed = {
       'bash', 'c', 'cmake', 'cpp', 'haskell', 'json', 'latex', 'lua',
-      'markdown', 'perl', 'python', 'r', 'rust', 'toml', 'vim', 'yaml'
+      'markdown', 'perl', 'python', 'r', 'rust', 'toml', 'vim', 'vimdoc',
+      'yaml'
     },
     highlight = {
       enable = true,
