@@ -1242,12 +1242,8 @@ let g:Illuminate_highlightPriority = -20
 " }}}
 
 
-" ---- Context / treesitter-context and nvim_context_vt plugins settings {{{1
+" ---- Treesitter-context and nvim_context_vt plugins settings {{{1
 " ----
-let g:context_enabled = 0
-let g:context_nvim_no_redraw = 1
-let g:context_filetype_blacklist = ['lsputil_locations_list']
-
 lua <<EOF
   require'treesitter-context'.setup {
     enable = true,
@@ -1256,13 +1252,13 @@ lua <<EOF
     max_lines = 0,
     patterns = {
       haskell = {
-        'adt'
+        'bind', 'conditional', 'data_type', 'do', 'match', 'multi_way_if'
       },
       json = {
         'pair'
       },
       rust = {
-        'impl_item', 'struct', 'enum'
+        'enum', 'impl_item', 'struct'
       },
       yaml = {
         'block_mapping_pair'
