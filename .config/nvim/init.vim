@@ -472,7 +472,7 @@ lua <<EOF
       end
       local function contains(tbl, val)
         for i = 1, #tbl do
-           if tbl[i] == val then 
+           if tbl[i] == val then
               return true
            end
         end
@@ -706,7 +706,7 @@ autocmd BufReadPost *
             \ endif
 
 fun! s:wintoggle_cmd(cmd, bufname)
-    let l:bufname = a:bufname == '__Tagbar__*' && 
+    let l:bufname = a:bufname == '__Tagbar__*' &&
                 \ exists('t:tagbar_buf_name') ? t:tagbar_buf_name : a:bufname
     let status = bufwinnr(l:bufname)
     let lastwin = winnr('$')
