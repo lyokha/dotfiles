@@ -213,3 +213,23 @@ fun! init#mdict_syntax_load()
 endfun
 " }}}
 
+
+" ---- Miscellaneous functions {{{1
+" ----
+fun! init#close_last_ancillary_buffers()
+    let curbuf = bufnr('%')
+    if empty(getbufvar(curbuf, '&buftype'))
+        let quit_all = 1
+        for buf in tabpagebuflist(tabpagenr())
+            if empty(getbufvar(buf, '&buftype')) && buf != curbuf
+                let quit_all = 0
+                break
+            endif
+        endfor
+        if quit_all
+            exe 'only'
+        endif
+    endif
+endfun
+" }}}
+

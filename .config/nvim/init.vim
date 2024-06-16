@@ -688,7 +688,7 @@ let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 " ---- Easy navigation between tabs and buffers {{{1
 " ----
 set switchbuf=usetab
-" use bufhidden=delete or bufhidden=wipe to enable following <C-arrow>
+" use bufhidden=delete or bufhidden=wipe to enable the following <C-arrow>
 " mappings; if 'delete' is used then cursor won't move to reopen buffers, but
 " when wipe is used <C-t> won't work
 autocmd BufEnter * if empty(&buftype) | setlocal bufhidden=delete | endif
@@ -756,6 +756,10 @@ nmap <silent> <C-p>f     :Telescope file_browser<CR>
 nmap <silent> <C-p>g     :Telescope live_grep<CR>
 nmap <silent> <C-p>s     :Telescope treesitter<CR>
 nmap <silent> <C-p>m     :Telescope marks<CR>
+
+" close tab / quit vim if there are only ancillary buffers in the current tab
+" after quitting the current buffer
+autocmd BufUnload * call init#close_last_ancillary_buffers()
 
 " toggle commands for tagbar, mundo, nerdtree and other are also here
 nmap <silent> <C-p>t     :call
