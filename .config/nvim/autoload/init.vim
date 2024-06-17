@@ -120,6 +120,37 @@ endfun
 " }}}
 
 
+" ---- Functions to setup airline {{{1
+" ----
+let s:airline_loaded = 0
+
+fun! init#airline_theme_patch(palette)
+    if !has_key(a:palette.accents, 'red_bold')
+        let a:palette.accents.red_bold = ['#d70000', '', 160, '', 'bold']
+    endif
+endfun
+
+fun! init#setup_airline(sudo_icon)
+    if !s:airline_loaded
+        " sudo indicator, this must work with both sudo -e and
+        " alias svim='sudo HOME=$HOME nvim'
+        call airline#parts#define('sudo', {
+            \ 'text': a:sudo_icon.'SUDO',
+            \ 'condition': '!empty($SUDO_USER) || $_ =~# "/sudo$"',
+            \ 'accent': 'red_bold'
+            \ })
+        let g:airline_section_a =
+                    \ airline#section#create_left(
+                        \ ['mode', 'sudo', 'crypt', 'paste', 'keymap',
+                        \ 'spell', 'capslock', 'xkblayout', 'iminsert']
+                    \ )
+        AirlineRefresh
+        let s:airline_loaded = 1
+    endif
+endfun
+" }}}
+
+
 " ---- Function to make rightmost window left to tagbar occupy all {{{1
 " ---- vertical space
 " ----

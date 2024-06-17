@@ -1000,39 +1000,13 @@ let g:airline#extensions#xkblayout#enabled = 0
 let g:airline#extensions#tagbar#flags = 'f'
 let g:airline#extensions#tabline#enabled = 0
 
-let g:airline_theme_patch_func = 'AirlineThemePatch'
+let g:airline_theme_patch_func = 'init#airline_theme_patch'
 
-fun! AirlineThemePatch(palette)
-    if !has_key(a:palette.accents, 'red_bold')
-        let a:palette.accents.red_bold = ['#d70000', '', 160, '', 'bold']
-    endif
-endfun
-
-if g:DisableUnicodeSymbols
-    let s:SudoAdminIcon = ''
-else
-    let s:SudoAdminIcon = 0 ? '🦁' : (1 ? ' ' : '🧔')
-endif
-
-" sudo indicator, this must work with both sudo -e and
-" alias svim='sudo HOME=$HOME nvim'
-call airline#parts#define('sudo', {
-            \ 'text': s:SudoAdminIcon.'SUDO',
-            \ 'condition': '!empty($SUDO_USER) || $_ =~# "/sudo$"',
-            \ 'accent': 'red_bold',
-            \ })
-
-let s:airline_loaded = 0
+let s:SudoAdminIcon = g:DisableUnicodeSymbols ? '' : ' '
 
 " load custom g:airline_section_a once at the first BufWinEnter event
 " (note that it happens before VimEnter!)
-autocmd BufWinEnter,VimEnter * if !s:airline_loaded |
-            \ let g:airline_section_a =
-            \ airline#section#create_left(['mode', 'sudo', 'crypt', 'paste',
-            \ 'keymap', 'spell', 'capslock', 'xkblayout', 'iminsert']) |
-            \ AirlineRefresh |
-            \ let s:airline_loaded = 1 |
-            \ endif
+autocmd BufWinEnter,VimEnter * call init#setup_airline(s:SudoAdminIcon)
 " }}}
 
 
