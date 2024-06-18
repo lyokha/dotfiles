@@ -1364,33 +1364,7 @@ let g:XkbSwitchKeymapNames =
 let g:XkbSwitchIminsertToggleKey = '<C-^>'
 let g:XkbSwitchIminsertToggleEcho = 0
 
-let g:XkbSwitchIEnterHook = 'XkbSwitchIEnterHook'
-
-highlight link BeaconNLayout Cursor
-highlight BeaconOtherLayout guibg=#87ff5f ctermbg=119  " #5f00af is also good
-
-fun! XkbSwitchRevertBeaconHighlight(id)
-    highlight! link Beacon BeaconDefault
-endfun
-
-let g:HighlightIEnterHookNLayout = 1
-
-fun! XkbSwitchIEnterHook(old, new)
-    if &ft == '_mdict_'
-        return
-    endif
-    let nlayout = a:new == g:XkbSwitchNLayout
-    if nlayout && !g:HighlightIEnterHookNLayout
-        return
-    endif
-    let save_beacon_size = g:beacon_size
-    let g:beacon_size = 20
-    let beacon_bg = nlayout ? 'BeaconNLayout' : 'BeaconOtherLayout'
-    exe 'highlight! link Beacon '.beacon_bg
-    Beacon
-    let g:beacon_size = save_beacon_size
-    call timer_start(500, 'XkbSwitchRevertBeaconHighlight')
-endfun
+let g:XkbSwitchIEnterHook = 'init#xkb_switch_ienter_hook'
 
 " automatic keyboard layout switching in a simple dictionary in insert mode
 " (may use vimwiki or tablemode engine)

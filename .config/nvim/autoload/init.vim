@@ -151,6 +151,36 @@ endfun
 " }}}
 
 
+" ---- Functions to setup XkbSwitchIEnterHook {{{1
+" ----
+highlight link BeaconNLayout Cursor
+highlight BeaconOtherLayout guibg=#87ff5f ctermbg=119  " #5f00af is also good
+
+fun! s:xkb_switch_revert_beacon_highlight(id)
+    highlight! link Beacon BeaconDefault
+endfun
+
+let s:HighlightIEnterHookNLayout = 1
+
+fun! init#xkb_switch_ienter_hook(old, new)
+    if &ft == '_mdict_'
+        return
+    endif
+    let nlayout = a:new == g:XkbSwitchNLayout
+    if nlayout && !s:HighlightIEnterHookNLayout
+        return
+    endif
+    let save_beacon_size = g:beacon_size
+    let g:beacon_size = 20
+    let beacon_bg = nlayout ? 'BeaconNLayout' : 'BeaconOtherLayout'
+    exe 'highlight! link Beacon '.beacon_bg
+    Beacon
+    let g:beacon_size = save_beacon_size
+    call timer_start(500, 's:xkb_switch_revert_beacon_highlight')
+endfun
+" }}}
+
+
 " ---- Function to make rightmost window left to tagbar occupy all {{{1
 " ---- vertical space
 " ----
