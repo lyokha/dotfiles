@@ -701,8 +701,8 @@ let g:JumpToLastChangeOnBufOpen = 1
 autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen
 autocmd BufReadPost *
             \ if empty(&buftype) && exists('b:start_jump_done') &&
-                \ !b:start_jump_done |
-            \ silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
+            \     !b:start_jump_done |
+            \     silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
             \ endif
 
 fun! s:wintoggle_cmd(cmd, bufname)
@@ -730,10 +730,11 @@ fun! s:wintoggle_cmd(cmd, bufname)
         if !exists('t:winhidden')
             let t:winhidden = {}
         endif
-        exe "if bufwinnr('".l:bufname."') == -1 | let t:winhidden['".
-                    \ l:bufname."'] = 1 | elseif exists('t:winhidden[\"".
-                    \ l:bufname."\"]') | unlet t:winhidden['".l:bufname.
-                    \ "'] | endif"
+        if bufwinnr(l:bufname) == -1
+            let t:winhidden[l:bufname] = 1
+        elseif exists('t:winhidden[l:bufname]')
+            unlet t:winhidden[l:bufname]
+        endif
     endif
     let lastwin = winnr('$')
     let i = 1
@@ -1098,7 +1099,7 @@ autocmd BufEnter *
         \ let b:RightBorder = &textwidth > 0 ? &textwidth : g:RightBorder |
         \ let g:RightAlign_RightBorder = b:RightBorder |
         \ if &colorcolumn |
-        \ exe "setlocal colorcolumn=".(b:RightBorder + 1) |
+        \     exe "setlocal colorcolumn=".(b:RightBorder + 1) |
         \ endif
 
 " show colorcolumn when committing to svn, cvs or other VCS
@@ -1153,42 +1154,42 @@ let g:tagbar_type_haskell = {
     \ 'ctagsbin'    : 'hasktags',
     \ 'ctagsargs'   : '-x -c -o-',
     \ 'kinds'       : [
-        \  'm:modules:0:1',
-        \  'd:data:0:1',
-        \  'd_gadt:data gadt:0:1',
-        \  'nt:newtype:0:1',
-        \  'c:classes:0:1',
-        \  'i:instances:0:1',
-        \  'cons:constructors:0:1',
-        \  'c_gadt:constructor gadt:0:1',
-        \  'c_a:constructor accessors:1:1',
-        \  't:type names:0:1',
-        \  'pt:pattern types:0:1',
-        \  'pi:pattern implementations:0:1',
-        \  'ft:function types:0:1',
-        \  'fi:function implementations:0:1',
-        \  'o:others:0:1'
+    \     'm:modules:0:1',
+    \     'd:data:0:1',
+    \     'd_gadt:data gadt:0:1',
+    \     'nt:newtype:0:1',
+    \     'c:classes:0:1',
+    \     'i:instances:0:1',
+    \     'cons:constructors:0:1',
+    \     'c_gadt:constructor gadt:0:1',
+    \     'c_a:constructor accessors:1:1',
+    \     't:type names:0:1',
+    \     'pt:pattern types:0:1',
+    \     'pi:pattern implementations:0:1',
+    \     'ft:function types:0:1',
+    \     'fi:function implementations:0:1',
+    \     'o:others:0:1'
     \ ],
     \ 'sro'          : '.',
     \ 'kind2scope'   : {
-        \ 'm'        : 'module',
-        \ 'd'        : 'data',
-        \ 'd_gadt'   : 'd_gadt',
-        \ 'c_gadt'   : 'c_gadt',
-        \ 'nt'       : 'newtype',
-        \ 'cons'     : 'cons',
-        \ 'c_a'      : 'accessor',
-        \ 'c'        : 'class',
-        \ 'i'        : 'instance'
+    \     'm'        : 'module',
+    \     'd'        : 'data',
+    \     'd_gadt'   : 'd_gadt',
+    \     'c_gadt'   : 'c_gadt',
+    \     'nt'       : 'newtype',
+    \     'cons'     : 'cons',
+    \     'c_a'      : 'accessor',
+    \     'c'        : 'class',
+    \     'i'        : 'instance'
     \ },
     \ 'scope2kind'   : {
-        \ 'module'   : 'm',
-        \ 'data'     : 'd',
-        \ 'newtype'  : 'nt',
-        \ 'cons'     : 'c_a',
-        \ 'd_gadt'   : 'c_gadt',
-        \ 'class'    : 'ft',
-        \ 'instance' : 'ft'
+    \     'module'   : 'm',
+    \     'data'     : 'd',
+    \     'newtype'  : 'nt',
+    \     'cons'     : 'c_a',
+    \     'd_gadt'   : 'c_gadt',
+    \     'class'    : 'ft',
+    \     'instance' : 'ft'
     \ }
 \ }
 " }}}

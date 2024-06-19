@@ -141,8 +141,8 @@ fun! init#setup_airline(sudo_icon)
             \ })
         let g:airline_section_a =
                     \ airline#section#create_left(
-                        \ ['mode', 'sudo', 'crypt', 'paste', 'keymap',
-                        \ 'spell', 'capslock', 'xkblayout', 'iminsert']
+                    \     ['mode', 'sudo', 'crypt', 'paste', 'keymap',
+                    \      'spell', 'capslock', 'xkblayout', 'iminsert']
                     \ )
         AirlineRefresh
         let s:airline_loaded = 1
@@ -278,7 +278,7 @@ endfun
 " ---- Miscellaneous functions {{{1
 " ----
 fun! init#close_last_ancillary_buffers()
-    let curbuf = bufnr('%')
+    let curbuf = expand('<abuf>')
     if empty(getbufvar(curbuf, '&buftype'))
         let quit_all = 1
         for buf in tabpagebuflist(tabpagenr())
