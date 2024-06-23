@@ -277,20 +277,27 @@ endfun
 
 " ---- Miscellaneous functions {{{1
 " ----
+let s:closing_ancillary_buffers = 0
+
 fun! init#close_last_ancillary_buffers()
-    let curbuf = expand('<abuf>')
-    if empty(getbufvar(curbuf, '&buftype'))
-        let quit_all = 1
-        for buf in tabpagebuflist(tabpagenr())
-            if empty(getbufvar(buf, '&buftype')) && buf != curbuf
-                let quit_all = 0
-                break
-            endif
-        endfor
-        if quit_all
-            exe 'only'
-        endif
+    if s:closing_ancillary_buffers
+        return
     endif
+    let s:closing_ancillary_buffers = 1
+    let curbuf = expand('<abuf>')
+    let quit_all = 1
+    for buf in tabpagebuflist(tabpagenr())
+        if getbufvar(buf, '&buflisted') && buf != curbuf ||
+                    \ index(["alpha", "nerdtree"],
+                    \ getbufvar(buf, '&filetype')) != -1
+            let quit_all = 0
+            break
+        endif
+    endfor
+    if quit_all
+        only
+    endif
+    let s:closing_ancillary_buffers = 0
 endfun
 " }}}
 

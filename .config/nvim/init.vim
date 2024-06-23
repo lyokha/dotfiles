@@ -63,7 +63,7 @@ Plug 'simnalamburt/vim-mundo'
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
-Plug 'danilamihailov/beacon.nvim'
+Plug 'danilamihailov/beacon.nvim', { 'commit': 'a786c9a' }
 Plug 'bogado/file-line'
 Plug 'uga-rosa/ccc.nvim'
 Plug 'lervag/vimtex'
