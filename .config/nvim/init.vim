@@ -760,6 +760,7 @@ nmap <silent> <C-p>m     :Telescope marks<CR>
 
 " close tab / quit vim if there are only ancillary buffers in the current tab
 " after quitting the current buffer
+autocmd QuitPre * call init#quit_pre_hook()
 autocmd BufUnload * call init#close_last_ancillary_buffers()
 
 " toggle commands for tagbar, mundo, nerdtree and other are also here
