@@ -1201,6 +1201,8 @@ let g:tagbar_type_haskell = {
 let g:haskell_indent_if = 4
 let g:haskell_indent_case = 4
 let g:haskell_indent_before_where = 4
+let g:haskell_indent_after_bare_where = 4
+let g:haskell_indent_guard = 4
 let g:haskell_indent_in = 0
 " }}}
 
