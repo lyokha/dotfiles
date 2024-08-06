@@ -1,4 +1,23 @@
-:set prompt "\ESC[38;5;208m%s> \ESC[m"
-:set prompt-cont "\ESC[38;5;130m%s| \ESC[m"
+:{
+prompt :: [String] -> Int -> Int -> Int -> String
+prompt s l c cd = putColor (if l `mod` 10 == 0 then cd else c) ++
+    unwords (s' ++ lambda ++ endColor)
+    where putColor c' = "\ESC[38;5;" ++ show c' ++ "m"
+          lambda = pure "\xf0c92"
+          endColor = pure "\ESC[m"
+          s' = map terseModuleName $ filter (/= "Prelude") s
+          terseModuleName = fst .
+              foldr (\v (vs, m) ->
+                        case (v, m) of
+                            ('.', _) -> (v : vs, True)
+                            (_, False) -> (v : vs, False)
+                            (_, True)
+                                | Data.Char.isUpper v ||
+                                  Data.Char.isDigit v -> (v : vs, True)
+                                | otherwise -> (vs, True)
+                    ) ("", False)
+:}
+:set prompt-function \s i -> pure $ prompt s i 208 214
+:set prompt-cont-function \s i -> pure $ prompt s i 130 130
 :seti -XOverloadedStrings
 
