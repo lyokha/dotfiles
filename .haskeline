@@ -2,3 +2,9 @@ editMode: Emacs
 maxHistorySize: Just 200
 historyDuplicates: IgnoreAll
 
+# enter/exit multiline mode with <C-Up>/<C-Down>
+keyseq: "\ESC[1;5A" ctrl-up
+keyseq: "\ESC[1;5B" ctrl-down
+bind: ctrl-up : {
+bind: ctrl-down : }
+

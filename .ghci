@@ -1,23 +1,22 @@
+:seti -XOverloadedStrings -XViewPatterns -XTupleSections -XLambdaCase
+
 :{
-prompt :: [String] -> Int -> Int -> Int -> String
-prompt s l c cd = putColor (if l `mod` 10 == 0 then cd else c) ++
-    unwords (s' ++ lambda ++ endColor)
-    where putColor c' = "\ESC[38;5;" ++ show c' ++ "m"
+prompt_ :: [String] -> Int -> Int -> Int -> String
+prompt_ mods line color colorDelim =
+    putColor (if line `mod` 10 == 0 then colorDelim else color) ++
+        unwords (shortMods ++ lambda ++ clearColor)
+    where putColor c = "\ESC[38;5;" ++ show c ++ "m\STX"
+          clearColor = pure "\ESC[m\STX "
           lambda = pure "\xf0c92"
-          endColor = pure "\ESC[m"
-          s' = map terseModuleName $ filter (/= "Prelude") s
-          terseModuleName = fst .
-              foldr (\v (vs, m) ->
-                        case (v, m) of
-                            ('.', _) -> (v : vs, True)
-                            (_, False) -> (v : vs, False)
-                            (_, True)
-                                | Data.Char.isUpper v ||
-                                  Data.Char.isDigit v -> (v : vs, True)
-                                | otherwise -> (vs, True)
+          shortMods = map shortenModName $ filter (/= "Prelude") mods
+          shortenModName = fst .
+              foldr (\x (xs, isQualifier) ->
+                        case (x, isQualifier) of
+                            ('.', _) -> (x : xs, True)
+                            (_, True) | Data.Char.isAsciiLower x -> (xs, True)
+                            _ -> (x : xs, isQualifier)
                     ) ("", False)
 :}
-:set prompt-function \s i -> pure $ prompt s i 208 214
-:set prompt-cont-function \s i -> pure $ prompt s i 130 130
-:seti -XOverloadedStrings
+:set prompt-function \mods line -> pure $ prompt_ mods line 208 214
+:set prompt-cont-function \mods line -> pure $ prompt_ mods line 130 130
 
