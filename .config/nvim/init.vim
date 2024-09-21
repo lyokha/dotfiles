@@ -115,8 +115,9 @@ if g:CustomTSHighlights
                 \ gui=italic guifg=#00ee9e guibg=NONE
     highlight TSProperty
                 \ cterm=NONE ctermfg=49 ctermbg=NONE
-                \ gui=NONE guifg=#00d990 guibg=NONE
+                \ gui=NONE guifg=#09d08d guibg=NONE
     highlight link TSField TSProperty
+    highlight link @constructor.haskell TSProperty
 endif
 
 let g:CustomFoldedHighlights = 1
