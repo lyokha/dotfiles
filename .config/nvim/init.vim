@@ -426,6 +426,14 @@ lua <<EOF
       }
     }
     if lsp == 'hls' then
+      setup.settings = {
+        haskell = {
+          formattingProvider = 'fourmolu',
+          plugin = {
+            semanticTokens = { globalOn = true }
+          }
+        }
+      }
       setup.filetypes = { 'haskell', 'lhaskell', 'cabal' }
     end
     nvim_lsp[lsp].setup(setup)

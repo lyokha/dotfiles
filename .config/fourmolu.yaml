@@ -3,15 +3,16 @@ column-limit: 80
 function-arrows: leading
 comma-style: leading
 import-export-style: leading
-indent-wheres: false
+indent-wheres: true
 record-brace-space: true
 newlines-between-decls: 1
 haddock-style: single-line
 haddock-style-module:
 let-style: auto
-in-style: right-align
+in-style: no-space
 single-constraint-parens: auto
 single-deriving-parens: auto
 unicode: never
 respectful: true
 fixities: []
+import-grouping: preserve
