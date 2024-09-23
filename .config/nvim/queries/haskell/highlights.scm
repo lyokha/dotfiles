@@ -1,5 +1,6 @@
 ; extends
-; collect items that will have higher priority than HLS semantic tokens
+
+; ### Collect items that will have higher priority than HLS semantic tokens
 
 ; consider infix functions as operators
 (infix_id
@@ -32,12 +33,17 @@
     "traceM" "traceShowM" "traceEvent" "traceEventWith" "traceEventIO" "flushEventLog" "traceMarker"
     "traceMarkerIO") (#set! priority 130))
 
-; render pragmas in a single color as Treesitter does
+; render pragmas in a single color (as treesitter does now)
 ; (HLS highlights types and functions differently)
 ((pragma) @keyword.directive (#set! priority 130))
 
-; render comments in a single color as Treesitter does
+; render comments in a single color (as treesitter does now)
 ; (HLS highlights links to types and functions differently)
 ((comment) @comment (#set! priority 130))
 ((haddock) @comment.documentation (#set! priority 130))
+
+; ### Various ad-hoc tweaks
+
+; highlight opening brackets of TH quotes as a whole
+("[" @keyword.quote . "|" @keyword.quote)
 
