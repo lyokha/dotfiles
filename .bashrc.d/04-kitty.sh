@@ -1,2 +1,2 @@
-[ "$TERM" = xterm-kitty ] && alias ssh='kitty +kitten ssh'
+[ "$TERM" = xterm-kitty ] && alias ssh='kitten ssh'
 
