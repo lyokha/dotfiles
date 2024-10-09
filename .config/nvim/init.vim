@@ -214,7 +214,7 @@ nmap <silent> ,Y    "+P
 " }}}
 
 
-" ---- Setup alpha-nvim {{{1
+" ---- Setup alpha-nvim and ccc {{{1
 " ----
 lua <<EOF
   local theta = require'alpha.themes.theta'
@@ -244,6 +244,7 @@ lua <<EOF
   }
 
   require'alpha'.setup(theta.config)
+  require'ccc'.setup()
 EOF
 " }}}
 
