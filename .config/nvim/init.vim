@@ -244,7 +244,8 @@ lua <<EOF
   }
 
   require'alpha'.setup(theta.config)
-  require'ccc'.setup()
+
+  require'ccc'.setup { lsp = false }
 EOF
 " }}}
 
@@ -476,7 +477,7 @@ lua <<EOF
     return newVirtText
   end
 
-  require'ufo'.setup({
+  require'ufo'.setup {
     provider_selector = function(bufnr, filetype, buftype)
       if buftype == 'nofile' then
         return ''
@@ -519,7 +520,7 @@ lua <<EOF
         winblend = 0
       }
     }
-  })
+  }
 
   vim.keymap.set('n', 'zK',
     function()
@@ -528,7 +529,7 @@ lua <<EOF
   )
 
   -- symbols-outline.nvim
-  require("symbols-outline").setup({
+  require'symbols-outline'.setup {
     highlight_hovered_item = true,
     show_guides = true,
     auto_preview = false,
@@ -588,7 +589,7 @@ lua <<EOF
       Operator = {icon = "+", hl = "TSOperator"},
       TypeParameter = {icon = "𝙏", hl = "TSParameter"}
     }
-  })
+  }
 
   -- LSP Enable diagnostics
   vim.lsp.handlers["textDocument/publishDiagnostics"] =
@@ -654,7 +655,7 @@ lua <<EOF
   local cmp = require'cmp'
   local lspkind = require'lspkind'
 
-  cmp.setup({
+  cmp.setup {
     completion = {
       completeopt = 'menu,menuone,noselect'
     },
@@ -688,7 +689,7 @@ lua <<EOF
     experimental = {
       ghost_text = false
     }
-  })
+  }
 EOF
 
 let g:UltiSnipsJumpForwardTrigger="<Tab>"
@@ -878,7 +879,7 @@ nmap <silent> ,ha   :GV<CR>
 nmap <silent> ,hf   :GV!<CR>
 
 lua <<EOF
-  require('gitsigns').setup {
+  require'gitsigns'.setup {
     signs = {
       add          = { text = '│' },
       change       = { text = '│' },
@@ -1299,7 +1300,7 @@ lua <<EOF
     return nil
   end
 
-  require'nvim_context_vt'.setup({
+  require'nvim_context_vt'.setup {
     disable_ft = { 'bash', 'haskell', 'markdown', 'pandoc', 'perl' },
     custom_parser = function(node, ft)
       local is_function_definition = node:type() == 'function_definition'
@@ -1342,7 +1343,7 @@ lua <<EOF
       end
       return context_vt_utils.default_validator(node, ft, opts)
     end
-  })
+  }
 EOF
 " }}}
 
