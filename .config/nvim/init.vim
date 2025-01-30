@@ -318,7 +318,7 @@ EOF
 lua <<EOF
   require'nvim-treesitter.configs'.setup {
     ensure_installed = {
-      'bash', 'c', 'cmake', 'cpp', 'haskell', 'json', 'latex', 'lua',
+      'bash', 'c', 'cmake', 'cpp', 'go', 'haskell', 'json', 'latex', 'lua',
       'markdown', 'perl', 'python', 'r', 'rust', 'toml', 'vim', 'vimdoc',
       'yaml'
     },
@@ -420,7 +420,9 @@ lua <<EOF
 
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
-  local servers = { 'bashls', 'clangd', 'hls', 'perlpls', 'rust_analyzer' }
+  local servers = {
+    'bashls', 'clangd', 'gopls', 'hls', 'perlpls', 'rust_analyzer'
+  }
   for _, lsp in ipairs(servers) do
     local setup = {
       on_attach = on_attach,
