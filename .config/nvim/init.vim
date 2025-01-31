@@ -1125,6 +1125,11 @@ autocmd FileType svn,cvs,gitcommit,hgcommit
 
 " ---- Tagbar settings {{{1
 " ----
+if executable('ctags-universal')
+    " prefer Universal ctags in Ubuntu
+    " (in Fedora, ctags executable is always Universal ctags)
+    let g:tagbar_ctags_bin = 'ctags-universal'
+endif
 let g:tagbar_width = 42 + &columns % 2
 let g:tagbar_sort = 0
 
