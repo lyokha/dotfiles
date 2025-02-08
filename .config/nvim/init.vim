@@ -488,9 +488,9 @@ lua <<EOF
       end
       local function contains(tbl, val)
         for i = 1, #tbl do
-           if tbl[i] == val then
-              return true
-           end
+          if tbl[i] == val then
+            return true
+          end
         end
         return false
       end
@@ -607,26 +607,18 @@ lua <<EOF
   do
     local method = "textDocument/publishDiagnostics"
     local default_handler = vim.lsp.handlers[method]
-    vim.lsp.handlers[method] = function(err, method, result, client_id,
-                                        bufnr, config)
-      default_handler(err, method, result, client_id, bufnr, config)
-      vim.diagnostic.setqflist({ open = false })
-    end
+    vim.lsp.handlers[method] =
+      function(err, method, result, client_id, bufnr, config)
+        default_handler(err, method, result, client_id, bufnr, config)
+        vim.diagnostic.setqflist({ open = false })
+      end
   end
 
   vim.lsp.handlers["textDocument/hover"] =
-    vim.lsp.with(
-      vim.lsp.handlers.hover,
-      {
-        border = "rounded"
-      })
+    vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
 
   vim.lsp.handlers["textDocument/signatureHelp"] =
-    vim.lsp.with(
-      vim.lsp.handlers.signature_help,
-      {
-        border = "rounded"
-      })
+    vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
   vim.ui.select = require'popui.ui-overrider'
 
