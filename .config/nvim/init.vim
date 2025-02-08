@@ -174,6 +174,8 @@ set cinoptions=:0(0+2s
 set completeopt=menu
 set foldcolumn=0
 set foldlevelstart=99
+set listchars=tab:󰅂\ ,trail:·,nbsp:⍽
+set list
 
 set mouse=a
 set hlsearch
@@ -593,24 +595,23 @@ lua <<EOF
     }
   }
 
-  -- LSP Enable diagnostics
-  vim.lsp.handlers["textDocument/publishDiagnostics"] =
-      vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-          virtual_text = false,
-          underline = true,
-          signs = true,
-          update_in_insert = false
-      })
+  -- LSP diagnostics setup
+  vim.diagnostic.config {
+    virtual_text = false,
+    underline = true,
+    signs = true,
+    update_in_insert = false
+  }
 
   -- Send diagnostics to quickfix list
   do
-      local method = "textDocument/publishDiagnostics"
-      local default_handler = vim.lsp.handlers[method]
-      vim.lsp.handlers[method] = function(err, method, result, client_id,
-                                          bufnr, config)
-          default_handler(err, method, result, client_id, bufnr, config)
-          vim.diagnostic.setqflist({ open = false })
-      end
+    local method = "textDocument/publishDiagnostics"
+    local default_handler = vim.lsp.handlers[method]
+    vim.lsp.handlers[method] = function(err, method, result, client_id,
+                                        bufnr, config)
+      default_handler(err, method, result, client_id, bufnr, config)
+      vim.diagnostic.setqflist({ open = false })
+    end
   end
 
   vim.lsp.handlers["textDocument/hover"] =
