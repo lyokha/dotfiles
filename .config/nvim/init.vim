@@ -318,11 +318,14 @@ EOF
 " ---- Setup treesitter {{{1
 " ----
 lua <<EOF
+  -- Register filetype pandoc as language markdown
+  vim.treesitter.language.register('markdown', 'pandoc')
+
   require'nvim-treesitter.configs'.setup {
     ensure_installed = {
-      'bash', 'c', 'cmake', 'cpp', 'go', 'haskell', 'json', 'latex', 'lua',
-      'markdown', 'perl', 'python', 'r', 'rust', 'toml', 'vim', 'vimdoc',
-      'yaml'
+      'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
+      'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
+      'r', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'yaml'
     },
     highlight = {
       enable = true,
@@ -340,9 +343,6 @@ lua <<EOF
     }
   }
 EOF
-
-" note that doxygen highlighting does not work with treesitter
-let g:load_doxygen_syntax = 1
 " }}}
 
 
