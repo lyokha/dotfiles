@@ -39,7 +39,6 @@ Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
-Plug 'nvim-treesitter/playground'
 Plug 'simrat39/symbols-outline.nvim'
 Plug 'RRethy/vim-illuminate'
 Plug 'onsails/lspkind-nvim'
@@ -69,6 +68,7 @@ Plug 'uga-rosa/ccc.nvim'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'vim-pandoc/vim-pandoc-after'
 Plug 'dpelle/vim-LanguageTool'
 Plug 'mechatroner/rainbow_csv'
 Plug 'derekwyatt/vim-fswitch'
@@ -329,7 +329,6 @@ lua <<EOF
     },
     highlight = {
       enable = true,
-      disable = { 'latex', 'markdown' },
       additional_vim_regex_highlighting = { 'haskell' },
     },
     incremental_selection = {
@@ -448,8 +447,7 @@ lua <<EOF
   end
 
   local ufo_ft_map = {
-    lsp = { 'c', 'cpp', 'haskell', 'rust', 'perl' },
-    disabled = { 'pandoc', 'markdown' }
+    lsp = { 'c', 'cpp', 'go', 'haskell', 'perl', 'rust' }
   }
 
   local ufo_virt_text = function(virtText, lnum, endLnum, width, truncate)
@@ -487,22 +485,23 @@ lua <<EOF
         return ''
       end
       local function contains(tbl, val)
-        for i = 1, #tbl do
-          if tbl[i] == val then
-            return true
+        if tbl then
+          for i = 1, #tbl do
+            if tbl[i] == val then
+              return true
+            end
           end
         end
         return false
       end
       local ret = ''
-      if contains(ufo_ft_map['disabled'], filetype) then
+      if contains(ufo_ft_map.disabled, filetype) then
         return ''
-      elseif contains(ufo_ft_map['lsp'], filetype) then
+      elseif contains(ufo_ft_map.lsp, filetype) then
         ret = { 'lsp', 'treesitter' }
       else
         ret = { 'treesitter', 'indent' }
       end
-      vim.opt_local.foldlevel = 99
       vim.keymap.set('n', 'zR', require'ufo'.openAllFolds,
                      { buffer = true })
       vim.keymap.set('n', 'zM', require'ufo'.closeAllFolds,
@@ -515,7 +514,8 @@ lua <<EOF
     end,
     fold_virt_text_handler = ufo_virt_text,
     close_fold_kinds_for_ft = {
-      default = { 'comment', 'imports' }
+      default = { 'comment', 'imports' },
+      pandoc = { 'fenced_code_block' }
     },
     preview = {
       win_config = {
@@ -824,6 +824,10 @@ filetype plugin indent on
 
 set spelllang=ru_ru,en_us
 
+" follow golang formatting style
+autocmd FileType go setlocal noexpandtab
+            \ tabstop=6 softtabstop=6 shiftwidth=6 textwidth=99
+            \ listchars=tab:\ \ ,trail:·,nbsp:⍽
 " set sensible textwidth for tex, rst and pandoc files
 autocmd FileType tex,rst,pandoc setlocal textwidth=80 colorcolumn=81
 " set appropriate conceallevel for tex files
@@ -1021,17 +1025,16 @@ autocmd BufWinEnter,VimEnter * call init#setup_airline(s:SudoAdminIcon)
 
 " ---- Pandoc settings {{{1
 " ----
-let g:pandoc#modules#disabled = ['menu', 'spell']
-let g:pandoc#syntax#codeblocks#embeds#langs = ['vim', 'tex', 'sh', 'cpp']
-let g:pandoc#formatting#textwidth = 80
-let g:pandoc#folding#mode = 'stacked'
-let g:pandoc#folding#level = 1
-let g:pandoc#folding#fold_fenced_codeblocks = 1
-let g:pandoc#folding#fdc = 0
+let g:pandoc#modules#disabled = ['menu', 'spell', 'folding']
+let g:pandoc#formatting#mode = 'ha'
+let g:pandoc#formatting#textwidth = 79
+" syntax and folding is up to treesitter!
+" let g:pandoc#folding#mode = 'stacked'
+" let g:pandoc#folding#level = 1
+" let g:pandoc#folding#fold_fenced_codeblocks = 1
+" let g:pandoc#folding#fdc = 0
 let g:pandoc#after#modules#enabled = ['tablemode']
 let g:pandoc#biblio#sources = 'b'
-" avoid possible folding mess on very long code blocks
-autocmd FileType pandoc syntax sync minlines=500
 " }}}
 
 
