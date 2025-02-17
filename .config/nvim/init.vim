@@ -90,8 +90,8 @@ set termguicolors
 " seamless FloatBorder around NormalFloat for gruvbox-material colorscheme
 autocmd ColorScheme *
             \ highlight FloatBorder
-                \ cterm=NONE ctermfg=186 ctermbg=237
-                \ gui=NONE guifg=#d7d787 guibg=#45403d
+            \     cterm=NONE ctermfg=186 ctermbg=237
+            \     gui=NONE guifg=#d7d787 guibg=#45403d
 
 let g:gruvbox_material_transparent_background = 1
 let g:gruvbox_material_enable_bold = 0
@@ -790,8 +790,10 @@ let g:mundo_preview_height = 20
 let g:mundo_prefer_python3 = 1
 
 " set winfixwidth in Mundo windows (as it is not set in the plugin)
-autocmd BufEnter * if match(bufname('%'), '__Mundo_\%(Preview\)\=_') != -1 |
-            \ setlocal winfixwidth | endif
+autocmd BufEnter *
+            \ if match(bufname('%'), '__Mundo_\%(Preview\)\=_') != -1 |
+            \     setlocal winfixwidth |
+            \ endif
 
 " quickly remove all current highlights
 nmap          ,l         :nohl<CR>
@@ -1035,6 +1037,16 @@ let g:pandoc#formatting#textwidth = 79
 " let g:pandoc#folding#fdc = 0
 let g:pandoc#after#modules#enabled = ['tablemode']
 let g:pandoc#biblio#sources = 'b'
+
+" regard any README.md as a gfm file and setup the right equalprg
+autocmd FileType pandoc
+            \ let b:PandocMarkdownFlavor =
+            \     expand('%:t') ==? "README.md" ? "gfm" : "markdown" |
+            \ let g:pandoc#formatting#equalprg = "pandoc -t ".
+            \     b:PandocMarkdownFlavor." --columns ".
+            \     g:pandoc#formatting#textwidth |
+            \ let &l:equalprg = g:pandoc#formatting#equalprg.' '.
+            \     g:pandoc#formatting#extra_equalprg
 " }}}
 
 
@@ -1102,16 +1114,14 @@ nmap <silent> ,f :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
 nmap          ,r :HideDosEols<CR>
 nmap <silent> ,m :if &colorcolumn == b:RightBorder + 1 <Bar>
             \ setlocal colorcolumn= <Bar> elseif !&colorcolumn <Bar>
-            \ exe "setlocal colorcolumn=".(b:RightBorder + 1) <Bar> endif<CR>
+            \ let &l:colorcolumn = b:RightBorder + 1 <Bar> endif<CR>
 
 " adjust colorcolumn and g:RightAlign_RightBorder when entering a buffer with
 " different value of 'textwidth'
 autocmd BufEnter *
         \ let b:RightBorder = &textwidth > 0 ? &textwidth : g:RightBorder |
         \ let g:RightAlign_RightBorder = b:RightBorder |
-        \ if &colorcolumn |
-        \     exe "setlocal colorcolumn=".(b:RightBorder + 1) |
-        \ endif
+        \ if &colorcolumn | let &l:colorcolumn = b:RightBorder + 1 | endif
 
 " show colorcolumn when committing to svn, cvs or other VCS
 autocmd FileType svn,cvs,gitcommit,hgcommit
