@@ -10,55 +10,66 @@
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?c$")(#set! conceal "")))
+    (#any-of? @label "c" ".c")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?cpp$")(#set! conceal "")))
+    (#any-of? @label "cpp" ".cpp")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?haskell$")(#set! conceal "")))
+    (#any-of? @label "haskell" ".haskell")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#any-of? @label "ShellSession" ".shelloutput")(#set! conceal "")))
+    (#any-of? @label "ShellSession" "shellsession" "shelloutput" ".shelloutput")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?sh$")(#set! conceal "")))
+    (#any-of? @label "sh" ".sh")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?nginx$")(#set! conceal "")))
+    (#any-of? @label "nginx" ".nginx")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?vim$")(#set! conceal "")))
+    (#any-of? @label "vim" ".vim")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?(la)?tex$")(#set! conceal "")))
+    (#any-of? @label "latex" "tex" ".latex" ".tex")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?go$")(#set! conceal "")))
+    (#any-of? @label "go" ".go")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?rust$")(#set! conceal "")))
+    (#any-of? @label "rust" ".rust")
+    (#set! conceal "")))
 
 (fenced_code_block
   (info_string
     (language) @label
-    (#match? @label "^\.?r$")(#set! conceal "")))
+    (#any-of? @label "r" ".r")
+    (#set! conceal "")))
 
