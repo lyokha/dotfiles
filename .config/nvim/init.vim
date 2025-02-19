@@ -315,9 +315,50 @@ EOF
 " }}}
 
 
+" ---- Setup nvim-web-devicons {{{1
+" ----
+lua <<EOF
+  local devicons = require'nvim-web-devicons'
+
+  devicons.set_icon {
+    nginx = { icon = '', color = '#009400', cterm_color = '28',
+      name = 'Nginx'
+    },
+    shellsession = { icon = '', color = '#cbcb41', cterm_color = '185',
+      name = 'ShellSession'
+    }
+  }
+
+  devicons.set_icon_by_filetype {
+    latex = 'tex', nginx = 'nginx', shellsession = 'shellsession',
+    shelloutput = 'shellsession'
+  }
+EOF
+" }}}
+
+
 " ---- Setup treesitter {{{1
 " ----
 lua <<EOF
+  local query = require'vim.treesitter.query'
+  local devicons = require'nvim-web-devicons'
+
+  -- Conceal language injections by language icons from devicons
+  query.add_directive('set-conceal-from-info-string!',
+    function(match, _, bufnr, pred, metadata)
+      local capture_id = pred[2]
+      local node = match[capture_id]
+      if not node then
+        return
+      end
+      local lang = vim.treesitter.get_node_text(node, bufnr):lower()
+      -- Pandoc attribute style requires a dot before the language id
+      if lang:sub(1, 1) == '.' then
+        lang = lang:sub(2)
+      end
+      metadata.conceal = devicons.get_icon_by_filetype(lang) or ''
+    end, opts)
+
   -- Register filetype pandoc as language markdown
   vim.treesitter.language.register('markdown', 'pandoc')
 
