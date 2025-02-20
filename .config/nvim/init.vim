@@ -556,7 +556,8 @@ lua <<EOF
     fold_virt_text_handler = ufo_virt_text,
     close_fold_kinds_for_ft = {
       default = { 'comment', 'imports' },
-      pandoc = { 'fenced_code_block' }
+      pandoc = { 'fenced_code_block' },
+      rst = { 'directive' }
     },
     preview = {
       win_config = {
