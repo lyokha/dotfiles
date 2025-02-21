@@ -295,7 +295,7 @@ fun! init#close_last_ancillary_buffers()
     endif
     let s:closing_last_ancillary_buffers = 1
     let quit_all = 1
-    let curbuf = expand('<abuf>')
+    let curbuf = bufnr()
     let bufs = tabpagebuflist(tabpagenr())
     for buf in bufs
         if buf != curbuf && getbufvar(buf, '&buflisted')

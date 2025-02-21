@@ -39,7 +39,9 @@ Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
-Plug 'simrat39/symbols-outline.nvim'
+Plug 'hedyhli/outline.nvim'
+Plug 'epheien/outline-treesitter-provider.nvim'
+Plug 'epheien/outline-ctags-provider.nvim'
 Plug 'RRethy/vim-illuminate'
 Plug 'onsails/lspkind-nvim'
 Plug 'lyokha/nvim-treesitter-context'
@@ -366,7 +368,7 @@ lua <<EOF
     ensure_installed = {
       'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
       'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
-      'r', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'yaml'
+      'r', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml', 'yaml'
     },
     highlight = {
       enable = true,
@@ -574,27 +576,51 @@ lua <<EOF
     end
   )
 
-  -- symbols-outline.nvim
-  require'symbols-outline'.setup {
-    highlight_hovered_item = true,
-    show_guides = true,
-    auto_preview = false,
-    position = 'right',
-    relative_width = true,
-    width = 25,
-    auto_close = false,
-    show_numbers = false,
-    show_relative_numbers = false,
-    show_symbol_details = true,
-    preview_bg_highlight = 'Pmenu',
-    autofold_depth = nil,
-    auto_unfold_hover = true,
-    fold_markers = { '', '' },
-    wrap = false,
+  -- outline.nvim
+  require'outline'.setup {
+    providers = {
+      priority = { 'lsp', 'treesitter' },
+    },
+    outline_items = {
+      highlight_hovered_item = true,
+      auto_set_cursor = true,
+      show_symbol_details = true,
+      auto_update_events = {
+        follow = { 'CursorHold' },
+        items = {
+          'InsertLeave', 'WinEnter', 'BufEnter', 'BufWinEnter', 'TabEnter',
+          'BufWritePost'
+        }
+      }
+    },
+    guides = {
+      enabled = true
+    },
+    preview_window = {
+      auto_preview = false,
+      winhl = 'NormalFloat:Folded,FloatBorder:Folded',
+      winblend = 0
+    },
+    outline_window = {
+      position = 'right',
+      width = 42 + vim.o.columns % 2,
+      relative_width = false,
+      auto_close = false,
+      show_numbers = false,
+      show_relative_numbers = false,
+      wrap = false
+    },
+    symbol_folding = {
+      markers = { '', '' },
+      autofold_depth = 1,
+      auto_unfold = {
+        hovered = true
+      }
+    },
     keymaps = {
-      close = {"<Esc>"},
+      close = {},
       goto_location = "<Cr>",
-      focus_location = "o",
+      peek_location = "o",
       hover_symbol = "K",
       toggle_preview = "q",
       rename_symbol = "r",
@@ -603,37 +629,7 @@ lua <<EOF
       unfold = "+",
       fold_all = "=",
       unfold_all = "O",
-      fold_reset = "R",
-    },
-    lsp_blacklist = {},
-    symbol_blacklist = {},
-    symbols = {
-      File = {icon = "󰈔", hl = "TSURI"},
-      Module = {icon = "󰆧", hl = "TSNamespace"},
-      Namespace = {icon = "󰅪", hl = "TSNamespace"},
-      Package = {icon = "󰏗", hl = "TSNamespace"},
-      Class = {icon = "𝓒", hl = "TSType"},
-      Method = {icon = "ƒ", hl = "TSMethod"},
-      Property = {icon = "", hl = "TSMethod"},
-      Field = {icon = "󰆨", hl = "TSField"},
-      Constructor = {icon = "", hl = "TSConstructor"},
-      Enum = {icon = "ℰ", hl = "TSType"},
-      Interface = {icon = "󰜰", hl = "TSType"},
-      Function = {icon = "", hl = "TSFunction"},
-      Variable = {icon = "", hl = "TSConstant"},
-      Constant = {icon = "", hl = "TSConstant"},
-      String = {icon = "𝓐", hl = "TSString"},
-      Number = {icon = "#", hl = "TSNumber"},
-      Boolean = {icon = "⊨", hl = "TSBoolean"},
-      Array = {icon = "󰅪", hl = "TSConstant"},
-      Object = {icon = "⦿", hl = "TSType"},
-      Key = {icon = "🔐", hl = "TSType"},
-      Null = {icon = "NULL", hl = "TSType"},
-      EnumMember = {icon = "", hl = "TSField"},
-      Struct = {icon = "𝓢", hl = "TSType"},
-      Event = {icon = "🗲", hl = "TSType"},
-      Operator = {icon = "+", hl = "TSOperator"},
-      TypeParameter = {icon = "𝙏", hl = "TSParameter"}
+      fold_reset = "R"
     }
   }
 
@@ -820,7 +816,7 @@ nmap <silent> <C-p>u     :call
 nmap <silent> <C-p>e     :call
             \ <SID>wintoggle_cmd('NERDTreeToggle', 'NERD_tree_*')<CR>
 nmap <silent> <C-p>o     :call
-            \ <SID>wintoggle_cmd('SymbolsOutline', 'OUTLINE')<CR>
+            \ <SID>wintoggle_cmd('Outline!', 'OUTLINE_*')<CR>
 " go to bottom-right window (tagbar etc.)
 nmap <silent> <C-p>[     :wincmd b<CR>
 
@@ -1207,11 +1203,40 @@ fun! s:open_tagbar(buf_enter)
     call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__*')
 endfun
 
-" automatically open tagbar on vim's start or a new tab is open if filetype
-" of the open file is supported by ctags and tagbar (if not in diff mode);
-autocmd BufEnter * call s:open_tagbar(1)
-" BufWritePost shall trigger tagbar opening on the first write to a new file
-autocmd BufWritePost * call s:open_tagbar(0)
+fun! s:open_outline(timer_id)
+    if a:timer_id != -1 && exists('b:open_outline_done')
+        OutlineRefresh
+        return
+    endif
+    if &diff || index(g:tagbar_win_ft_skip, &filetype) != -1 ||
+                \ exists('t:winhidden[t:tagbar_buf_name]')
+        let b:open_outline_done = 1
+        return
+    endif
+    if !v:lua.require'outline.providers'.has_provider()
+        return
+    endif
+    let b:open_outline_done = 1
+    if empty(&buftype)
+        setlocal buflisted
+    endif
+    call s:wintoggle_cmd('OutlineOpen!', 'OUTLINE_*')
+endfun
+
+let g:OutlineImpl = 'outline'
+
+if g:OutlineImpl == 'tagbar'
+    " automatically open tagbar on vim's start or a new tab is open if
+    " filetype of the open file is supported by ctags and tagbar (when not
+    " in diff mode);
+    autocmd BufEnter * call s:open_tagbar(1)
+    " BufWritePost shall trigger tagbar opening on the first write to
+    " a new file
+    autocmd BufWritePost * call s:open_tagbar(0)
+elseif g:OutlineImpl == 'outline'
+    autocmd BufEnter * call timer_start(500, 's:open_outline', {'repeat': 9})
+    autocmd BufWritePost * call s:open_outline(-1)
+endif
 
 " setting specific ambiwidth prevents from printing garbage in the first two
 " columns on the second row of the screen when tagbar automatically opens on
