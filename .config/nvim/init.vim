@@ -563,18 +563,16 @@ lua <<EOF
     },
     preview = {
       win_config = {
-        border = 'rounded',
+        border = 'none',
         winhighlight = 'NormalFloat:Folded,FloatBorder:Folded',
         winblend = 0
       }
     }
   }
 
-  vim.keymap.set('n', 'zK',
-    function()
-      require'ufo'.peekFoldedLinesUnderCursor()
-    end
-  )
+  vim.keymap.set('n', 'zK', function()
+    require'ufo'.peekFoldedLinesUnderCursor()
+  end)
 
   -- outline.nvim
   require'outline'.setup {
@@ -585,6 +583,7 @@ lua <<EOF
       highlight_hovered_item = true,
       auto_set_cursor = true,
       show_symbol_details = true,
+      show_symbol_lineno = false,
       auto_update_events = {
         follow = { 'CursorHold' },
         items = {
@@ -598,7 +597,8 @@ lua <<EOF
     },
     preview_window = {
       auto_preview = false,
-      winhl = 'NormalFloat:Folded,FloatBorder:Folded',
+      border = 'rounded',
+      winhl = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder',
       winblend = 0
     },
     outline_window = {
@@ -607,6 +607,8 @@ lua <<EOF
       relative_width = false,
       auto_close = false,
       show_numbers = false,
+      show_cursor_line = true,
+      hide_cursor = true,
       show_relative_numbers = false,
       wrap = false
     },
@@ -616,6 +618,9 @@ lua <<EOF
       auto_unfold = {
         hovered = true
       }
+    },
+    symbols = {
+      icon_source = 'lspkind'
     },
     keymaps = {
       close = {},
