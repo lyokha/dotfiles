@@ -586,8 +586,10 @@ lua <<EOF
       show_symbol_lineno = false,
       auto_update_events = {
         follow = { 'CursorHold' },
+        -- BufEnter is missing in the following list because it's called
+        -- from s:open_outline() which gets triggered on BufEnter *
         items = {
-          'InsertLeave', 'WinEnter', 'BufEnter', 'BufWinEnter', 'TabEnter',
+          'InsertLeave', 'WinEnter', 'BufWinEnter', 'TabEnter',
           'BufWritePost'
         }
       }
@@ -1209,19 +1211,16 @@ fun! s:open_tagbar(buf_enter)
 endfun
 
 fun! s:open_outline(timer_id)
-    if a:timer_id != -1 && exists('b:open_outline_done')
+    if a:timer_id != -1 && exists('t:open_outline_done')
+        " refresh outline if a quicker provider has already grabbed it
         OutlineRefresh
         return
     endif
-    if &diff || index(g:tagbar_win_ft_skip, &filetype) != -1 ||
-                \ exists('t:winhidden[t:tagbar_buf_name]')
-        let b:open_outline_done = 1
+    if &diff || exists('t:open_outline_done') ||
+                \ !v:lua.require'outline.providers'.has_provider()
         return
     endif
-    if !v:lua.require'outline.providers'.has_provider()
-        return
-    endif
-    let b:open_outline_done = 1
+    let t:open_outline_done = 1
     if empty(&buftype)
         setlocal buflisted
     endif
