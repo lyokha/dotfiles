@@ -612,6 +612,8 @@ lua <<EOF
       show_cursor_line = true,
       hide_cursor = true,
       show_relative_numbers = false,
+      -- use plugin beacon instead
+      jump_highlight_duration = false,
       wrap = false
     },
     symbol_folding = {
