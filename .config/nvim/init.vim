@@ -586,10 +586,8 @@ lua <<EOF
       show_symbol_lineno = false,
       auto_update_events = {
         follow = { 'CursorHold' },
-        -- BufEnter is missing in the following list because it's called
-        -- from s:open_outline() which gets triggered on BufEnter *
         items = {
-          'InsertLeave', 'WinEnter', 'BufWinEnter', 'TabEnter',
+          'InsertLeave', 'WinEnter', 'BufEnter', 'BufWinEnter', 'TabEnter',
           'BufWritePost'
         }
       }
@@ -1214,8 +1212,6 @@ endfun
 
 fun! s:open_outline(timer_id)
     if a:timer_id != -1 && exists('t:open_outline_done')
-        " refresh outline if a quicker provider has already grabbed it
-        OutlineRefresh
         return
     endif
     if &diff || exists('t:open_outline_done') ||
@@ -1229,6 +1225,13 @@ fun! s:open_outline(timer_id)
     call s:wintoggle_cmd('OutlineOpen!', 'OUTLINE_*')
 endfun
 
+fun! s:refresh_outline(timer_id)
+    if exists('t:open_outline_done')
+        " refresh outline window if a quicker provider has already grabbed it
+        OutlineRefresh
+    endif
+endfun
+
 let g:OutlineImpl = 'outline'
 
 if g:OutlineImpl == 'tagbar'
@@ -1240,7 +1243,10 @@ if g:OutlineImpl == 'tagbar'
     " a new file
     autocmd BufWritePost * call s:open_tagbar(0)
 elseif g:OutlineImpl == 'outline'
-    autocmd BufEnter * call timer_start(500, 's:open_outline', {'repeat': 9})
+    autocmd BufEnter * call
+                \ timer_start(500, 's:open_outline', {'repeat': 9})
+    autocmd BufReadPre * call
+                \ timer_start(500, 's:refresh_outline', {'repeat': 9})
     autocmd BufWritePost * call s:open_outline(-1)
 endif
 
