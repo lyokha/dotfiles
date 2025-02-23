@@ -1059,6 +1059,8 @@ let g:airline#extensions#keymap#enabled = 0
 let g:airline#extensions#xkblayout#enabled = 0
 let g:airline#extensions#tagbar#flags = 'f'
 let g:airline#extensions#tabline#enabled = 0
+" see https://github.com/vim-airline/vim-airline/issues/2704
+let g:airline#extensions#whitespace#symbol = ''
 
 let g:airline_theme_patch_func = 'init#airline_theme_patch'
 
@@ -1222,7 +1224,10 @@ fun! s:open_outline(timer_id)
     if empty(&buftype)
         setlocal buflisted
     endif
+    let cursor = &guicursor
     call s:wintoggle_cmd('OutlineOpen!', 'OUTLINE_*')
+    " revert to the original cursor as outline can change it due to some bug
+    let &guicursor = cursor
 endfun
 
 fun! s:refresh_outline(timer_id)
