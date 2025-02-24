@@ -368,7 +368,7 @@ lua <<EOF
     ensure_installed = {
       'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
       'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
-      'r', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml', 'yaml'
+      'query', 'r', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml', 'yaml'
     },
     highlight = {
       enable = true,
@@ -840,10 +840,11 @@ autocmd BufEnter *
             \     setlocal winfixwidth |
             \ endif
 
-" quickly remove all current highlights
-nmap          ,l         :nohl<CR>
+" quickly toggle hlsearch highlights
+nmap <silent> ,l         :if v:hlsearch <Bar> nohlsearch <Bar> else <Bar>
+            \ set hlsearch <Bar> endif<CR>
 
-" quickly toggle paste mode
+" quickly toggle paste mode (note that paste mode was obsoleted in neovim)
 nmap <silent> ,p         :set paste! <Bar> set paste?<CR>
 
 " quickly toggle spellcheck
