@@ -1248,10 +1248,13 @@ if g:OutlineImpl == 'tagbar'
     " a new file
     autocmd BufWritePost * call s:open_tagbar(0)
 elseif g:OutlineImpl == 'outline'
+    " trying to open outline window within 10 sec, if it fails due to slow
+    " LSP clients, the window can be opened manually with :OutlineOpen! or
+    " <C-p>o
     autocmd BufEnter * call
-                \ timer_start(500, 's:open_outline', {'repeat': 9})
+                \ timer_start(500, 's:open_outline', {'repeat': 20})
     autocmd BufReadPre * call
-                \ timer_start(500, 's:refresh_outline', {'repeat': 9})
+                \ timer_start(500, 's:refresh_outline', {'repeat': 20})
     autocmd BufWritePost * call s:open_outline(-1)
 endif
 
