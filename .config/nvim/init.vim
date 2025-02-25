@@ -626,17 +626,19 @@ lua <<EOF
     },
     keymaps = {
       close = {},
-      goto_location = "<Cr>",
-      peek_location = "o",
-      hover_symbol = "K",
-      toggle_preview = "q",
-      rename_symbol = "r",
-      code_actions = "a",
-      fold = "-",
-      unfold = "+",
-      fold_all = "=",
-      unfold_all = "O",
-      fold_reset = "R"
+      goto_location = '<Cr>',
+      peek_location = 'o',
+      hover_symbol = 'K',
+      toggle_preview = 'q',
+      rename_symbol = 'r',
+      code_actions = 'a',
+      fold = '-',
+      unfold = '+',
+      fold_all = '=',
+      unfold_all = 'O',
+      fold_toggle = '<Tab>',
+      fold_toggle_all = '<S-Tab>',
+      fold_reset = 'R'
     }
   }
 
