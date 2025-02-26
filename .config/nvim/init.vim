@@ -926,6 +926,8 @@ let g:git_messenger_popup_content_margins = v:false
 
 nmap <silent> ,ha   :GV<CR>
 nmap <silent> ,hf   :GV!<CR>
+nmap          ,hB   :Git blame<CR>
+nmap          ,hl   :Git log <C-r><C-w><CR>
 
 lua <<EOF
   require'gitsigns'.setup {
@@ -973,10 +975,9 @@ lua <<EOF
       map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
       map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
       map('n', '<leader>hS', gs.stage_buffer)
-      map('n', '<leader>hu', gs.undo_stage_hunk)
       map('n', '<leader>hR', gs.reset_buffer)
       map('n', '<leader>hp', gs.preview_hunk)
-      map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+      map('n', '<leader>hb', function() gs.blame_line { full = true } end)
       map('n', '<leader>tb', gs.toggle_current_line_blame)
       map('n', '<leader>hd', gs.diffthis)
       map('n', '<leader>hD', function() gs.diffthis('~') end)
@@ -1328,6 +1329,7 @@ nmap <C-k><C-k> <Plug>MarkSet
 nmap <C-k>r     <Plug>MarkRegex
 vmap <C-k><C-k> <Plug>MarkSet
 vmap <C-k>r     <Plug>MarkRegex
+nmap <C-k>i     <Plug>MarkPartialWord
 nmap <C-k>n     <Plug>MarkSearchCurrentNext
 nmap <C-k>p     <Plug>MarkSearchCurrentPrev
 nmap <C-k>]     <Plug>MarkSearchAnyNext
