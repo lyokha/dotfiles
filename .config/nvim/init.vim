@@ -398,15 +398,9 @@ lua <<EOF
   -- Use an on_attach function to only map the following keys
   -- after the language server attaches to the current buffer
   local on_attach = function(client, bufnr)
-    local function buf_set_keymap(...)
-      vim.api.nvim_buf_set_keymap(bufnr, ...)
-    end
     local function buf_set_option(...)
       vim.api.nvim_buf_set_option(bufnr, ...)
     end
-
-    -- Uncomment the next line to disable LSP semantic tokens highlights
-    -- client.server_capabilities.semanticTokensProvider = nil
 
     -- Use LSP as the handler for omnifunc
     buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -414,8 +408,15 @@ lua <<EOF
     -- Use LSP as the handler for formatexpr
     buf_set_option('formatexpr', 'v:lua.vim.lsp.formatexpr()')
 
+    -- Use LSP as the handler for tagfunc
+    buf_set_option('tagfunc', '{t -> v:lua.vim.lsp.tagfunc(t, "cr")}')
+
     -- Mappings
     local opts = { noremap = true, silent = true }
+
+    local function buf_set_keymap(...)
+      vim.api.nvim_buf_set_keymap(bufnr, ...)
+    end
 
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     buf_set_keymap('n', 'gD',
@@ -454,6 +455,12 @@ lua <<EOF
     buf_set_keymap('n', ',wl',
                    '<cmd>lua print(vim.inspect(' ..
                      'vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+    buf_set_keymap('n', 'gp', 
+                   '<cmd>lua vim.lsp.inlay_hint.enable('..
+                   'not vim.lsp.inlay_hint.is_enabled())<CR>', opts)
+
+    -- Uncomment the next line to disable LSP semantic tokens highlights
+    -- client.server_capabilities.semanticTokensProvider = nil
   end
 
   local capabilities = require'cmp_nvim_lsp'.default_capabilities()
@@ -927,7 +934,7 @@ let g:git_messenger_popup_content_margins = v:false
 nmap <silent> ,ha   :GV<CR>
 nmap <silent> ,hf   :GV!<CR>
 nmap          ,hB   :Git blame<CR>
-nmap          ,hl   :Git log <C-r><C-w><CR>
+nmap          ,hl   :Git log <C-r>=expand("<cword>")<CR><CR>
 
 lua <<EOF
   require'gitsigns'.setup {

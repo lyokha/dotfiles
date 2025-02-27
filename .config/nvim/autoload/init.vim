@@ -52,13 +52,34 @@ fun! init#open_tag(tag)
     if empty(a:tag)
         return
     endif
-    " BEWARE: command :(s)tag may produce a bigger list than the following
-    " call to function taglist()
-    if empty(taglist('^'.a:tag.'$'))
+    let exact_tag = '^'.a:tag.'$'
+    let res = taglist(exact_tag)
+    if empty(res)
         echohl WarningMsg
         echo "No tag '".a:tag."' found"
         echohl None
         return
+    endif
+    let same_buf = res[0]['filename'] == expand('%:p')
+    let tagpwin_closed = 0
+    if same_buf
+        exe "tag ".exact_tag
+        return
+    elseif &tagfunc =~ 'lsp\.tagfunc'
+        let lastwin = winnr('$')
+        let curwin = winnr()
+        let i = 1
+        " close the tag window as the tag being searched may happen
+        " irrelevant in its current buffer with LSP tagfunc
+        while i <= lastwin
+            let pwin = getwinvar(i, 'tagpwin')
+            if pwin && i != curwin
+                exe "close ".i
+                let tagpwin_closed = 1
+                break
+            endif
+            let i += 1
+        endwhile
     endif
     let split = 's'
     let lastwin = winnr('$')
@@ -81,7 +102,7 @@ fun! init#open_tag(tag)
     endwhile
     " FIXME: in case of exception when executing command :(s)tag the cursor
     " may stay in the original window
-    exe split."tag ".a:tag
+    exe split."tag ".exact_tag
     if empty(split) && i != curwin
         " if we stay on same position then return to original window; a better
         " solution would be checking changes in tagstack but it seems to be
@@ -90,7 +111,7 @@ fun! init#open_tag(tag)
             exe curwin."wincmd w"
         endif
     endif
-    if split == 's' && lastwin < winnr('$')
+    if split == 's' && (lastwin < winnr('$') || tagpwin_closed)
         exe s:TagPWinHeight."wincmd _"
         set winfixheight
         let w:tagpwin = 1
@@ -105,10 +126,11 @@ fun! init#close_tag_win()
         let pwin = getwinvar(i, 'tagpwin')
         if pwin
             if i != curwin
+                " FIXME: using exe "close ".i is simpler, but currently,
+                " lyokha/nvim-treesitter-context fails to redraw with :close
                 exe i."wincmd w"
                 wincmd q
-                let dstwin = curwin > i ? curwin - 1 : curwin
-                exe dstwin."wincmd w"
+                wincmd #
             else
                 wincmd q
             endif
