@@ -1116,12 +1116,12 @@ set tagstack
 nmap ,T  :tag<CR>
 
 " mappings for opening/closing various preview windows
-nmap <silent> ,,  :call init#open_tag('<C-r>=expand("<cword>")<CR>')<CR>
-nmap ,qo          :botright copen<CR>
-nmap ,qq          :cclose<CR>
-nmap <silent> ,qw :call init#close_tag_win()<CR>
+nmap <silent> ,,   :call init#open_tag('<C-r>=expand("<cword>")<CR>')<CR>
+nmap <silent> ,<   :call init#close_tag_win()<CR>
+nmap          ,qo  :botright copen<CR>
+nmap          ,qq  :cclose<CR>
 
-nmap <silent> ,U :call init#win_occupy_vert_space('tagbar')<CR>
+nmap <silent> ,U   :call init#win_occupy_vert_space('tagbar')<CR>
 
 " gutentags settings
 let g:gutentags_exclude_filetypes = ['svn', 'cvs', 'gitcommit', 'hgcommit']
