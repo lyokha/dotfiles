@@ -126,11 +126,11 @@ fun! init#close_tag_win()
         let pwin = getwinvar(i, 'tagpwin')
         if pwin
             if i != curwin
-                " FIXME: using exe "close ".i is simpler, but currently,
-                " lyokha/nvim-treesitter-context fails to redraw with :close
-                exe i."wincmd w"
-                wincmd q
-                wincmd #
+                " treesitter-context fails to redraw correctly,
+                " so close-and-open its window
+                call v:lua.require'treesitter-context'.close()
+                exe "close ".i
+                call v:lua.require'treesitter-context'.open()
             else
                 wincmd q
             endif
