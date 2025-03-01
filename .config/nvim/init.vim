@@ -1116,7 +1116,7 @@ set tagstack
 nmap ,T  :tag<CR>
 
 " mappings for opening/closing various preview windows
-nmap <silent> ,,   :call init#open_tag('<C-r>=expand("<cword>")<CR>')<CR>
+nmap <silent> ,,   :call init#open_tag("<C-r>=expand('<cword>')<CR>")<CR>
 nmap <silent> ,<   :call init#close_tag_win()<CR>
 nmap          ,qo  :botright copen<CR>
 nmap          ,qq  :cclose<CR>
