@@ -904,12 +904,10 @@ imap <C-v>ё  <C-v>u0301
 
 autocmd BufRead *.csv setlocal nomodeline
 
-nmap <silent> ,vv :echo synIDattr(synID(line("."), col("."), 1), "name")<CR>
+nmap <silent> ,vv :Inspect<CR>
 nmap <silent> ,vf :GetFgColorUnderCursor<CR>
 nmap <silent> ,vb :GetBgColorUnderCursor<CR>
-nmap <silent> ,vt :TSPlaygroundToggle<CR>
-nmap <silent> ,vc :TSHighlightCapturesUnderCursor<CR>
-nmap <silent> ,vm :CccHighlighterToggle<CR>
+nmap <silent> ,vc :CccHighlighterToggle<CR>
 nmap <silent> ,vp :CccPick<CR>
 
 let g:NERDSpaceDelims = 1
