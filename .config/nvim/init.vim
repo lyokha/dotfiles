@@ -23,7 +23,7 @@ Plug 'sainnhe/gruvbox-material'
 Plug 'fladson/vim-kitty'
 Plug 'neovim/nvim-lspconfig'
 Plug 'RishabhRD/popfix'
-Plug 'RishabhRD/nvim-lsputils'
+Plug 'lyokha/nvim-lsputils'
 Plug 'hood/popui.nvim'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
@@ -423,7 +423,7 @@ lua <<EOF
                    '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     buf_set_keymap('n', 'gd',
                    '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    buf_set_keymap('n', 'gi',
+    buf_set_keymap('n', 'gm',
                    '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
     buf_set_keymap('n', 'gt',
                    '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
@@ -433,6 +433,10 @@ lua <<EOF
                    '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', 'gr',
                    '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+    buf_set_keymap('n', 'gi',
+                   '<cmd>lua vim.lsp.buf.incoming_calls()<CR>', opts)
+    buf_set_keymap('n', 'go',
+                   '<cmd>lua vim.lsp.buf.outgoing_calls()<CR>', opts)
     buf_set_keymap('n', 'gs',
                    '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
     buf_set_keymap('n', ',e',
@@ -492,6 +496,8 @@ lua <<EOF
         }
       }
       setup.filetypes = { 'haskell', 'lhaskell', 'cabal' }
+    elseif lsp == 'clangd' then
+      setup.cmd = { 'clangd', '--background-index', '--clang-tidy' }
     end
     nvim_lsp[lsp].setup(setup)
   end
@@ -676,8 +682,10 @@ lua <<EOF
 
   vim.ui.select = require'popui.ui-overrider'
 
-  vim.lsp.handlers['textDocument/codeAction'] =
-    require'lsputil.codeAction'.code_action_handler
+  -- vim.lsp.handlers['textDocument/codeAction'] does nothing,
+  -- see https://github.com/neovim/neovim/pull/15818
+  -- vim.lsp.handlers['textDocument/codeAction'] =
+  --   require'lsputil.codeAction'.code_action_handler
   vim.lsp.handlers['textDocument/references'] =
     require'lsputil.locations'.references_handler
   vim.lsp.handlers['textDocument/definition'] =
@@ -692,6 +700,10 @@ lua <<EOF
     require'lsputil.symbols'.document_handler
   vim.lsp.handlers['workspace/symbol'] =
     require'lsputil.symbols'.workspace_handler
+  vim.lsp.handlers['callHierarchy/incomingCalls'] =
+    require'telescope.builtin'.lsp_incoming_calls
+  vim.lsp.handlers['callHierarchy/outgoingCalls'] =
+    require'telescope.builtin'.lsp_outgoing_calls
 EOF
 
 let g:popui_border_style = "rounded"
@@ -1116,8 +1128,8 @@ nmap ,T  :tag<CR>
 " mappings for opening/closing various preview windows
 nmap <silent> ,,   :call init#open_tag("<C-r>=expand('<cword>')<CR>")<CR>
 nmap <silent> ,<   :call init#close_tag_win()<CR>
-nmap          ,qo  :botright copen<CR>
-nmap          ,qq  :cclose<CR>
+nmap <silent> ,qo  :botright copen<CR>
+nmap <silent> ,qq  :cclose<CR>
 
 nmap <silent> ,U   :call init#win_occupy_vert_space('tagbar')<CR>
 
