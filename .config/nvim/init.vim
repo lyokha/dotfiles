@@ -256,43 +256,34 @@ EOF
 
 " ---- Setup telescope {{{1
 " ----
-
-" after loading markdown/pandoc files with telescope, expected folds won't
-" trigger (see https://github.com/nvim-telescope/telescope.nvim/issues/559);
-" one of proposed workarounds is leaving insert mode before exiting telescope
-
 lua <<EOF
-  local function stopinsert(callback)
-    return function(prompt_bufnr)
-      vim.cmd.stopinsert()
-      vim.schedule(function() callback(prompt_bufnr) end)
-    end
-  end
+  local actions = require'telescope.actions'
+  local actions_fb = require'telescope'.extensions.file_browser.actions
 
-  local function stopinsert_fb(callback, callback_dir)
+  local function dispatch_actions(callback, callback_dir)
     return function(prompt_bufnr)
       local entry = require'telescope.actions.state'.get_selected_entry()
       if entry then
-        if not entry.Path:is_dir() then
-          stopinsert(callback)(prompt_bufnr)
-        elseif callback_dir then
-          callback_dir(prompt_bufnr)
+        if entry.Path:is_dir() then
+          if callback_dir then
+            callback_dir(prompt_bufnr)
+          end
+        else
+          callback(prompt_bufnr)
         end
       end
     end
   end
 
-  local actions = require'telescope.actions'
-  local actions_fb = require'telescope'.extensions.file_browser.actions
-
   require'telescope'.setup {
     defaults = {
       mappings = {
         i = {
-          ["<CR>"]  = stopinsert(actions.select_default),
-          ["<C-x>"] = stopinsert(actions.select_horizontal),
-          ["<C-j>"] = stopinsert(actions.select_vertical),
-          ["<C-t>"] = stopinsert(actions.select_tab)
+          ["<CR>"]  = actions.select_default,
+          ["<C-x>"] = actions.select_horizontal,
+          ["<C-j>"] = actions.select_vertical,
+          ["<C-v>"] = false,
+          ["<C-t>"] = actions.select_tab
         }
       }
     },
@@ -300,12 +291,13 @@ lua <<EOF
       file_browser = {
         mappings = {
           i = {
-            ["<CR>"]  = stopinsert_fb(actions.select_default,
-                                      actions.select_default),
-            ["<C-x>"] = stopinsert_fb(actions.select_horizontal),
-            ["<C-j>"] = stopinsert_fb(actions.select_vertical),
-            ["<C-t>"] = stopinsert_fb(actions.select_tab,
-                                      actions_fb.change_cwd)
+            ["<CR>"]  = dispatch_actions(actions.select_default,
+                                         actions.select_default),
+            ["<C-x>"] = dispatch_actions(actions.select_horizontal),
+            ["<C-j>"] = dispatch_actions(actions.select_vertical),
+            ["<C-v>"] = false,
+            ["<C-t>"] = dispatch_actions(actions.select_tab,
+                                         actions_fb.change_cwd)
           }
         }
       }
@@ -1171,6 +1163,7 @@ nmap ,as  :FSSplitAbove<CR>
 nmap ,ax  :FSSplitAbove<CR>
 nmap ,av  :FSSplitRight<CR>
 nmap ,aj  :FSSplitRight<CR>
+nmap ,at  :FSTab<CR>
 
 " fswitch settings for opening buffers
 augroup fswitch
