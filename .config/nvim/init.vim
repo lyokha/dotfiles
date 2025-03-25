@@ -893,12 +893,36 @@ filetype plugin indent on
 
 set spelllang=ru_ru,en_us
 
-" follow golang formatting style
-autocmd FileType go setlocal noexpandtab
-            \ tabstop=6 softtabstop=6 shiftwidth=6 textwidth=99
-            \ listchars=tab:\ \ ,trail:·,nbsp:⍽
+let g:RightBorder = 80
+
+" follow Golang or common formatting style (expandtab etc.)
+let g:FollowGoFormattingStyle = 1
+autocmd FileType go
+            \ if g:FollowGoFormattingStyle |
+            \     setlocal noexpandtab
+            \         tabstop=6 softtabstop=6 shiftwidth=6
+            \         listchars=tab:\ \ ,trail:·,nbsp:⍽ |
+            \     let b:RightBorderForce = 100 |
+            \ else |
+            \     setlocal expandtab
+            \         tabstop=8 softtabstop=4 shiftwidth=4
+            \         listchars=tab:󰅂\ ,trail:·,nbsp:⍽ |
+            \     let b:RightBorderForce = g:RightBorder |
+            \ endif |
+            \ if &colorcolumn =~ '^\d\+$' |
+            \     let &l:colorcolumn = b:RightBorderForce + 1 |
+            \ endif |
+            \ nmap <silent> <buffer> g=
+            \     :let g:FollowGoFormattingStyle = !g:FollowGoFormattingStyle
+            \         <Bar> set filetype=go<CR>
+
+" follow Rust recommended style (expandtab, textwidth=99 etc.)
+let g:rust_recommended_style = 1
+
 " set sensible textwidth for tex, rst and pandoc files
-autocmd FileType tex,rst,pandoc setlocal textwidth=80 colorcolumn=81
+autocmd FileType tex,rst,pandoc
+            \ let &l:textwidth = g:RightBorder |
+            \ let &l:colorcolumn = g:RightBorder + 1
 " set appropriate conceallevel for tex files
 autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
@@ -1097,7 +1121,7 @@ autocmd BufWinEnter,VimEnter * call init#setup_airline(s:SudoAdminIcon)
 " ----
 let g:pandoc#modules#disabled = ['menu', 'spell', 'folding']
 let g:pandoc#formatting#mode = 'ha'
-let g:pandoc#formatting#textwidth = 79
+let g:pandoc#formatting#textwidth = g:RightBorder
 " syntax and folding is up to treesitter!
 " let g:pandoc#folding#mode = 'stacked'
 " let g:pandoc#folding#level = 1
@@ -1115,6 +1139,8 @@ autocmd FileType pandoc
             \     g:pandoc#formatting#textwidth |
             \ let &l:equalprg = g:pandoc#formatting#equalprg.' '.
             \     g:pandoc#formatting#extra_equalprg
+" format inside paragraph (delete trailing spaces left when using 'ha' mode)
+autocmd FileType pandoc nmap <silent> <buffer> g= vip=
 " }}}
 
 
@@ -1163,7 +1189,6 @@ augroup END
 
 " ---- Commands and mappings for formatting hints highlights {{{1
 " ----
-let g:RightBorder = 80
 highlight FormatHints term=standout
             \ cterm=NONE ctermfg=244 ctermbg=229
             \ gui=NONE guifg=#808080 guibg=#ffffaf
@@ -1171,6 +1196,12 @@ highlight FormatHints term=standout
 autocmd ColorScheme * highlight FormatHints term=standout
             \ cterm=NONE ctermfg=244 ctermbg=229
             \ gui=NONE guifg=#808080 guibg=#ffffaf
+
+fun! s:update_right_border()
+    let b:RightBorder =
+                \ exists('b:RightBorderForce') ? b:RightBorderForce :
+                \ (&textwidth > 0 ? &textwidth : g:RightBorder) |
+endfun
 
 command -bar ShowFormatHints call init#formathints()
 command -bar HideFormatHints call init#formathints_hide()
@@ -1180,20 +1211,24 @@ nmap <silent> ,f :if !exists("w:m1") <Bar><Bar> w:m1 == 0 <Bar>
             \ ShowFormatHints <Bar> echo "Show format hints" <Bar> else <Bar>
             \ HideFormatHints <Bar> echo "Hide format hints" <Bar> endif<CR>
 nmap          ,r :HideDosEols<CR>
-nmap <silent> ,m :if &colorcolumn == b:RightBorder + 1 <Bar>
+nmap <silent> ,m :if &colorcolumn =~ '^\d\+$' <Bar>
             \ setlocal colorcolumn= <Bar> elseif !&colorcolumn <Bar>
+            \ call <SID>update_right_border() <Bar>
             \ let &l:colorcolumn = b:RightBorder + 1 <Bar> endif<CR>
 
 " adjust colorcolumn and g:RightAlign_RightBorder when entering a buffer with
 " different value of 'textwidth'
 autocmd BufEnter *
-        \ let b:RightBorder = &textwidth > 0 ? &textwidth : g:RightBorder |
-        \ let g:RightAlign_RightBorder = b:RightBorder |
-        \ if &colorcolumn | let &l:colorcolumn = b:RightBorder + 1 | endif
+            \ call s:update_right_border() |
+            \ let g:RightAlign_RightBorder = b:RightBorder |
+            \ if &colorcolumn =~ '^\d\+$' |
+            \     let &l:colorcolumn = b:RightBorder + 1 |
+            \ endif
 
 " show colorcolumn when committing to svn, cvs or other VCS
 autocmd FileType svn,cvs,gitcommit,hgcommit
-            \ setlocal textwidth=80 colorcolumn=81
+            \ let &l:textwidth = g:RightBorder |
+            \ let &l:colorcolumn = g:RightBorder + 1
 " }}}
 
 
