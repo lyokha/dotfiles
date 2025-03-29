@@ -2,7 +2,7 @@
 
 " ---- Functions for rendering window titles {{{1
 " ----
-fun! init#get_title_text()
+fun init#get_title_text()
     let l:showtagbar = &filetype == 'tagbar' &&
                 \ (!exists('t:wintoggle_tagbar_done') ||
                 \ exists('t:winhidden[t:tagbar_buf_name]'))
@@ -33,7 +33,7 @@ fun! init#get_title_text()
     return l:icon . ' ' . l:text
 endfun
 
-fun! init#get_title_modified()
+fun init#get_title_modified()
     if &filetype == 'tagbar' &&
                 \ (!exists('t:wintoggle_tagbar_done') ||
                 \ exists('t:winhidden[t:tagbar_buf_name]'))
@@ -48,7 +48,7 @@ endfun
 " ----
 let s:TagPWinHeight = 16
 
-fun! init#open_tag(tag)
+fun init#open_tag(tag)
     if empty(a:tag)
         return
     endif
@@ -118,7 +118,7 @@ fun! init#open_tag(tag)
     endif
 endfun
 
-fun! init#close_tag_win()
+fun init#close_tag_win()
     let lastwin = winnr('$')
     let curwin = winnr()
     let i = 1
@@ -146,13 +146,13 @@ endfun
 " ----
 let s:airline_loaded = 0
 
-fun! init#airline_theme_patch(palette)
+fun init#airline_theme_patch(palette)
     if !has_key(a:palette.accents, 'red_bold')
         let a:palette.accents.red_bold = ['#d70000', '', 160, '', 'bold']
     endif
 endfun
 
-fun! init#setup_airline(sudo_icon)
+fun init#setup_airline(sudo_icon)
     if !s:airline_loaded
         " sudo indicator, this must work with both sudo -e and
         " alias svim='sudo HOME=$HOME nvim'
@@ -178,13 +178,13 @@ endfun
 highlight link BeaconNLayout Cursor
 highlight BeaconOtherLayout guibg=#87ff5f ctermbg=119  " #5f00af is also good
 
-fun! s:xkb_switch_revert_beacon_highlight(id)
+fun s:xkb_switch_revert_beacon_highlight(id)
     highlight! link Beacon BeaconDefault
 endfun
 
 let s:HighlightIEnterHookNLayout = 1
 
-fun! init#xkb_switch_ienter_hook(old, new)
+fun init#xkb_switch_ienter_hook(old, new)
     if &ft == '_mdict_'
         return
     endif
@@ -213,7 +213,7 @@ endfun
 " |    |    |  |    |         |  |       |    |    |  |
 " --------------    --------------       --------------
 "
-fun! init#win_occupy_vert_space(altwinbufft)
+fun init#win_occupy_vert_space(altwinbufft)
     let curwinwidth = winwidth(0)
     let curwin = winnr()
     wincmd l
@@ -235,7 +235,7 @@ endfun
 
 " ---- Functions for formatting hints highlights {{{1
 " ----
-fun! init#formathints()
+fun init#formathints()
     if !exists("w:m1") || w:m1 == 0
         let w:m1 = matchadd('FormatHints', '\%>'.b:RightBorder.'v.\+', -1)
         let w:m2 = matchadd('FormatHints', '[\t]', -1)
@@ -243,7 +243,7 @@ fun! init#formathints()
     endif
 endfun
 
-fun! init#formathints_hide()
+fun init#formathints_hide()
     if exists("w:m1") && w:m1 > 0
         silent! call matchdelete(w:m1)
         silent! call matchdelete(w:m2)
@@ -254,7 +254,7 @@ fun! init#formathints_hide()
     endif
 endfun
 
-fun! init#doseol_hide()
+fun init#doseol_hide()
     " hide ^M symbols in DOS files (they are still visible on a
     " transparent screen)
     match Ignore /\r$/
@@ -264,7 +264,7 @@ endfun
 
 " ---- Functions to support mdict functionality {{{1
 " ----
-fun! s:mdict_syntax_set_colors(colors)
+fun s:mdict_syntax_set_colors(colors)
     let colors = deepcopy(a:colors)
     if exists('g:colors_name') && g:colors_name == 'lucius' &&
                 \ g:lucius_style == 'light'
@@ -280,7 +280,7 @@ fun! s:mdict_syntax_set_colors(colors)
                 \ ' guifg='.colors['extra'][1]
 endfun
 
-fun! init#mdict_syntax_load()
+fun init#mdict_syntax_load()
     syntax match mdictOriginal '\(^|\)\@1<=[^|]*' containedin=Table
                 \ contains=TableBorder,mdictExtra
     syntax match mdictTranslated '\(.|\)\@2<=[^|]*' containedin=Table
@@ -302,16 +302,16 @@ endfun
 let s:quit_pre = 0
 let s:closing_last_ancillary_buffers = 0
 
-fun! s:quit_pre_cancel(id)
+fun s:quit_pre_cancel(id)
     let s:quit_pre = 0
 endfun
 
-fun! init#quit_pre_hook()
+fun init#quit_pre_hook()
     let s:quit_pre = 1
     call timer_start(250, 's:quit_pre_cancel')
 endfun
 
-fun! init#close_last_ancillary_buffers()
+fun init#close_last_ancillary_buffers()
     if !s:quit_pre || s:closing_last_ancillary_buffers
         return
     endif

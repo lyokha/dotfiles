@@ -15,6 +15,16 @@ endif
 
 " ---- Plugins {{{1
 " ----
+let g:plug_home = stdpath('data').'/plugged'
+
+fun TreesitterUpdate()
+    TSUpdate
+    let qpath = g:plug_home.'/nvim-treesitter/queries'
+    call system('sed -i -n ''1{h; n}; H; '.
+                \ '${g; s/\n\s*(#set! conceal_lines "")//gp}'' '.
+                \ qpath.'/markdown/highlights.scm')
+endfun
+
 call plug#begin()
 Plug 'ryanoasis/vim-devicons'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -38,7 +48,7 @@ Plug 'kshenoy/vim-signature'
 Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': { -> TreesitterUpdate() } }
 Plug 'hedyhli/outline.nvim'
 Plug 'epheien/outline-treesitter-provider.nvim'
 Plug 'epheien/outline-ctags-provider.nvim'
@@ -185,6 +195,11 @@ set noincsearch
 
 " make vertical split open on the right
 set splitright
+
+if has('nvim-0.11')
+    set winborder=rounded
+    " let g:_ts_force_sync_parsing = 1
+endif
 
 let mapleader = ','
 let g:netrw_winsize = 25
@@ -770,7 +785,7 @@ autocmd BufReadPost *
             \     silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
             \ endif
 
-fun! s:wintoggle_cmd(cmd, bufname)
+fun s:wintoggle_cmd(cmd, bufname)
     let l:bufname = a:bufname == '__Tagbar__*' &&
                 \ exists('t:tagbar_buf_name') ? t:tagbar_buf_name : a:bufname
     let status = bufwinnr(l:bufname)
@@ -1029,7 +1044,7 @@ EOF
 " ----
 let g:committia_hooks = {}
 
-fun! g:committia_hooks.edit_open(info)
+fun g:committia_hooks.edit_open(info)
     setlocal spell
 
     " If no commit message, start with insert mode
@@ -1060,7 +1075,7 @@ let g:lexima_no_default_rules = 1
 " ----
 let g:loaded_file_line = 1
 
-fun! s:file_line(file)
+fun s:file_line(file)
     let l:parts = matchlist(a:file, '\(.\{-1,}\):\(\d\+\)\%(:\(\d\+\)\)\?$')
     if empty(l:parts) || !filereadable(l:parts[1])
         if !empty(glob(escape(a:file, '[]*?').'*')) && empty(&buftype)
@@ -1190,7 +1205,7 @@ autocmd ColorScheme * highlight FormatHints term=standout
             \ cterm=NONE ctermfg=244 ctermbg=229
             \ gui=NONE guifg=#808080 guibg=#ffffaf
 
-fun! s:update_right_border()
+fun s:update_right_border()
     let b:RightBorder =
                 \ exists('b:RightBorderForce') ? b:RightBorderForce :
                 \ (&textwidth > 0 ? &textwidth : g:RightBorder) |
@@ -1246,7 +1261,7 @@ autocmd BufNewFile,BufReadPre *.snippets let b:tagbar_ignore = 1
 
 let g:tagbar_win_ft_skip = ['tagbar', 'alpha']
 
-fun! s:open_tagbar(buf_enter)
+fun s:open_tagbar(buf_enter)
     if a:buf_enter && exists('b:open_tagbar_done')
         return
     endif
@@ -1261,7 +1276,7 @@ fun! s:open_tagbar(buf_enter)
     call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__*')
 endfun
 
-fun! s:open_outline(timer_id)
+fun s:open_outline(timer_id)
     if a:timer_id != -1 && exists('t:open_outline_done')
         return
     endif
@@ -1279,7 +1294,7 @@ fun! s:open_outline(timer_id)
     let &guicursor = cursor
 endfun
 
-fun! s:refresh_outline(timer_id)
+fun s:refresh_outline(timer_id)
     if exists('t:open_outline_done')
         " refresh outline window if a quicker provider has already grabbed it
         OutlineRefresh
