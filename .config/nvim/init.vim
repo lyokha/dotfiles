@@ -19,10 +19,12 @@ let g:plug_home = stdpath('data').'/plugged'
 
 fun TreesitterUpdate()
     TSUpdate
-    let qpath = g:plug_home.'/nvim-treesitter/queries'
-    call system('sed -i -n ''1{h; n}; H; '.
-                \ '${g; s/\n\s*(#set! conceal_lines "")//gp}'' '.
-                \ qpath.'/markdown/highlights.scm')
+    let cfgqpath = stdpath('config').'/queries'
+    let tsqpath = g:plug_home.'/nvim-treesitter/queries'
+    let mdhlscm = '/markdown/highlights.scm'
+    call system('cp '.tsqpath.mdhlscm.' '.cfgqpath.mdhlscm)
+    call system('sed -i ''s/^\s*(#set! conceal_lines "")//'' '.
+                \ cfgqpath.mdhlscm)
 endfun
 
 call plug#begin()
