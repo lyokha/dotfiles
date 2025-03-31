@@ -300,19 +300,22 @@ endfun
 " ---- Functions to close last ancillary buffers on quit {{{1
 " ----
 let s:quit_pre = 0
+let s:quit_qf = 0
 let s:closing_last_ancillary_buffers = 0
 
 fun s:quit_pre_cancel(id)
     let s:quit_pre = 0
+    let s:quit_qf = 0
 endfun
 
 fun init#quit_pre_hook()
     let s:quit_pre = 1
+    let s:quit_qf = &filetype == 'qf'
     call timer_start(250, 's:quit_pre_cancel')
 endfun
 
 fun init#close_last_ancillary_buffers()
-    if !s:quit_pre || s:closing_last_ancillary_buffers
+    if !s:quit_pre || s:quit_qf || s:closing_last_ancillary_buffers
         return
     endif
     let s:closing_last_ancillary_buffers = 1
@@ -320,16 +323,18 @@ fun init#close_last_ancillary_buffers()
     let curbuf = bufnr()
     let bufs = tabpagebuflist(tabpagenr())
     for buf in bufs
-        if buf != curbuf && getbufvar(buf, '&buflisted')
+        let ft = getbufvar(buf, '&filetype')
+        if buf != curbuf && getbufvar(buf, '&buflisted') && ft != 'qf'
             let quit_all = 0
             break
         endif
     endfor
     if quit_all
         for buf in bufs
+            let ft = getbufvar(buf, '&filetype')
             if buf != curbuf && (!getbufvar(buf, '&buflisted') &&
-                        \ index(["alpha", "nerdtree", "tagbar"],
-                        \ getbufvar(buf, '&filetype')) == -1)
+                        \ index(['alpha', 'nerdtree', 'tagbar'], ft) == -1 ||
+                        \ ft == 'qf')
                 exe 'bdelete '.buf
             endif
         endfor

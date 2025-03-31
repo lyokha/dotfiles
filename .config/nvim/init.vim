@@ -34,15 +34,13 @@ Plug 'goolord/alpha-nvim'
 Plug 'sainnhe/gruvbox-material'
 Plug 'fladson/vim-kitty'
 Plug 'neovim/nvim-lspconfig'
-Plug 'RishabhRD/popfix'
-Plug 'lyokha/nvim-lsputils'
-Plug 'hood/popui.nvim'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/nvim-cmp'
 Plug 'kevinhwang91/promise-async'
 Plug 'kevinhwang91/nvim-ufo'
+Plug 'kevinhwang91/nvim-bqf'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'cohama/lexima.vim'
 Plug 'machakann/vim-sandwich'
@@ -58,6 +56,7 @@ Plug 'RRethy/vim-illuminate'
 Plug 'onsails/lspkind-nvim'
 Plug 'lyokha/nvim-treesitter-context'
 Plug 'haringsrob/nvim_context_vt'
+Plug 'folke/snacks.nvim'
 Plug 'preservim/tagbar'
 Plug 'preservim/nerdtree'
 Plug 'preservim/nerdcommenter'
@@ -76,7 +75,7 @@ Plug 'simnalamburt/vim-mundo'
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
-Plug 'danilamihailov/beacon.nvim', { 'commit': 'a786c9a' }
+Plug 'lyokha/beacon.nvim', { 'commit': '49bed65' }
 Plug 'bogado/file-line'
 Plug 'uga-rosa/ccc.nvim'
 Plug 'lervag/vimtex'
@@ -105,7 +104,10 @@ set termguicolors
 autocmd ColorScheme *
             \ highlight FloatBorder
             \     cterm=NONE ctermfg=186 ctermbg=237
-            \     gui=NONE guifg=#d7d787 guibg=#45403d
+            \     gui=NONE guifg=#d7d787 guibg=#45403d |
+            \ highlight BqfPreviewBorder
+            \     cterm=NONE ctermfg=186 ctermbg=NONE
+            \     gui=NONE guifg=#d7d787 guibg=NONE
 
 let g:gruvbox_material_transparent_background = 1
 let g:gruvbox_material_enable_bold = 0
@@ -432,16 +434,18 @@ lua <<EOF
                    '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     buf_set_keymap('n', 'gd',
                    '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    buf_set_keymap('n', 'gm',
-                   '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
     buf_set_keymap('n', 'gt',
                    '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    buf_set_keymap('n', 'gn',
-                   '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    buf_set_keymap('n', 'gc',
-                   '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-    buf_set_keymap('n', 'gr',
-                   '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+    if vim.fn.has('0.11') == 0 then
+      buf_set_keymap('n', 'gri',
+                     '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+      buf_set_keymap('n', 'grr',
+                     '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+      buf_set_keymap('n', 'grn',
+                     '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+      buf_set_keymap('n', 'gra',
+                     '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+    end
     buf_set_keymap('n', 'gi',
                    '<cmd>lua vim.lsp.buf.incoming_calls()<CR>', opts)
     buf_set_keymap('n', 'go',
@@ -648,7 +652,7 @@ lua <<EOF
     },
     keymaps = {
       close = {},
-      goto_location = '<Cr>',
+      goto_location = '<CR>',
       peek_location = 'o',
       hover_symbol = 'K',
       toggle_preview = 'q',
@@ -689,33 +693,22 @@ lua <<EOF
   vim.lsp.handlers["textDocument/signatureHelp"] =
     vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
-  vim.ui.select = require'popui.ui-overrider'
+  -- Setup snacks plugin (input, picker etc.)
+  require'snacks'.setup {
+    input = { enabled = true },
+    picker = { enabled = true },
+    notifier = { enabled = true }
+  }
 
-  -- vim.lsp.handlers['textDocument/codeAction'] does nothing,
-  -- see https://github.com/neovim/neovim/pull/15818
-  -- vim.lsp.handlers['textDocument/codeAction'] =
-  --   require'lsputil.codeAction'.code_action_handler
-  vim.lsp.handlers['textDocument/references'] =
-    require'lsputil.locations'.references_handler
-  vim.lsp.handlers['textDocument/definition'] =
-    require'lsputil.locations'.definition_handler
-  vim.lsp.handlers['textDocument/declaration'] =
-    require'lsputil.locations'.declaration_handler
-  vim.lsp.handlers['textDocument/typeDefinition'] =
-    require'lsputil.locations'.typeDefinition_handler
-  vim.lsp.handlers['textDocument/implementation'] =
-    require'lsputil.locations'.implementation_handler
-  vim.lsp.handlers['textDocument/documentSymbol'] =
-    require'lsputil.symbols'.document_handler
-  vim.lsp.handlers['workspace/symbol'] =
-    require'lsputil.symbols'.workspace_handler
-  vim.lsp.handlers['callHierarchy/incomingCalls'] =
-    require'telescope.builtin'.lsp_incoming_calls
-  vim.lsp.handlers['callHierarchy/outgoingCalls'] =
-    require'telescope.builtin'.lsp_outgoing_calls
+  -- Setup bqf plugin
+  require'bqf'.setup {
+    auto_enable = true,
+    func_map = {
+      open = 'o',
+      openc = '<CR>'
+    }
+  }
 EOF
-
-let g:popui_border_style = "rounded"
 " }}}
 
 
