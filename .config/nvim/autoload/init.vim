@@ -1,5 +1,18 @@
 " vim: set fdm=marker fdl=0:
 
+" ---- Helper functions for vim-plug {{{1
+" ----
+fun init#ts_update()
+    TSUpdate
+    let mdhlscm = '/markdown/highlights.scm'
+    let cfgq_mdhlscm = stdpath('config').'/queries'.mdhlscm
+    let tsq_mdhlscm = g:plug_home.'/nvim-treesitter/queries'.mdhlscm
+    call system('cp '.tsq_mdhlscm.' '.cfgq_mdhlscm)
+    call system('sed -i ''s/^\s*(#set! conceal_lines "")//'' '.cfgq_mdhlscm)
+endfun
+" }}}
+
+
 " ---- Functions for rendering window titles {{{1
 " ----
 fun init#get_title_text()

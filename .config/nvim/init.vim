@@ -17,16 +17,6 @@ endif
 " ----
 let g:plug_home = stdpath('data').'/plugged'
 
-fun TreesitterUpdate()
-    TSUpdate
-    let cfgqpath = stdpath('config').'/queries'
-    let tsqpath = g:plug_home.'/nvim-treesitter/queries'
-    let mdhlscm = '/markdown/highlights.scm'
-    call system('cp '.tsqpath.mdhlscm.' '.cfgqpath.mdhlscm)
-    call system('sed -i ''s/^\s*(#set! conceal_lines "")//'' '.
-                \ cfgqpath.mdhlscm)
-endfun
-
 call plug#begin()
 Plug 'ryanoasis/vim-devicons'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -48,7 +38,7 @@ Plug 'kshenoy/vim-signature'
 Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'nvim-treesitter/nvim-treesitter', { 'do': { -> TreesitterUpdate() } }
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': { -> init#ts_update() } }
 Plug 'hedyhli/outline.nvim'
 Plug 'epheien/outline-treesitter-provider.nvim'
 Plug 'epheien/outline-ctags-provider.nvim'
