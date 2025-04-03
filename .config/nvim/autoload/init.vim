@@ -8,7 +8,10 @@ fun init#ts_update()
     let cfgq_mdhlscm = stdpath('config').'/queries'.mdhlscm
     let tsq_mdhlscm = g:plug_home.'/nvim-treesitter/queries'.mdhlscm
     call system('cp '.tsq_mdhlscm.' '.cfgq_mdhlscm)
-    call system('sed -i ''s/^\s*(#set! conceal_lines "")//'' '.cfgq_mdhlscm)
+    call system('sed -i ''/^(fenced_code_block$/,/^$/'.
+                \ '{s/^\((.*\)/\1 (#not-normalbuf?)/;H;'.
+                \ '/^$/{x;s/(#not-\(normalbuf?)\n\)/(#\1/;'.
+                \ 's/\s*(#set! conceal_lines "")//}}'' '.cfgq_mdhlscm)
 endfun
 " }}}
 

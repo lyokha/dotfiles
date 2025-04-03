@@ -191,7 +191,7 @@ set noincsearch
 set splitright
 
 if has('nvim-0.11')
-    set winborder=rounded
+    set winborder=
     " let g:_ts_force_sync_parsing = 1
 endif
 
@@ -362,6 +362,11 @@ lua <<EOF
       metadata.conceal = devicons.get_icon_by_filetype(lang) or ''
     end, opts)
 
+  query.add_predicate('normalbuf?',
+    function(_, _, bufnr, _, _)
+      return vim.bo[bufnr].buftype == ''
+    end, opts)
+
   -- Register filetype pandoc as language markdown
   vim.treesitter.language.register('markdown', 'pandoc')
 
@@ -393,6 +398,11 @@ EOF
 " ----
 lua <<EOF
   local nvim_lsp = require'lspconfig'
+
+  local hover = vim.lsp.buf.hover
+  vim.lsp.buf.hover = function()
+      return hover { border = 'rounded' }
+  end
 
   require'lspkind'.init()
 
