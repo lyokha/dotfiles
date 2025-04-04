@@ -360,12 +360,12 @@ lua <<EOF
         lang = lang:sub(2)
       end
       metadata.conceal = devicons.get_icon_by_filetype(lang) or ''
-    end, opts)
+    end)
 
   query.add_predicate('normalbuf?',
     function(_, _, bufnr, _, _)
       return vim.bo[bufnr].buftype == ''
-    end, opts)
+    end)
 
   -- Register filetype pandoc as language markdown
   vim.treesitter.language.register('markdown', 'pandoc')
