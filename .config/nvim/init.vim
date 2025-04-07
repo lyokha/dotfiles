@@ -401,7 +401,7 @@ lua <<EOF
 
   local hover = vim.lsp.buf.hover
   vim.lsp.buf.hover = function()
-      return hover { border = 'rounded' }
+    return hover { border = 'rounded' }
   end
 
   require'lspkind'.init()
@@ -431,9 +431,9 @@ lua <<EOF
 
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     buf_set_keymap('n', 'gD',
-                   '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+                   '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     buf_set_keymap('n', 'gd',
-                   '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+                   '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
     buf_set_keymap('n', 'gt',
                    '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
     if vim.fn.has('0.11') == 0 then
@@ -462,7 +462,7 @@ lua <<EOF
                    '<cmd>lua vim.diagnostic.goto_next(' ..
                      '{ float = { border = "rounded" }})<CR>', opts)
     buf_set_keymap('n', 'K',
-                   '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+                   '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
     buf_set_keymap('n', ',F',
                    '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', opts)
     buf_set_keymap('n', ',wa',
@@ -472,7 +472,7 @@ lua <<EOF
     buf_set_keymap('n', ',wl',
                    '<cmd>lua print(vim.inspect(' ..
                      'vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    buf_set_keymap('n', 'gp', 
+    buf_set_keymap('n', 'gp',
                    '<cmd>lua vim.lsp.inlay_hint.enable('..
                    'not vim.lsp.inlay_hint.is_enabled())<CR>', opts)
 
@@ -489,7 +489,7 @@ lua <<EOF
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
   local servers = {
-    'bashls', 'clangd', 'gopls', 'hls', 'perlpls', 'rust_analyzer'
+    'bashls', 'clangd', 'gopls', 'hls', 'lua_ls', 'perlpls', 'rust_analyzer'
   }
   for _, lsp in ipairs(servers) do
     local setup = {
@@ -514,91 +514,6 @@ lua <<EOF
     end
     nvim_lsp[lsp].setup(setup)
   end
-
-  local ufo_ft_map = {
-    lsp = { 'c', 'cpp', 'go', 'haskell', 'perl', 'rust' }
-  }
-
-  local ufo_virt_text = function(virtText, lnum, endLnum, width, truncate)
-    local newVirtText = {}
-    local suffix = (' 󰏢 %d '):format(endLnum - lnum)
-    local sufWidth = vim.fn.strdisplaywidth(suffix)
-    local targetWidth = width - sufWidth
-    local curWidth = 0
-    for _, chunk in ipairs(virtText) do
-      local chunkText = chunk[1]
-      local chunkWidth = vim.fn.strdisplaywidth(chunkText)
-      if targetWidth > curWidth + chunkWidth then
-        table.insert(newVirtText, chunk)
-      else
-        chunkText = truncate(chunkText, targetWidth - curWidth)
-        local hlGroup = chunk[2]
-        table.insert(newVirtText, {chunkText, hlGroup})
-        chunkWidth = vim.fn.strdisplaywidth(chunkText)
-        -- str width returned from truncate() may be less than 2nd argument,
-        -- need padding
-        if curWidth + chunkWidth < targetWidth then
-            suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
-        end
-        break
-      end
-      curWidth = curWidth + chunkWidth
-    end
-    table.insert(newVirtText, {suffix, 'FoldAnno'})
-    return newVirtText
-  end
-
-  require'ufo'.setup {
-    provider_selector = function(bufnr, filetype, buftype)
-      if buftype == 'nofile' then
-        return ''
-      end
-      local function contains(tbl, val)
-        if tbl then
-          for i = 1, #tbl do
-            if tbl[i] == val then
-              return true
-            end
-          end
-        end
-        return false
-      end
-      local ret = ''
-      if contains(ufo_ft_map.disabled, filetype) then
-        return ''
-      elseif contains(ufo_ft_map.lsp, filetype) then
-        ret = { 'lsp', 'treesitter' }
-      else
-        ret = { 'treesitter', 'indent' }
-      end
-      vim.keymap.set('n', 'zR', require'ufo'.openAllFolds,
-                     { buffer = true })
-      vim.keymap.set('n', 'zM', require'ufo'.closeAllFolds,
-                     { buffer = true })
-      vim.keymap.set('n', 'zr', require'ufo'.openFoldsExceptKinds,
-                     { buffer = true })
-      vim.keymap.set('n', 'zm', require'ufo'.closeFoldsWith,
-                     { buffer = true })
-      return ret
-    end,
-    fold_virt_text_handler = ufo_virt_text,
-    close_fold_kinds_for_ft = {
-      default = { 'comment', 'imports' },
-      pandoc = { 'fenced_code_block' },
-      rst = { 'directive' }
-    },
-    preview = {
-      win_config = {
-        border = 'none',
-        winhighlight = 'NormalFloat:Folded,FloatBorder:Folded',
-        winblend = 0
-      }
-    }
-  }
-
-  vim.keymap.set('n', 'zK', function()
-    require'ufo'.peekFoldedLinesUnderCursor()
-  end)
 
   -- outline.nvim
   require'outline'.setup {
@@ -699,8 +614,108 @@ lua <<EOF
     picker = { enabled = true },
     notifier = { enabled = true }
   }
+EOF
+" }}}
 
-  -- Setup bqf plugin
+
+" ---- Setup nvim-ufo and nvim-bqf {{{1
+" ----
+lua <<EOF
+  local ufo_virt_text = function(virtText, lnum, endLnum, width, truncate)
+    local newVirtText = {}
+    local suffix = (' 󰏢 %d '):format(endLnum - lnum)
+    local sufWidth = vim.fn.strdisplaywidth(suffix)
+    local targetWidth = width - sufWidth
+    local curWidth = 0
+
+    for _, chunk in ipairs(virtText) do
+      local chunkText = chunk[1]
+      local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+      if targetWidth > curWidth + chunkWidth then
+        table.insert(newVirtText, chunk)
+      else
+        chunkText = truncate(chunkText, targetWidth - curWidth)
+        local hlGroup = chunk[2]
+        table.insert(newVirtText, {chunkText, hlGroup})
+        chunkWidth = vim.fn.strdisplaywidth(chunkText)
+        -- str width returned from truncate() may be less than 2nd argument,
+        -- need padding
+        if curWidth + chunkWidth < targetWidth then
+          suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
+        end
+        break
+      end
+      curWidth = curWidth + chunkWidth
+    end
+
+    table.insert(newVirtText, {suffix, 'FoldAnno'})
+
+    return newVirtText
+  end
+
+  local ufo = require'ufo'
+
+  local ufo_ft_map = {
+    lsp = { 'c', 'cpp', 'go', 'haskell', 'perl', 'rust' }
+  }
+
+  local ufo_provider_selector = function(bufnr, filetype, buftype)
+    if buftype == 'nofile' then
+      return ''
+    end
+
+    local function contains(tbl, val)
+      if tbl then
+        for i = 1, #tbl do
+          if tbl[i] == val then
+            return true
+          end
+        end
+      end
+      return false
+    end
+
+    local ret = ''
+    if contains(ufo_ft_map.disabled, filetype) then
+      return ''
+    elseif contains(ufo_ft_map.lsp, filetype) then
+      ret = { 'lsp', 'treesitter' }
+    else
+      ret = { 'treesitter', 'indent' }
+    end
+
+    local opts = { noremap = true, silent = true }
+
+    local function buf_set_keymap(keys, cmd)
+      vim.keymap.set('n', keys, cmd, { buffer = true })
+    end
+
+    buf_set_keymap('zR', ufo.openAllFolds)
+    buf_set_keymap('zM', ufo.closeAllFolds)
+    buf_set_keymap('zr', ufo.openFoldsExceptKinds)
+    buf_set_keymap('zm', ufo.closeFoldsWith)
+    buf_set_keymap('zK', ufo.peekFoldedLinesUnderCursor)
+
+    return ret
+  end
+
+  ufo.setup {
+    provider_selector = ufo_provider_selector,
+    fold_virt_text_handler = ufo_virt_text,
+    close_fold_kinds_for_ft = {
+      default = { 'comment', 'imports' },
+      pandoc = { 'fenced_code_block' },
+      rst = { 'directive' }
+    },
+    preview = {
+      win_config = {
+        border = 'none',
+        winhighlight = 'NormalFloat:Folded,FloatBorder:Folded',
+        winblend = 0
+      }
+    }
+  }
+
   require'bqf'.setup {
     auto_enable = true,
     func_map = {
