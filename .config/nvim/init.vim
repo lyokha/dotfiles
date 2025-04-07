@@ -411,7 +411,7 @@ lua <<EOF
     buf_set_option('formatexpr', 'v:lua.vim.lsp.formatexpr()')
 
     -- Use LSP as the handler for tagfunc
-    buf_set_option('tagfunc', '{t -> v:lua.vim.lsp.tagfunc(t, "cr")}')
+    buf_set_option('tagfunc', '{ t -> v:lua.vim.lsp.tagfunc(t, "cr") }')
 
     -- Mappings
     local function buf_set_keymap_mode(mode, keys, cmd)
@@ -447,7 +447,8 @@ lua <<EOF
       end)
     buf_set_keymap('gp',
       function() vim.lsp.inlay_hint.enable(
-        not vim.lsp.inlay_hint.is_enabled())
+        not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }),
+        { bufnr = bufnr })
       end)
 
     -- Uncomment the next line to disable LSP semantic tokens highlights
