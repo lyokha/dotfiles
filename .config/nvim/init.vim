@@ -397,17 +397,8 @@ EOF
 " ---- Setup language servers and related stuff {{{1
 " ----
 lua <<EOF
-  local nvim_lsp = require'lspconfig'
-
-  local hover = vim.lsp.buf.hover
-  vim.lsp.buf.hover = function()
-    return hover { border = 'rounded' }
-  end
-
   require'lspkind'.init()
 
-  -- Use an on_attach function to only map the following keys
-  -- after the language server attaches to the current buffer
   local on_attach = function(client, bufnr)
     local function buf_set_option(...)
       vim.api.nvim_buf_set_option(bufnr, ...)
@@ -423,58 +414,41 @@ lua <<EOF
     buf_set_option('tagfunc', '{t -> v:lua.vim.lsp.tagfunc(t, "cr")}')
 
     -- Mappings
-    local opts = { noremap = true, silent = true }
-
+    local function buf_set_keymap_mode(mode, keys, cmd)
+      vim.keymap.set(mode, keys, cmd,
+        { buffer = bufnr, noremap = true, silent = true })
+    end
     local function buf_set_keymap(...)
-      vim.api.nvim_buf_set_keymap(bufnr, ...)
+      buf_set_keymap_mode('n', ...)
     end
 
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    buf_set_keymap('n', 'gD',
-                   '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-    buf_set_keymap('n', 'gd',
-                   '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    buf_set_keymap('n', 'gt',
-                   '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+    buf_set_keymap('gD', vim.lsp.buf.declaration)
+    buf_set_keymap('gd', vim.lsp.buf.definition)
+    buf_set_keymap('gt', vim.lsp.buf.type_definition)
     if vim.fn.has('0.11') == 0 then
-      buf_set_keymap('n', 'gri',
-                     '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-      buf_set_keymap('n', 'grr',
-                     '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-      buf_set_keymap('n', 'grn',
-                     '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-      buf_set_keymap('n', 'gra',
-                     '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+      buf_set_keymap('gri', vim.lsp.buf.implementation)
+      buf_set_keymap('grr', vim.lsp.buf.references)
+      buf_set_keymap('grn', vim.lsp.buf.rename)
+      buf_set_keymap('gra', vim.lsp.buf.code_action)
     end
-    buf_set_keymap('n', 'gi',
-                   '<cmd>lua vim.lsp.buf.incoming_calls()<CR>', opts)
-    buf_set_keymap('n', 'go',
-                   '<cmd>lua vim.lsp.buf.outgoing_calls()<CR>', opts)
-    buf_set_keymap('n', 'gs',
-                   '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    buf_set_keymap('n', ',e',
-                   '<cmd>lua vim.diagnostic.open_float(' ..
-                     '{ border = "rounded" })<CR>', opts)
-    buf_set_keymap('n', '[d',
-                   '<cmd>lua vim.diagnostic.goto_prev(' ..
-                     '{ float = { border = "rounded" }})<CR>', opts)
-    buf_set_keymap('n', ']d',
-                   '<cmd>lua vim.diagnostic.goto_next(' ..
-                     '{ float = { border = "rounded" }})<CR>', opts)
-    buf_set_keymap('n', 'K',
-                   '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    buf_set_keymap('n', ',F',
-                   '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', opts)
-    buf_set_keymap('n', ',wa',
-                   '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', ',wr',
-                   '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', ',wl',
-                   '<cmd>lua print(vim.inspect(' ..
-                     'vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    buf_set_keymap('n', 'gp',
-                   '<cmd>lua vim.lsp.inlay_hint.enable('..
-                   'not vim.lsp.inlay_hint.is_enabled())<CR>', opts)
+    buf_set_keymap('gi', vim.lsp.buf.incoming_calls)
+    buf_set_keymap('go', vim.lsp.buf.outgoing_calls)
+    buf_set_keymap('gs', vim.lsp.buf.signature_help)
+    buf_set_keymap(',e', vim.diagnostic.open_float)
+    buf_set_keymap('[d', vim.diagnostic.goto_prev)
+    buf_set_keymap(']d', vim.diagnostic.goto_next)
+    buf_set_keymap('K',
+      function()
+        vim.lsp.buf.hover({ border = 'rounded' })
+      end)
+    buf_set_keymap_mode({'n', 'v'}, ',F',
+      function()
+        vim.lsp.buf.format({ async = true })
+      end)
+    buf_set_keymap('gp',
+      function() vim.lsp.inlay_hint.enable(
+        not vim.lsp.inlay_hint.is_enabled())
+      end)
 
     -- Uncomment the next line to disable LSP semantic tokens highlights
     -- client.server_capabilities.semanticTokensProvider = nil
@@ -485,6 +459,8 @@ lua <<EOF
     dynamicRegistration = false,
     lineFoldingOnly = true
   }
+
+  local nvim_lsp = require'lspconfig'
 
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
@@ -588,7 +564,8 @@ lua <<EOF
     virtual_text = false,
     underline = true,
     signs = true,
-    update_in_insert = false
+    update_in_insert = false,
+    float = { border = 'rounded' }
   }
 
   -- Send diagnostics to quickfix list
@@ -684,16 +661,15 @@ lua <<EOF
       ret = { 'treesitter', 'indent' }
     end
 
-    local opts = { noremap = true, silent = true }
-
     local function buf_set_keymap(keys, cmd)
-      vim.keymap.set('n', keys, cmd, { buffer = true })
+      vim.keymap.set('n', keys, cmd,
+        { buffer = bufnr, noremap = true, silent = true })
     end
 
     buf_set_keymap('zR', ufo.openAllFolds)
     buf_set_keymap('zM', ufo.closeAllFolds)
     buf_set_keymap('zr', ufo.openFoldsExceptKinds)
-    buf_set_keymap('zm', ufo.closeFoldsWith)
+    buf_set_keymap('zm', ufo.closeFoldsWith)  -- (0)zm, 1zm, 2zm etc.
     buf_set_keymap('zK', ufo.peekFoldedLinesUnderCursor)
 
     return ret
