@@ -446,9 +446,20 @@ lua <<EOF
         vim.lsp.buf.format({ async = true })
       end)
     buf_set_keymap('gp',
-      function() vim.lsp.inlay_hint.enable(
-        not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }),
-        { bufnr = bufnr })
+      function()
+        vim.lsp.inlay_hint.enable(
+          not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }),
+          { bufnr = bufnr })
+      end)
+    buf_set_keymap('gwa', vim.lsp.buf.add_workspace_folder)
+    buf_set_keymap('gwr', vim.lsp.buf.remove_workspace_folder)
+    buf_set_keymap('gwl',
+      function()
+        vim.print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+      end)
+    buf_set_keymap('gws',
+      function()
+        vim.lsp.buf.workspace_symbol(vim.call('expand','<cword>'))
       end)
 
     -- Uncomment the next line to disable LSP semantic tokens highlights
