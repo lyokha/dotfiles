@@ -472,8 +472,6 @@ lua <<EOF
     lineFoldingOnly = true
   }
 
-  local nvim_lsp = require'lspconfig'
-
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
   local servers = {
@@ -500,8 +498,9 @@ lua <<EOF
     elseif lsp == 'clangd' then
       setup.cmd = { 'clangd', '--background-index', '--clang-tidy' }
     end
-    nvim_lsp[lsp].setup(setup)
+    vim.lsp.config[lsp] = setup
   end
+  vim.lsp.enable(servers)
 
   -- outline.nvim
   require'outline'.setup {
