@@ -374,7 +374,8 @@ lua <<EOF
     ensure_installed = {
       'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
       'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
-      'query', 'r', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml', 'yaml'
+      'query', 'r', 'regex', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml',
+      'yaml'
     },
     highlight = {
       enable = true,
@@ -398,6 +399,14 @@ EOF
 " ----
 lua <<EOF
   require'lspkind'.init()
+
+  local orig_open_floating_preview = vim.lsp.util.open_floating_preview
+
+  function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+    opts = opts or {} 
+    opts.border = opts.border or 'rounded'
+    return orig_open_floating_preview(contents, syntax, opts, ...) 
+  end
 
   local on_attach = function(client, bufnr)
     local function buf_set_option(...)
@@ -425,11 +434,12 @@ lua <<EOF
     buf_set_keymap('gD', vim.lsp.buf.declaration)
     buf_set_keymap('gd', vim.lsp.buf.definition)
     buf_set_keymap('gt', vim.lsp.buf.type_definition)
-    if vim.fn.has('0.11') == 0 then
+    if vim.fn.has('nvim-0.11') == 0 then
       buf_set_keymap('gri', vim.lsp.buf.implementation)
       buf_set_keymap('grr', vim.lsp.buf.references)
       buf_set_keymap('grn', vim.lsp.buf.rename)
       buf_set_keymap('gra', vim.lsp.buf.code_action)
+      buf_set_keymap_mode('i', '<C-s>', vim.lsp.buf.signature_help)
     end
     buf_set_keymap('gi', vim.lsp.buf.incoming_calls)
     buf_set_keymap('go', vim.lsp.buf.outgoing_calls)
@@ -437,10 +447,7 @@ lua <<EOF
     buf_set_keymap(',e', vim.diagnostic.open_float)
     buf_set_keymap('[d', vim.diagnostic.goto_prev)
     buf_set_keymap(']d', vim.diagnostic.goto_next)
-    buf_set_keymap('K',
-      function()
-        vim.lsp.buf.hover({ border = 'rounded' })
-      end)
+    buf_set_keymap('K', vim.lsp.buf.hover)
     buf_set_keymap_mode({'n', 'v'}, ',F',
       function()
         vim.lsp.buf.format({ async = true })
@@ -467,9 +474,14 @@ lua <<EOF
   end
 
   local capabilities = require'cmp_nvim_lsp'.default_capabilities()
-  capabilities.textDocument.foldingRange = {
-    dynamicRegistration = false,
-    lineFoldingOnly = true
+  capabilities.textDocument = {
+    foldingRange = {
+      dynamicRegistration = false,
+      lineFoldingOnly = true
+    },
+    semanticTokens = {
+      multilineTokenSupport = true
+    }
   }
 
   -- Use a loop to conveniently call 'setup' on multiple servers and
@@ -589,12 +601,6 @@ lua <<EOF
         vim.diagnostic.setqflist({ open = false })
       end
   end
-
-  vim.lsp.handlers["textDocument/hover"] =
-    vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-
-  vim.lsp.handlers["textDocument/signatureHelp"] =
-    vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
   -- Setup snacks plugin (input, picker etc.)
   require'snacks'.setup {
@@ -832,6 +838,8 @@ nmap <silent> ,<right>   :tabn<CR>
 nmap <silent> <C-p><C-p> :Telescope find_files<CR>
 nmap <silent> <C-p>f     :Telescope file_browser<CR>
 nmap <silent> <C-p>g     :Telescope live_grep<CR>
+nmap <silent> <C-p>z     :Telescope current_buffer_fuzzy_find<CR>
+nmap <silent> <C-p>l     :Telescope spell_suggest<CR>
 nmap <silent> <C-p>s     :Telescope treesitter<CR>
 nmap <silent> <C-p>m     :Telescope marks<CR>
 
