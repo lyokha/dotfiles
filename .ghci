@@ -1,4 +1,5 @@
 :seti -XOverloadedStrings -XViewPatterns -XTupleSections -XLambdaCase
+:seti -XTypeApplications -XImportQualifiedPost
 
 :{
 prompt_ :: [String] -> Int -> Int -> Int -> String
