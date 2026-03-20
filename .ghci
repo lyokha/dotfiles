@@ -1,14 +1,18 @@
+:seti -Wno-type-defaults
+
 :seti -XOverloadedStrings -XViewPatterns -XTupleSections -XLambdaCase
 :seti -XTypeApplications -XImportQualifiedPost
 
 :{
 prompt_ :: [String] -> Int -> Int -> Int -> String
-prompt_ mods line color colorDelim =
-    putColor (if line `mod` 10 == 0 then colorDelim else color) ++
-        unwords (shortMods ++ lambda ++ clearColor)
-    where putColor c = "\ESC[38;5;" ++ show c ++ "m\STX"
-          clearColor = pure "\ESC[m\STX "
-          lambda = pure "\xf0c92"
+prompt_ mods line color colorDelim = concat
+    [ putColor $ if line `mod` 10 == 0 then colorDelim else color
+    , unwords $ shortMods ++ [lambda, clearColor]
+    , " "
+    ]
+    where putColor c = concat ["\ESC[38;5;", show c, "m\STX"]
+          clearColor = "\ESC[m\STX"
+          lambda = "\xf0c92"
           shortMods = map shortenModName $ filter (/= "Prelude") mods
           shortenModName = fst .
               foldr (\x (xs, isQualifier) ->
