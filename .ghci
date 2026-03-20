@@ -5,12 +5,11 @@
 
 :{
 prompt_ :: [String] -> Int -> Int -> Int -> String
-prompt_ mods line color colorDelim = concat
-    [ putColor $ if line `mod` 10 == 0 then colorDelim else color
-    , unwords $ shortMods ++ [lambda, clearColor]
-    , " "
-    ]
-    where putColor c = concat ["\ESC[38;5;", show c, "m\STX"]
+prompt_ mods line color colorDelim =
+    concat [putColor, unwords $ shortMods ++ [lambda, clearColor, ""]]
+    where color' | line `mod` 10 == 0 = colorDelim
+                 | otherwise = color
+          putColor = concat ["\ESC[38;5;", show color', "m\STX"]
           clearColor = "\ESC[m\STX"
           lambda = "\xf0c92"
           shortMods = map shortenModName $ filter (/= "Prelude") mods
