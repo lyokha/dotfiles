@@ -38,7 +38,13 @@ Plug 'kshenoy/vim-signature'
 Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'nvim-treesitter/nvim-treesitter', { 'do': { -> init#ts_update() } }
+if has('nvim-0.12')
+Plug 'nvim-treesitter/nvim-treesitter',
+            \ { 'do': { -> init#ts_update() }, 'branch': 'main' }
+else
+Plug 'nvim-treesitter/nvim-treesitter',
+            \ { 'do': { -> init#ts_update() }, 'branch': 'master' }
+endif
 Plug 'hedyhli/outline.nvim'
 Plug 'epheien/outline-treesitter-provider.nvim'
 Plug 'epheien/outline-ctags-provider.nvim'
@@ -370,27 +376,29 @@ lua <<EOF
   -- Register filetype pandoc as language markdown
   vim.treesitter.language.register('markdown', 'pandoc')
 
-  require'nvim-treesitter.configs'.setup {
-    ensure_installed = {
-      'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
-      'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
-      'query', 'r', 'regex', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml',
-      'yaml'
-    },
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = { 'haskell' },
-    },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = "sn",
-        node_incremental = "n",
-        scope_incremental = "N",
-        node_decremental = "m",
+  if vim.fn.has('nvim-0.12') == 0 then
+    require'nvim-treesitter.configs'.setup {
+      ensure_installed = {
+        'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
+        'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
+        'query', 'r', 'regex', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml',
+        'yaml'
+      },
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = { 'haskell' },
+      },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "sn",
+          node_incremental = "n",
+          scope_incremental = "N",
+          node_decremental = "m",
+        }
       }
     }
-  }
+  end
 EOF
 " }}}
 
@@ -1445,7 +1453,6 @@ endif
 
 lua <<EOF
   local ts = require'vim.treesitter'
-  local ts_utils = require'nvim-treesitter.ts_utils'
   local context_vt_utils = require'nvim_context_vt.utils'
   local min_node_size = 21
 
@@ -1455,7 +1462,7 @@ lua <<EOF
   end
 
   local function find_node(node, type)
-    local children = ts_utils.get_named_children(node)
+    local children = node:named_children()
     for _, child in ipairs(children) do
       if child:type() == type then
         return child
