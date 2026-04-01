@@ -2,7 +2,7 @@
 
 " ---- Helper functions for vim-plug {{{1
 " ----
-fun init#ts_update()
+fun s:ts_ensure_installed()
 lua <<EOF
   if vim.fn.has('nvim-0.12') == 1 then
     local ensure_installed = {}
@@ -15,6 +15,10 @@ lua <<EOF
     require'nvim-treesitter'.install(ensure_installed)
   end
 EOF
+endfun
+
+fun init#ts_update()
+    call s:ts_ensure_installed()
     TSUpdate
     if !has('nvim-0.12')
         let mdhlscm = '/markdown/highlights.scm'
