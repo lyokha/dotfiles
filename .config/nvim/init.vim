@@ -17,6 +17,14 @@ endif
 " ----
 let g:plug_home = stdpath('data').'/plugged'
 
+if has('nvim-0.12')
+  let g:ts_ensure_installed_ft =
+              \ ['c', 'cmake', 'cpp', 'go', 'gomod', 'haskell', 'json',
+              \  'lua', 'make', 'markdown', 'nginx', 'perl', 'pandoc',
+              \  'python', 'query', 'r', 'rst', 'rust', 'sh', 'tex', 'toml',
+              \  'vim', 'vimdoc', 'xml', 'yaml']
+endif
+
 call plug#begin()
 Plug 'ryanoasis/vim-devicons'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -352,11 +360,13 @@ lua <<EOF
   local query = require'vim.treesitter.query'
   local devicons = require'nvim-web-devicons'
 
+  local opts = vim.fn.has('nvim-0.12') == 1 and {} or { all = true }
+
   -- Conceal language injections by language icons from devicons
   query.add_directive('set-conceal-from-info-string!',
     function(match, _, bufnr, pred, metadata)
       local capture_id = pred[2]
-      local node = match[capture_id]
+      local node = match[capture_id][1]
       if not node then
         return
       end
@@ -366,7 +376,7 @@ lua <<EOF
         lang = lang:sub(2)
       end
       metadata.conceal = devicons.get_icon_by_filetype(lang) or ''
-    end)
+    end, opts)
 
   query.add_predicate('normalbuf?',
     function(_, _, bufnr, _, _)
@@ -376,13 +386,24 @@ lua <<EOF
   -- Register filetype pandoc as language markdown
   vim.treesitter.language.register('markdown', 'pandoc')
 
-  if vim.fn.has('nvim-0.12') == 0 then
+  if vim.fn.has('nvim-0.12') == 1 then
+    vim.api.nvim_create_autocmd('FileType', {
+      pattern = vim.g.ts_ensure_installed_ft,
+      callback = function(ev)
+        vim.treesitter.start(ev.buf,
+          vim.treesitter.language.get_lang(ev.match))
+        if ev.match == 'haskell' then
+          vim.bo[ev.buf].syntax = 'on'
+        end
+      end
+    })
+  else
     require'nvim-treesitter.configs'.setup {
       ensure_installed = {
         'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
-        'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
-        'query', 'r', 'regex', 'rst', 'rust', 'toml', 'vim', 'vimdoc', 'xml',
-        'yaml'
+        'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl',
+        'python', 'query', 'r', 'regex', 'rst', 'rust', 'toml', 'vim',
+        'vimdoc', 'xml', 'yaml'
       },
       highlight = {
         enable = true,
@@ -411,9 +432,9 @@ lua <<EOF
   local orig_open_floating_preview = vim.lsp.util.open_floating_preview
 
   function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-    opts = opts or {} 
+    opts = opts or {}
     opts.border = opts.border or 'rounded'
-    return orig_open_floating_preview(contents, syntax, opts, ...) 
+    return orig_open_floating_preview(contents, syntax, opts, ...)
   end
 
   local on_attach = function(client, bufnr)
@@ -947,6 +968,11 @@ autocmd FileType tex,rst,pandoc
 autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
 autocmd FileType pandoc setlocal nocindent
+" conceal lines in LSP doc floating windows
+autocmd FileType markdown
+            \ if &buftype == 'nofile' |
+            \     setlocal conceallevel=3 concealcursor=n |
+            \ endif
 
 " disable autocommenting lines following a commented line
 autocmd FileType c,cpp
@@ -954,6 +980,7 @@ autocmd FileType c,cpp
 
 set wildmenu
 set wildmode=list:longest,full
+set wildoptions=tagfile
 
 " insert combining acute accent when writing Russian texts easily
 imap <C-v>ё  <C-v>u0301

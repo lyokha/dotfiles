@@ -3,15 +3,29 @@
 " ---- Helper functions for vim-plug {{{1
 " ----
 fun init#ts_update()
+lua <<EOF
+  if vim.fn.has('nvim-0.12') == 1 then
+    local ensure_installed = {}
+    for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
+      if ft == 'pandoc' then
+        ft = 'markdown'
+      end
+      ensure_installed[i] = vim.treesitter.language.get_lang(ft)
+    end
+    require'nvim-treesitter'.install(ensure_installed)
+  end
+EOF
     TSUpdate
-    let mdhlscm = '/markdown/highlights.scm'
-    let cfgq_mdhlscm = stdpath('config').'/queries'.mdhlscm
-    let tsq_mdhlscm = g:plug_home.'/nvim-treesitter/queries'.mdhlscm
-    call system('cp '.tsq_mdhlscm.' '.cfgq_mdhlscm)
-    call system('sed -i ''/^(fenced_code_block$/,/^$/'.
-                \ '{s/^\((.*\)/\1 (#not-normalbuf? "")/;H;'.
-                \ '/^$/{x;s/(#not-\(normalbuf? "")\n\)/(#\1/;'.
-                \ 's/\s*(#set! conceal_lines[^)]*)//}}'' '.cfgq_mdhlscm)
+    if !has('nvim-0.12')
+        let mdhlscm = '/markdown/highlights.scm'
+        let cfgq_mdhlscm = stdpath('config').'/queries'.mdhlscm
+        let tsq_mdhlscm = g:plug_home.'/nvim-treesitter/queries'.mdhlscm
+        call system('cp '.tsq_mdhlscm.' '.cfgq_mdhlscm)
+        call system('sed -i ''/^(fenced_code_block$/,/^$/'.
+                    \ '{s/^\((.*\)/\1 (#not-normalbuf? "")/;H;'.
+                    \ '/^$/{x;s/(#not-\(normalbuf? "")\n\)/(#\1/;'.
+                    \ 's/\s*(#set! conceal_lines[^)]*)//}}'' '.cfgq_mdhlscm)
+    endif
 endfun
 " }}}
 
