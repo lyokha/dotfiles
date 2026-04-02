@@ -7,9 +7,6 @@ lua <<EOF
   if vim.fn.has('nvim-0.12') == 1 then
     local ensure_installed = {}
     for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
-      if ft == 'pandoc' then
-        ft = 'markdown'
-      end
       ensure_installed[i] = vim.treesitter.language.get_lang(ft)
     end
     require'nvim-treesitter'.install(ensure_installed)

@@ -20,9 +20,9 @@ let g:plug_home = stdpath('data').'/plugged'
 if has('nvim-0.12')
   let g:ts_ensure_installed_ft =
               \ ['c', 'cmake', 'cpp', 'go', 'gomod', 'haskell', 'json',
-              \  'lua', 'make', 'markdown', 'nginx', 'perl', 'pandoc',
-              \  'python', 'query', 'r', 'rst', 'rust', 'sh', 'tex', 'toml',
-              \  'vim', 'vimdoc', 'xml', 'yaml']
+              \  'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
+              \  'query', 'r', 'rst', 'rust', 'sh', 'tex', 'toml', 'vim',
+              \  'vimdoc', 'xml', 'yaml']
 endif
 
 call plug#begin()
@@ -357,6 +357,7 @@ EOF
 " ---- Setup treesitter {{{1
 " ----
 lua <<EOF
+  local ts = require'vim.treesitter'
   local query = require'vim.treesitter.query'
   local devicons = require'nvim-web-devicons'
 
@@ -370,7 +371,7 @@ lua <<EOF
       if not node then
         return
       end
-      local lang = vim.treesitter.get_node_text(node, bufnr):lower()
+      local lang = ts.get_node_text(node, bufnr):lower()
       -- Pandoc attribute style requires a dot before the language id
       if lang:sub(1, 1) == '.' then
         lang = lang:sub(2)
@@ -384,19 +385,41 @@ lua <<EOF
     end)
 
   -- Register filetype pandoc as language markdown
-  vim.treesitter.language.register('markdown', 'pandoc')
+  ts.language.register('markdown', 'pandoc')
 
   if vim.fn.has('nvim-0.12') == 1 then
+    local ft = vim.g.ts_ensure_installed_ft
+    table.insert(ft, 'pandoc')
     vim.api.nvim_create_autocmd('FileType', {
-      pattern = vim.g.ts_ensure_installed_ft,
+      pattern = ft,
       callback = function(ev)
-        vim.treesitter.start(ev.buf,
-          vim.treesitter.language.get_lang(ev.match))
+        ts.start(ev.buf, ts.language.get_lang(ev.match))
         if ev.match == 'haskell' then
           vim.bo[ev.buf].syntax = 'on'
         end
       end
     })
+    -- Incremental selection (try treesitter then LSP)
+    local function inc_node_selection()
+      if ts.get_parser(nil, nil, { error = false }) then
+        require'vim.treesitter._select'.select_parent(vim.v.count1)
+      else
+        vim.lsp.buf.selection_range(vim.v.count1)
+      end
+    end
+    vim.keymap.set({ 'n' }, 'sn', inc_node_selection,
+      { desc = "Start incremental node selection" })
+    vim.keymap.set({ 'x', 'o' }, 'n', inc_node_selection,
+      { desc = "Increment node selection" })
+    local function dec_node_selection()
+      if ts.get_parser(nil, nil, { error = false }) then
+        require'vim.treesitter._select'.select_child(vim.v.count1)
+      else
+        vim.lsp.buf.selection_range(-vim.v.count1)
+      end
+    end
+    vim.keymap.set({ 'x', 'o' }, 'm', dec_node_selection,
+      { desc = "Decrement node selection" })
   else
     require'nvim-treesitter.configs'.setup {
       ensure_installed = {
