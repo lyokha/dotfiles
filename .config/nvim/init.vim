@@ -399,27 +399,18 @@ lua <<EOF
         end
       end
     })
-    -- Incremental selection (try treesitter then LSP)
-    local function inc_node_selection()
-      if ts.get_parser(nil, nil, { error = false }) then
-        require'vim.treesitter._select'.select_parent(vim.v.count1)
-      else
-        vim.lsp.buf.selection_range(vim.v.count1)
-      end
-    end
-    vim.keymap.set({ 'n' }, 'sn', inc_node_selection,
-      { desc = "Start incremental node selection" })
-    vim.keymap.set({ 'x', 'o' }, 'n', inc_node_selection,
-      { desc = "Increment node selection" })
-    local function dec_node_selection()
-      if ts.get_parser(nil, nil, { error = false }) then
-        require'vim.treesitter._select'.select_child(vim.v.count1)
-      else
-        vim.lsp.buf.selection_range(-vim.v.count1)
-      end
-    end
-    vim.keymap.set({ 'x', 'o' }, 'm', dec_node_selection,
-      { desc = "Decrement node selection" })
+    -- Incremental node selection
+    -- (type vn to start selection, ]n, [n to jump to sibling nodes)
+    vim.keymap.set({ 'x', 'o' }, 'n', function()
+        if ts.get_parser(nil, nil, { error = false }) then
+          require'vim.treesitter._select'.select_parent(vim.v.count1)
+        end
+      end, { desc = "Increment selection to the parent node" })
+    vim.keymap.set('x', 'm', function()
+        if ts.get_parser(nil, nil, { error = false }) then
+          require'vim.treesitter._select'.select_child(vim.v.count1)
+        end
+      end, { desc = "Decrement selection to the child node" })
   else
     require'nvim-treesitter.configs'.setup {
       ensure_installed = {
@@ -449,6 +440,8 @@ EOF
 
 " ---- Setup language servers and related stuff {{{1
 " ----
+let g:LspHoverWinFocusable = v:true
+
 lua <<EOF
   require'lspkind'.init()
 
@@ -499,7 +492,10 @@ lua <<EOF
     buf_set_keymap(',e', vim.diagnostic.open_float)
     buf_set_keymap('[d', vim.diagnostic.goto_prev)
     buf_set_keymap(']d', vim.diagnostic.goto_next)
-    buf_set_keymap('K', vim.lsp.buf.hover)
+    buf_set_keymap('K',
+      function()
+        vim.lsp.buf.hover({ focusable = vim.g.LspHoverWinFocusable })
+      end)
     buf_set_keymap_mode({'n', 'v'}, ',F',
       function()
         vim.lsp.buf.format({ async = true })
@@ -815,8 +811,8 @@ lua <<EOF
   }
 EOF
 
-let g:UltiSnipsJumpForwardTrigger="<Tab>"
-let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
+let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
 " }}}
 
 
