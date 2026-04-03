@@ -987,10 +987,16 @@ autocmd FileType tex,rst,pandoc
 autocmd FileType tex setlocal conceallevel=2
 " nocindent for pandoc
 autocmd FileType pandoc setlocal nocindent
-" conceal lines in LSP doc floating windows
+" conceal lines in LSP hover windows
 autocmd FileType markdown
             \ if &buftype == 'nofile' |
             \     setlocal conceallevel=3 concealcursor=n |
+            \ endif
+" disable airline in floating windows
+autocmd WinNew *
+            \ let win = nvim_win_get_config(win_getid(expand('<amatch>'))) |
+            \ if !empty(win.relative) |
+            \     let w:airline_disable_statusline = 1 |
             \ endif
 
 " disable autocommenting lines following a commented line
