@@ -4,20 +4,27 @@
 " ----
 fun s:ts_ensure_installed()
 lua <<EOF
-  if vim.fn.has('nvim-0.12') == 1 then
-    local ensure_installed = {}
-    for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
-      ensure_installed[i] = vim.treesitter.language.get_lang(ft)
-    end
-    require'nvim-treesitter'.install(ensure_installed)
+  local ensure_installed = {}
+  for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
+    ensure_installed[i] = vim.treesitter.language.get_lang(ft)
   end
+  require'nvim-treesitter'.install(ensure_installed)
 EOF
 endfun
 
-fun init#ts_update()
-    call s:ts_ensure_installed()
+fun init#ts_update(...)
+    if a:0 && a:1 != 'old' && a:1 != 'new'
+        lua vim.notify(
+                    \ 'init#ts_update: '..
+                    \ 'the optional argument must be "old" or "new"',
+                    \ vim.log.levels.ERROR)
+        return
+    endif
+    if !a:0 || a:1 == 'new'
+        call s:ts_ensure_installed()
+    endif
     TSUpdate
-    if !has('nvim-0.12')
+    if a:0 && a:1 == 'old'
         let mdhlscm = '/markdown/highlights.scm'
         let cfgq_mdhlscm = stdpath('config').'/queries'.mdhlscm
         let tsq_mdhlscm = g:plug_home.'/nvim-treesitter/queries'.mdhlscm
@@ -157,11 +164,15 @@ fun init#close_tag_win()
         let pwin = getwinvar(i, 'tagpwin')
         if pwin
             if i != curwin
-                " treesitter-context fails to redraw correctly,
-                " so close-and-open its window
-                call v:lua.require'treesitter-context'.close()
+                if !has('nvim-0.12')
+                    " treesitter-context fails to redraw correctly,
+                    " so close and then open its window
+                    lua require'treesitter-context'.close()
+                endif
                 exe "close ".i
-                call v:lua.require'treesitter-context'.open()
+                if !has('nvim-0.12')
+                    lua require'treesitter-context'.open()
+                endif
             else
                 wincmd q
             endif

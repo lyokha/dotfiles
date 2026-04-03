@@ -18,11 +18,11 @@ endif
 let g:plug_home = stdpath('data').'/plugged'
 
 if has('nvim-0.12')
-  let g:ts_ensure_installed_ft =
-              \ ['c', 'cmake', 'cpp', 'go', 'gomod', 'haskell', 'json',
-              \  'lua', 'make', 'markdown', 'nginx', 'perl', 'python',
-              \  'query', 'r', 'rst', 'rust', 'sh', 'tex', 'toml', 'vim',
-              \  'vimdoc', 'xml', 'yaml']
+    let g:ts_ensure_installed_ft =
+                \ ['c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
+                \  'json', 'lua', 'make', 'markdown', 'nginx', 'perl',
+                \  'python', 'query', 'r', 'regex', 'rst', 'rust', 'sh',
+                \  'tex', 'toml', 'vim', 'vimdoc', 'xml', 'yaml']
 endif
 
 call plug#begin()
@@ -51,7 +51,7 @@ Plug 'nvim-treesitter/nvim-treesitter',
             \ { 'do': { -> init#ts_update() }, 'branch': 'main' }
 else
 Plug 'nvim-treesitter/nvim-treesitter',
-            \ { 'do': { -> init#ts_update() }, 'branch': 'master' }
+            \ { 'do': { -> init#ts_update('old') }, 'branch': 'master' }
 endif
 Plug 'hedyhli/outline.nvim'
 Plug 'epheien/outline-treesitter-provider.nvim'
@@ -998,6 +998,9 @@ autocmd WinNew *
             \ if !empty(win.relative) |
             \     let w:airline_disable_statusline = 1 |
             \ endif
+" disable airline in snacks input and notifier windows
+autocmd FileType snacks_input,snacks_notif
+            \ let b:airline_disable_statusline = 1
 
 " disable autocommenting lines following a commented line
 autocmd FileType c,cpp
