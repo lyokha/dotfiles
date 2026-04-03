@@ -8,23 +8,16 @@ lua <<EOF
   for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
     ensure_installed[i] = vim.treesitter.language.get_lang(ft)
   end
-  require'nvim-treesitter'.install(ensure_installed)
+  require'nvim-treesitter'.install(ensure_installed):wait(300000)
+  require'nvim-treesitter'.update(ensure_installed, { summary = true })
 EOF
 endfun
 
 fun init#ts_update(...)
-    if a:0 && a:1 != 'old' && a:1 != 'new'
-        lua vim.notify(
-                    \ 'init#ts_update: '..
-                    \ 'the optional argument must be "old" or "new"',
-                    \ vim.log.levels.ERROR)
-        return
-    endif
     if !a:0 || a:1 == 'new'
         call s:ts_ensure_installed()
-    endif
-    TSUpdate
-    if a:0 && a:1 == 'old'
+    elseif a:1 == 'old'
+        TSUpdate
         let mdhlscm = '/markdown/highlights.scm'
         let cfgq_mdhlscm = stdpath('config').'/queries'.mdhlscm
         let tsq_mdhlscm = g:plug_home.'/nvim-treesitter/queries'.mdhlscm
@@ -33,6 +26,10 @@ fun init#ts_update(...)
                     \ '{s/^\((.*\)/\1 (#not-normalbuf? "")/;H;'.
                     \ '/^$/{x;s/(#not-\(normalbuf? "")\n\)/(#\1/;'.
                     \ 's/\s*(#set! conceal_lines[^)]*)//}}'' '.cfgq_mdhlscm)
+    else
+        lua vim.notify(
+                    \ 'the optional argument must be "old" or "new"',
+                    \ vim.log.levels.ERROR, { title = 'init#ts_update()' })
     endif
 endfun
 " }}}

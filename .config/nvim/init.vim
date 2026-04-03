@@ -393,9 +393,16 @@ lua <<EOF
     vim.api.nvim_create_autocmd('FileType', {
       pattern = ft,
       callback = function(ev)
-        ts.start(ev.buf, ts.language.get_lang(ev.match))
-        if ev.match == 'haskell' then
-          vim.bo[ev.buf].syntax = 'on'
+        local lang = ts.language.get_lang(ev.match)
+        if pcall(function() ts.start(ev.buf, lang) end) then
+          if ev.match == 'haskell' then
+            vim.bo[ev.buf].syntax = 'on'
+          end
+        else
+          vim.notify('failed to load parser for language '.. lang..' ...',
+                     vim.log.levels.ERROR, { title = 'nvim-treesitter' })
+          vim.notify('... run ":call init#ts_update()" to install languages',
+                     vim.log.levels.INFO, { title = 'nvim-treesitter' })
         end
       end
     })
