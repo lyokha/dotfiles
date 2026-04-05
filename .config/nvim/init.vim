@@ -399,7 +399,7 @@ lua <<EOF
             vim.bo[ev.buf].syntax = 'on'
           end
         else
-          vim.notify('failed to load parser for language '.. lang..' ...',
+          vim.notify('failed to load parser for language ' .. lang .. ' ...',
                      vim.log.levels.ERROR, { title = 'nvim-treesitter' })
           vim.notify('... run ":call init#ts_update()" to install languages',
                      vim.log.levels.INFO, { title = 'nvim-treesitter' })
@@ -945,9 +945,9 @@ let g:DisableUnicodeSymbols = &term =~? '^linux' &&
 " set good line breaks
 set linebreak
 if g:DisableUnicodeSymbols
-    set showbreak=\ >>>\ 
+    set showbreak=\ >>>\ " (suppress trailing whitespace warning)
 else
-    set showbreak=\ \ ↳\ \ 
+    set showbreak=\ \ 󱞩\ \ " (suppress trailing whitespace warning)
 endif
 
 " fold blocks with '+'

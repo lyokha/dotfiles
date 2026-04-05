@@ -27,8 +27,7 @@ fun init#ts_update(...)
                     \ '/^$/{x;s/(#not-\(normalbuf? "")\n\)/(#\1/;'.
                     \ 's/\s*(#set! conceal_lines[^)]*)//}}'' '.cfgq_mdhlscm)
     else
-        lua vim.notify(
-                    \ 'the optional argument must be "old" or "new"',
+        lua vim.notify('the optional argument must be "old" or "new"',
                     \ vim.log.levels.ERROR, { title = 'init#ts_update()' })
     endif
 endfun
