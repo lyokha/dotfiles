@@ -47,6 +47,8 @@ fun init#get_title_text()
             let l:icon = ""
         elseif &filetype == 'alpha'
             let l:icon = "󰀫"
+        elseif &filetype == g:DashboardImpl
+            let l:icon = "󰡃"
         elseif index(["tagbar", "Outline"], &filetype) != -1 && !l:showtagbar
             let l:icon = "󰅴"
         elseif index(["Mundo", "MundoDiff"], &filetype) != -1
@@ -371,7 +373,8 @@ fun init#close_last_ancillary_buffers()
         for buf in bufs
             let ft = getbufvar(buf, '&filetype')
             if buf != curbuf && (!getbufvar(buf, '&buflisted') &&
-                        \ index(['alpha', 'nerdtree', 'tagbar'], ft) == -1 ||
+                        \ index([g:DashboardImpl,
+                        \     'nerdtree', 'tagbar', 'vim-plug'], ft) == -1 ||
                         \ ft == 'qf')
                 exe 'bdelete '.buf
             endif

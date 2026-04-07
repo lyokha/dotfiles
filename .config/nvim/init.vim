@@ -28,7 +28,6 @@ endif
 call plug#begin()
 Plug 'ryanoasis/vim-devicons'
 Plug 'kyazdani42/nvim-web-devicons'
-Plug 'goolord/alpha-nvim'
 Plug 'sainnhe/gruvbox-material'
 Plug 'fladson/vim-kitty'
 Plug 'neovim/nvim-lspconfig'
@@ -81,7 +80,6 @@ Plug 'inkarkat/vim-mark'
 Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
 Plug 'danilamihailov/beacon.nvim', { 'commit': 'a786c9a' }
 Plug 'bogado/file-line'
-Plug 'uga-rosa/ccc.nvim'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
@@ -241,38 +239,82 @@ nmap <silent> ,Y    "+P
 " }}}
 
 
-" ---- Setup alpha-nvim and ccc {{{1
+" ---- Setup snacks plugin (dashboard, input, picker etc.) {{{1
 " ----
+let g:DashboardImpl = 'snacks_dashboard'
+
+highlight DashboardHeader
+                \ cterm=NONE ctermfg=210 ctermbg=NONE
+                \ gui=NONE guifg=#94d194 guibg=NONE
+highlight DashboardNormal
+                \ cterm=NONE ctermfg=210 ctermbg=NONE
+                \ gui=NONE guifg=#ffa093 guibg=NONE
+highlight DashboardKey
+                \ cterm=NONE ctermfg=30 ctermbg=NONE
+                \ gui=NONE guifg=#009999 guibg=NONE
+highlight DashboardIcon
+                \ cterm=NONE ctermfg=167 ctermbg=NONE
+                \ gui=NONE guifg=#cb6e62 guibg=NONE
+
+highlight link SnacksDashboardHeader DashboardHeader
+highlight link SnacksDashboardTitle DashboardNormal
+highlight link SnacksDashboardDesc DashboardNormal
+highlight link SnacksDashboardFile DashboardNormal
+highlight link SnacksDashboardIcon DashboardIcon
+highlight link SnacksDashboardDir DashboardIcon
+highlight link SnacksDashboardKey DashboardKey
+
+let g:plug_window = "lua Snacks.win { ".
+            \ "position = 'float', border = 'solid', ".
+            \ "keys = { ['<Esc>'] = 'close' } }"
+
 lua <<EOF
-  local theta = require'alpha.themes.theta'
-  local dashboard = require'alpha.themes.dashboard'
-
-  theta.buttons.val = {
-    { type = "text", val = "Quick links",
-      opts = { hl = "SpecialComment", position = "center" }
-    },
-    { type = "padding", val = 1 },
-    dashboard.button("e", "󰈔  New file", "<cmd>enew<CR>"),
-    dashboard.button("CTRL-p p", "󰈞  Find file",
-                     "<cmd>Telescope find_files<CR>"),
-    dashboard.button("CTRL-P g", "󰊄  Live grep",
-                     "<cmd>Telescope live_grep<CR>"),
-    dashboard.button("c", "  Configuration",
-                     "<cmd>e ~/.config/nvim/init.vim<CR>"),
-    dashboard.button("u", "󰚰  Update plugins", "<cmd>PlugUpdate<CR>"),
-    dashboard.button("q", "󰅚  Quit", "<cmd>qa<CR>"),
-    { type = "padding", val = 2 },
-    { type = "text", val = "File browser",
-      opts = { hl = "SpecialComment", position = "center" }
-    },
-    { type = "padding", val = 1 },
-    dashboard.button("CTRL-p f", "󰉓  File browser",
-                     "<cmd>Telescope file_browser<CR>")
+  require'snacks'.setup {
+    input = { enabled = true },
+    picker = { enabled = true },
+    notifier = { enabled = true },
+    dashboard = {
+      enabled = true,
+      preset = {
+        header = [[
+                                         $$\
+                                         \__|
+ $$$$$$$\   $$$$$$\   $$$$$$\ $$\    $$\ $$\ $$$$$$\$$$$\
+ $$  __$$\ $$  __$$\ $$  __$$\\$$\  $$  |$$ |$$  _$$  _$$\
+ $$ |  $$ |$$$$$$$$ |$$ /  $$ |\$$\$$  / $$ |$$ / $$ / $$ |
+ $$ |  $$ |$$   ____|$$ |  $$ | \$$$  /  $$ |$$ | $$ | $$ |
+ $$ |  $$ |\$$$$$$$\ \$$$$$$  |  \$  /   $$ |$$ | $$ | $$ |
+ \__|  \__| \_______| \______/    \_/    \__|\__| \__| \__|]],
+        keys = {
+          { icon = " ", key = "n", desc = "New file",
+              action = ":enew | startinsert" },
+          { icon = " ", key = "f", desc = "Find file",
+              action = ":lua require'telescope.builtin'.find_files()" },
+          { icon = "󰊄 ", key = "g", desc = "Live grep",
+              action = ":lua require'telescope.builtin'.live_grep()" },
+          { icon = "󰉓 ", key = "p", desc = "File browser",
+              action = ":lua \z
+              require'telescope'.extensions.file_browser.file_browser()" },
+          { icon = " ", key = "c", desc = "Configuration",
+              action = ":lua require'telescope.builtin'.find_files \z
+              { cwd = vim.fn.stdpath('config') }" },
+          { icon = "󰚰 ", key = "u", desc = "Update plugins",
+              action = ":PlugUpdate" },
+          { icon = "󰅚 ", key = "q", desc = "Quit",
+              action = ":qa" }
+        }
+      },
+      formats = { header = { "%s", align = "left" } },
+      sections = {
+        { section = "header" },
+        { section = "keys", padding = 1 },
+        { icon = " ", title = "Recent Files", section = "recent_files",
+            indent = 2, padding = 1 },
+        { icon = " ", title = "Projects", section = "projects",
+            indent = 2, padding = 1 }
+      }
+    }
   }
-
-  require'alpha'.setup(theta.config)
-
-  require'ccc'.setup { lsp = false }
 EOF
 " }}}
 
@@ -659,13 +701,6 @@ lua <<EOF
         vim.diagnostic.setqflist({ open = false })
       end
   end
-
-  -- Setup snacks plugin (input, picker etc.)
-  require'snacks'.setup {
-    input = { enabled = true },
-    picker = { enabled = true },
-    notifier = { enabled = true }
-  }
 EOF
 " }}}
 
@@ -1008,8 +1043,8 @@ autocmd WinNew *
             \ if !empty(win.relative) |
             \     let w:airline_disable_statusline = 1 |
             \ endif
-" disable airline in snacks input and notifier windows
-autocmd FileType snacks_input,snacks_notif
+" disable airline in snacks dashboard, input and notifier windows
+autocmd FileType snacks_dashboard,snacks_input,snacks_notif
             \ let b:airline_disable_statusline = 1
 
 " disable autocommenting lines following a commented line
@@ -1337,7 +1372,7 @@ autocmd TabLeave * if &filetype == 'tagbar' | wincmd p | endif
 
 autocmd BufNewFile,BufReadPre *.snippets let b:tagbar_ignore = 1
 
-let g:tagbar_win_ft_skip = ['tagbar', 'alpha']
+let g:tagbar_win_ft_skip = ['tagbar', g:DashboardImpl]
 
 fun s:open_tagbar(buf_enter)
     if a:buf_enter && exists('b:open_tagbar_done')
