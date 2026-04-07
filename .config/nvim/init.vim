@@ -491,7 +491,10 @@ lua <<EOF
       buf_set_keymap('grr', vim.lsp.buf.references)
       buf_set_keymap('grn', vim.lsp.buf.rename)
       buf_set_keymap('gra', vim.lsp.buf.code_action)
+      buf_set_keymap('grt', vim.lsp.buf.type_definition)
+      buf_set_keymap('gO', vim.lsp.buf.document_symbol)
       buf_set_keymap_mode('i', '<C-s>', vim.lsp.buf.signature_help)
+      -- nvim-0.12 adds another mapping 'grx' for vim.lsp.codelens.run()
     end
     buf_set_keymap('gi', vim.lsp.buf.incoming_calls)
     buf_set_keymap('go', vim.lsp.buf.outgoing_calls)
