@@ -121,7 +121,7 @@ let g:CustomTSHighlights = 1
 
 if g:CustomTSHighlights
     highlight TSFunction
-                \ cterm=NONE ctermfg=192 ctermbg=NONE
+                \ cterm=NONE ctermfg=186 ctermbg=NONE
                 \ gui=NONE guifg=#c1d173 guibg=NONE
     highlight link TSFunctionCall TSFunction
     highlight TSVariable
@@ -132,7 +132,7 @@ if g:CustomTSHighlights
                 \ cterm=NONE ctermfg=49 ctermbg=NONE
                 \ gui=italic guifg=#00ee9e guibg=NONE
     highlight TSProperty
-                \ cterm=NONE ctermfg=49 ctermbg=NONE
+                \ cterm=NONE ctermfg=42 ctermbg=NONE
                 \ gui=NONE guifg=#09d08d guibg=NONE
     highlight link TSField TSProperty
     highlight link @constructor.haskell TSProperty
@@ -143,12 +143,12 @@ let g:CustomFoldedHighlights = 1
 
 if g:CustomFoldedHighlights
     highlight Folded
-                \ cterm=NONE ctermfg=NONE ctermbg=238
+                \ cterm=NONE ctermfg=NONE ctermbg=236
                 \ gui=NONE guifg=NONE guibg=#332f2d
 endif
 
 highlight FoldAnno
-            \ cterm=NONE ctermfg=79 ctermbg=NONE
+            \ cterm=NONE ctermfg=29 ctermbg=NONE
             \ gui=NONE guifg=#3d8a70 guibg=NONE
 
 let g:CustomMatchParenHighlight = 1
@@ -244,7 +244,7 @@ nmap <silent> ,Y    "+P
 let g:DashboardImpl = 'snacks_dashboard'
 
 highlight DashboardHeader
-                \ cterm=NONE ctermfg=210 ctermbg=NONE
+                \ cterm=NONE ctermfg=114 ctermbg=NONE
                 \ gui=NONE guifg=#94d194 guibg=NONE
 highlight link SnacksDashboardHeader DashboardHeader
 highlight DashboardNormal
@@ -385,23 +385,30 @@ EOF
 " }}}
 
 
-" ---- Setup nvim-web-devicons {{{1
+" ---- Setup nvim-web-devicons and extra filetype detections {{{1
 " ----
 lua <<EOF
+  vim.filetype.add { extension = { log = 'log' } }
+
   local devicons = require'nvim-web-devicons'
 
-  devicons.set_icon {
-    nginx = { icon = '', color = '#009400', cterm_color = '28',
-      name = 'Nginx'
+  devicons.setup {
+    override = {
+      nginx = { icon = '', color = '#009400', cterm_color = '28',
+        name = 'Nginx'
+      },
+      shellsession = { icon = '', color = '#cbcb41', cterm_color = '185',
+        name = 'ShellSession'
+      }
     },
-    shellsession = { icon = '', color = '#cbcb41', cterm_color = '185',
-      name = 'ShellSession'
-    }
+    default = true,
+    strict = true
   }
 
   devicons.set_icon_by_filetype {
-    latex = 'tex', nginx = 'nginx', shellsession = 'shellsession',
-    shelloutput = 'shellsession'
+    cabal = 'hs', cabalproject = 'hs', latex = 'tex', messages = 'log',
+    nginx = 'nginx', pandoc = 'markdown', requirements = 'txt', rst = 'txt',
+    shellsession = 'shellsession', shelloutput = 'shellsession'
   }
 EOF
 " }}}
@@ -1054,8 +1061,8 @@ autocmd WinNew *
             \ if !empty(win.relative) |
             \     let w:airline_disable_statusline = 1 |
             \ endif
-" disable airline in snacks dashboard, input and notifier windows
-autocmd FileType snacks_dashboard,snacks_input,snacks_notif
+" disable airline in snacks windows and cmp menus
+autocmd FileType snacks_dashboard,snacks_input,snacks_notif,cmp_*
             \ let b:airline_disable_statusline = 1
 
 " disable autocommenting lines following a commented line

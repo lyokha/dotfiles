@@ -36,6 +36,19 @@ endfun
 
 " ---- Functions for rendering window titles {{{1
 " ----
+fun s:get_title_devicon_icon()
+lua <<EOF
+  local devicons = require'nvim-web-devicons'
+  local icon = devicons.get_icon_by_filetype(vim.bo.filetype)
+  if icon == devicons.get_default_icon().icon then
+    icon = devicons.get_icon(
+      vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':t'),
+      vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':e'))
+  end
+  vim.b.title_devicon_icon = icon
+EOF
+endfun
+
 fun init#get_title_text()
     let l:showtagbar = &filetype == 'tagbar' &&
                 \ (!exists('t:wintoggle_tagbar_done') ||
@@ -48,7 +61,7 @@ fun init#get_title_text()
         elseif &filetype == 'alpha'
             let l:icon = "󰀫"
         elseif &filetype == g:DashboardImpl
-            let l:icon = "󰡃"
+            let l:icon = "󰨝"
         elseif index(["tagbar", "Outline"], &filetype) != -1 && !l:showtagbar
             let l:icon = "󰅴"
         elseif index(["Mundo", "MundoDiff"], &filetype) != -1
@@ -56,12 +69,9 @@ fun init#get_title_text()
         elseif &filetype == 'TelescopePrompt'
             let l:icon = ""
         else
-            let l:icon = v:lua.require'nvim-web-devicons'
-                        \.get_icon(fnamemodify(l:bufname, ':t'),
-                        \ fnamemodify(l:bufname, ':e'))
-            if l:icon == v:null
-                let l:icon = ""
-            endif
+            let b:title_devicon_bufname = l:bufname
+            call s:get_title_devicon_icon()
+            let l:icon = b:title_devicon_icon
         endif
     endif
     let l:text = pathshorten(l:bufname, 1)
