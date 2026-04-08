@@ -246,27 +246,32 @@ let g:DashboardImpl = 'snacks_dashboard'
 highlight DashboardHeader
                 \ cterm=NONE ctermfg=210 ctermbg=NONE
                 \ gui=NONE guifg=#94d194 guibg=NONE
+highlight link SnacksDashboardHeader DashboardHeader
 highlight DashboardNormal
                 \ cterm=NONE ctermfg=210 ctermbg=NONE
                 \ gui=NONE guifg=#ffa093 guibg=NONE
-highlight DashboardKey
-                \ cterm=NONE ctermfg=30 ctermbg=NONE
-                \ gui=NONE guifg=#009999 guibg=NONE
-highlight DashboardIcon
-                \ cterm=NONE ctermfg=167 ctermbg=NONE
-                \ gui=NONE guifg=#cb6e62 guibg=NONE
-
-highlight link SnacksDashboardHeader DashboardHeader
 highlight link SnacksDashboardTitle DashboardNormal
 highlight link SnacksDashboardDesc DashboardNormal
 highlight link SnacksDashboardFile DashboardNormal
+highlight DashboardIcon
+                \ cterm=NONE ctermfg=167 ctermbg=NONE
+                \ gui=NONE guifg=#cb6e62 guibg=NONE
 highlight link SnacksDashboardIcon DashboardIcon
 highlight link SnacksDashboardDir DashboardIcon
+highlight DashboardKey
+                \ cterm=NONE ctermfg=30 ctermbg=NONE
+                \ gui=NONE guifg=#009999 guibg=NONE
 highlight link SnacksDashboardKey DashboardKey
 
-let g:plug_window = 'lua Snacks.win { position = "float", border = "solid" }'
+let g:plug_window = 'lua Snacks.win '.
+            \ '{ position = "float", border = "solid", zindex = 20 }'
+let g:plug_pwindow = 'lua Snacks.win '.
+            \ '{ position = "float", border = "solid", zindex = 30 }'
 
-autocmd FileType vim-plug nmap <silent> <buffer> q :q<CR>
+autocmd FileType vim-plug nnoremap <silent> <buffer> q
+            \ :if b:plug_preview == 1 <Bar> pclose <Bar>
+            \     let b:plug_preview = -1 <Bar>
+            \ else <Bar> close <Bar> endif<CR>
 
 lua <<EOF
   require'snacks'.setup {
