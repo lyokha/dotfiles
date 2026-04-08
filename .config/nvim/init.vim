@@ -264,9 +264,9 @@ highlight link SnacksDashboardIcon DashboardIcon
 highlight link SnacksDashboardDir DashboardIcon
 highlight link SnacksDashboardKey DashboardKey
 
-let g:plug_window = "lua Snacks.win { ".
-            \ "position = 'float', border = 'solid', ".
-            \ "keys = { ['<Esc>'] = 'close' } }"
+let g:plug_window = 'lua Snacks.win { position = "float", border = "solid" }'
+
+autocmd FileType vim-plug nmap <silent> <buffer> q :q<CR>
 
 lua <<EOF
   require'snacks'.setup {
@@ -309,9 +309,15 @@ lua <<EOF
         { section = "header" },
         { section = "keys", padding = 1 },
         { icon = " ", title = "Recent Files", section = "recent_files",
-            indent = 2, padding = 1 },
+            indent = 2, padding = 1
+        },
         { icon = " ", title = "Projects", section = "projects",
-            indent = 2, padding = 1 }
+            indent = 2, padding = 1,
+            action = function(dir)
+              vim.fn.chdir(dir)
+              require'telescope.builtin'.find_files()
+            end
+        }
       }
     }
   }
@@ -928,8 +934,8 @@ nmap <silent> <C-up>     :wincmd k<CR>
 nmap <silent> <C-down>   :wincmd j<CR>
 nmap <silent> ,<left>    :tabp<CR>
 nmap <silent> ,<right>   :tabn<CR>
-nmap <silent> <C-p><C-p> :Telescope find_files<CR>
-nmap <silent> <C-p>f     :Telescope file_browser<CR>
+nmap <silent> <C-p><C-p> :Telescope file_browser<CR>
+nmap <silent> <C-p>f     :Telescope find_files<CR>
 nmap <silent> <C-p>g     :Telescope live_grep<CR>
 nmap <silent> <C-p>z     :Telescope current_buffer_fuzzy_find<CR>
 nmap <silent> <C-p>l     :Telescope spell_suggest<CR>
