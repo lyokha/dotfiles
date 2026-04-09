@@ -899,7 +899,12 @@ autocmd BufReadPost *
             \     silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
             \ endif
 
+autocmd CmdwinEnter * let w:disable_wintoggle_cmd = 1
+
 fun s:wintoggle_cmd(cmd, bufname)
+    if exists('w:disable_wintoggle_cmd')
+        return
+    endif
     let l:bufname = a:bufname == '__Tagbar__*' &&
                 \ exists('t:tagbar_buf_name') ? t:tagbar_buf_name : a:bufname
     let status = bufwinnr(l:bufname)
