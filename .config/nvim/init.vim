@@ -198,6 +198,7 @@ set list
 set mouse=a
 set hlsearch
 set noincsearch
+set wrapscan
 
 " make vertical split open on the right
 set splitright
@@ -520,6 +521,8 @@ lua <<EOF
     return orig_open_floating_preview(contents, syntax, opts, ...)
   end
 
+  vim.lsp.log.set_level('WARN')
+
   local on_attach = function(client, bufnr)
     local function buf_set_option(...)
       vim.api.nvim_buf_set_option(bufnr, ...)
@@ -560,8 +563,14 @@ lua <<EOF
     buf_set_keymap('go', vim.lsp.buf.outgoing_calls)
     buf_set_keymap('gs', vim.lsp.buf.signature_help)
     buf_set_keymap(',e', vim.diagnostic.open_float)
-    buf_set_keymap('[d', vim.diagnostic.goto_prev)
-    buf_set_keymap(']d', vim.diagnostic.goto_next)
+    buf_set_keymap('[d',
+      function()
+        vim.diagnostic.jump({ count = -1, float = true })
+      end)
+    buf_set_keymap(']d',
+      function()
+        vim.diagnostic.jump({ count = 1, float = true })
+      end)
     buf_set_keymap('K',
       function()
         vim.lsp.buf.hover({ focusable = vim.g.LspHoverWinFocusable })
@@ -706,7 +715,8 @@ lua <<EOF
     underline = true,
     signs = true,
     update_in_insert = false,
-    float = { border = 'rounded' }
+    float = { border = 'rounded' },
+    jump = { wrap = true }
   }
 
   -- Send diagnostics to quickfix list
