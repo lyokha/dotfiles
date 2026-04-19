@@ -339,7 +339,16 @@ lua <<EOF
     hide_cursor = false,
     duration_multiplier = 0.75,
     mappings = { '<C-u>', '<C-d>', '<C-b>', '<C-f>', 'zt', 'zz', 'zb' },
-    ignored_events = { 'CursorMoved' }
+    ignored_events = { 'CursorMoved' },
+    pre_hook = function()
+      -- close LSP hover and other similar windows on scroll
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local conf = vim.api.nvim_win_get_config(win)
+        if conf.relative == 'win' and conf.win == vim.fn.win_getid() then
+          vim.api.nvim_win_close(win, false)
+        end
+      end
+    end
   }
 
   for _, key in ipairs { '<S-up>', '<PageUp>' } do
