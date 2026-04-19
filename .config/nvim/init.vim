@@ -77,7 +77,7 @@ Plug 'rhysd/committia.vim'
 Plug 'simnalamburt/vim-mundo'
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
-Plug 'psliwka/vim-smoothie', { 'commit': '10fd0aa' }
+Plug 'karb94/neoscroll.nvim'
 Plug 'danilamihailov/beacon.nvim', { 'commit': 'a786c9a' }
 Plug 'bogado/file-line'
 Plug 'lervag/vimtex'
@@ -211,8 +211,6 @@ endif
 let mapleader = ','
 let g:netrw_winsize = 25
 
-let g:cursorhold_updatetime = 100
-
 " editorconfig clashes with file_line()
 let g:editorconfig = v:false
 " }}}
@@ -327,6 +325,32 @@ lua <<EOF
       }
     }
   }
+EOF
+" }}}
+
+
+" ---- Setup neoscroll plugin {{{1
+" ----
+lua <<EOF
+  local neoscroll = require'neoscroll'
+  neoscroll.setup {
+    easing = 'quadratic',
+    hide_cursor = false,
+    duration_multiplier = 0.75,
+    mappings = { '<C-u>', '<C-d>', '<C-b>', '<C-f>', 'zt', 'zz', 'zb' }
+  }
+  for _, key in ipairs { '<S-up>', '<PageUp>' } do
+    vim.keymap.set({ 'n', 'x' }, key,
+      function()
+        neoscroll.scroll(-0.8, { duration = 200 })
+      end)
+  end
+  for _, key in ipairs { '<S-down>', '<PageDown>' } do
+    vim.keymap.set({ 'n', 'x' }, key,
+      function()
+        neoscroll.scroll(0.8, { duration = 200 })
+      end)
+  end
 EOF
 " }}}
 
