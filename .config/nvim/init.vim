@@ -333,12 +333,15 @@ EOF
 " ----
 lua <<EOF
   local neoscroll = require'neoscroll'
+
   neoscroll.setup {
     easing = 'quadratic',
     hide_cursor = false,
     duration_multiplier = 0.75,
-    mappings = { '<C-u>', '<C-d>', '<C-b>', '<C-f>', 'zt', 'zz', 'zb' }
+    mappings = { '<C-u>', '<C-d>', '<C-b>', '<C-f>', 'zt', 'zz', 'zb' },
+    ignored_events = { 'CursorMoved' }
   }
+
   for _, key in ipairs { '<S-up>', '<PageUp>' } do
     vim.keymap.set({ 'n', 'x' }, key,
       function()
@@ -493,12 +496,14 @@ lua <<EOF
     })
     -- Incremental node selection
     -- (type vn to start selection, ]n, [n to jump to sibling nodes)
-    vim.keymap.set({ 'x', 'o' }, 'n', function()
+    vim.keymap.set({ 'x', 'o' }, 'n',
+      function()
         if ts.get_parser(nil, nil, { error = false }) then
           require'vim.treesitter._select'.select_parent(vim.v.count1)
         end
       end, { desc = "Increment selection to the parent node" })
-    vim.keymap.set('x', 'm', function()
+    vim.keymap.set('x', 'm',
+      function()
         if ts.get_parser(nil, nil, { error = false }) then
           require'vim.treesitter._select'.select_child(vim.v.count1)
         end
@@ -589,24 +594,24 @@ lua <<EOF
     buf_set_keymap(',e', vim.diagnostic.open_float)
     buf_set_keymap('[d',
       function()
-        vim.diagnostic.jump({ count = -1, float = true })
+        vim.diagnostic.jump { count = -1, float = true }
       end)
     buf_set_keymap(']d',
       function()
-        vim.diagnostic.jump({ count = 1, float = true })
+        vim.diagnostic.jump { count = 1, float = true }
       end)
     buf_set_keymap('K',
       function()
-        vim.lsp.buf.hover({ focusable = vim.g.LspHoverWinFocusable })
+        vim.lsp.buf.hover { focusable = vim.g.LspHoverWinFocusable }
       end)
-    buf_set_keymap_mode({'n', 'v'}, ',F',
+    buf_set_keymap_mode({ 'n', 'v' }, ',F',
       function()
-        vim.lsp.buf.format({ async = true })
+        vim.lsp.buf.format { async = true }
       end)
     buf_set_keymap('gp',
       function()
         vim.lsp.inlay_hint.enable(
-          not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }),
+          not vim.lsp.inlay_hint.is_enabled { bufnr = bufnr },
           { bufnr = bufnr })
       end)
     buf_set_keymap('gwa', vim.lsp.buf.add_workspace_folder)
@@ -750,7 +755,7 @@ lua <<EOF
     vim.lsp.handlers[method] =
       function(err, method, result, client_id, bufnr, config)
         default_handler(err, method, result, client_id, bufnr, config)
-        vim.diagnostic.setqflist({ open = false })
+        vim.diagnostic.setqflist { open = false }
       end
   end
 EOF
@@ -775,7 +780,7 @@ lua <<EOF
       else
         chunkText = truncate(chunkText, targetWidth - curWidth)
         local hlGroup = chunk[2]
-        table.insert(newVirtText, {chunkText, hlGroup})
+        table.insert(newVirtText, { chunkText, hlGroup })
         chunkWidth = vim.fn.strdisplaywidth(chunkText)
         -- str width returned from truncate() may be less than 2nd argument,
         -- need padding
@@ -787,7 +792,7 @@ lua <<EOF
       curWidth = curWidth + chunkWidth
     end
 
-    table.insert(newVirtText, {suffix, 'FoldAnno'})
+    table.insert(newVirtText, { suffix, 'FoldAnno' })
 
     return newVirtText
   end
@@ -880,27 +885,27 @@ lua <<EOF
         vim.fn["UltiSnips#Anon"](args.body)
       end
     },
-    mapping = cmp.mapping.preset.insert({
+    mapping = cmp.mapping.preset.insert {
       ['<C-up>'] = cmp.mapping.scroll_docs(-4),
       ['<C-down>'] = cmp.mapping.scroll_docs(4),
       ['<C-space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.abort(),
-      ['<CR>'] = cmp.mapping.confirm({ select = false }),
-      ['<C-right>'] = cmp.mapping.confirm({ select = true })
-    }),
-    sources = cmp.config.sources({
+      ['<CR>'] = cmp.mapping.confirm { select = false },
+      ['<C-right>'] = cmp.mapping.confirm { select = true }
+    },
+    sources = cmp.config.sources {
       { name = 'nvim_lsp' },
       { name = 'ultisnips' },
       { name = 'buffer', option = { keyword_pattern = [[\k\+]] } }
-    }),
+    },
     formatting = {
       format = lspkind.cmp_format()
     },
     window = {
-      documentation = cmp.config.window.bordered({
+      documentation = cmp.config.window.bordered {
         border = 'rounded',
         winhighlight = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder'
-      })
+      }
     },
     experimental = {
       ghost_text = false
@@ -1177,21 +1182,23 @@ lua <<EOF
       end
 
       -- Navigation
-      map('n', ']c', function()
-        if vim.wo.diff then return ']c' end
-        vim.schedule(function() gs.next_hunk() end)
-        return '<Ignore>'
-      end, {expr=true})
+      map('n', ']c',
+        function()
+          if vim.wo.diff then return ']c' end
+          vim.schedule(function() gs.nav_hunk('next') end)
+          return '<Ignore>'
+        end, { expr = true })
 
-      map('n', '[c', function()
-        if vim.wo.diff then return '[c' end
-        vim.schedule(function() gs.prev_hunk() end)
-        return '<Ignore>'
-      end, {expr=true})
+      map('n', '[c',
+        function()
+          if vim.wo.diff then return '[c' end
+          vim.schedule(function() gs.nav_hunk('prev') end)
+          return '<Ignore>'
+        end, { expr = true })
 
       -- Actions
-      map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
-      map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+      map({ 'n', 'v' }, '<leader>hs', ':Gitsigns stage_hunk<CR>')
+      map({ 'n', 'v' }, '<leader>hr', ':Gitsigns reset_hunk<CR>')
       map('n', '<leader>hS', gs.stage_buffer)
       map('n', '<leader>hR', gs.reset_buffer)
       map('n', '<leader>hp', gs.preview_hunk)
@@ -1203,7 +1210,7 @@ lua <<EOF
       map('n', '<leader>tw', gs.toggle_word_diff)
 
       -- Text object
-      map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+      map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
     end
   }
 EOF
