@@ -205,7 +205,8 @@ endfun
 fun init#setup_airline(sudo_icon)
     if !s:airline_loaded
         " sudo indicator, this must work with both sudo -e and
-        " alias svim='sudo HOME=$HOME nvim'
+        " alias svim='sudo XDG_CONFIG_HOME=$HOME/.config '`
+        "                `'XDG_DATA_HOME=$HOME/.local/share nvim'
         call airline#parts#define('sudo', {
             \ 'text': a:sudo_icon.'SUDO',
             \ 'condition': '!empty($SUDO_USER) || $_ =~# "/sudo$"',
