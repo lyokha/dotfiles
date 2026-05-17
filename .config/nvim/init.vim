@@ -1133,10 +1133,9 @@ imap <C-v>ё  <C-v>u0301
 autocmd BufRead *.csv setlocal nomodeline
 
 nmap <silent> ,vv :Inspect<CR>
+nmap <silent> ,vt :InspectTree<CR>
 nmap <silent> ,vf :GetFgColorUnderCursor<CR>
 nmap <silent> ,vb :GetBgColorUnderCursor<CR>
-nmap <silent> ,vc :CccHighlighterToggle<CR>
-nmap <silent> ,vp :CccPick<CR>
 
 let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
