@@ -44,6 +44,14 @@
 
 ; ### Various ad-hoc tweaks
 
-; highlight opening brackets of TH quotes as a whole
-("[" @keyword.quote . "|" @keyword.quote)
+; highlight surrounding brackets of TH quotes and quasiquotes as a whole
+(quote . ("[" @keyword.quote
+          . ["e" "d" "t" "p"]* @keyword.quote
+          . "|" @keyword.quote)
+       "|]" @keyword.quote .)
+(quasiquote . ("[" @keyword.quote
+               . (quoter) @keyword.quote
+               . "|" @keyword.quote
+              )
+            "|]" @keyword.quote .)
 

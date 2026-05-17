@@ -494,7 +494,7 @@ lua <<EOF
         local lang = ts.language.get_lang(ev.match)
         if pcall(function() ts.start(ev.buf, lang) end) then
           if ev.match == 'haskell' then
-            vim.bo[ev.buf].syntax = 'on'
+            vim.bo[ev.buf].syntax = 'ON'
           end
         else
           vim.notify('failed to load parser for language ' .. lang .. ' ...',
