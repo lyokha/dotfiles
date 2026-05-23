@@ -209,6 +209,10 @@ if has('nvim-0.11')
     " let g:_ts_force_sync_parsing = 1
 endif
 
+if has('nvim-0.12')
+  lua require('vim._core.ui2').enable()
+endif
+
 let mapleader = ','
 let g:netrw_winsize = 25
 
