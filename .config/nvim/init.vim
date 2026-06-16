@@ -936,12 +936,7 @@ let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
 " ---- Easy navigation between tabs and buffers {{{1
 " ----
 set switchbuf=usetab
-" use bufhidden=delete or bufhidden=wipe to enable the following <C-arrow>
-" mappings; if 'delete' is used then cursor won't move to reopen buffers, but
-" when wipe is used <C-t> won't work
-autocmd BufEnter * if empty(&buftype) | setlocal bufhidden=delete | endif
-" this will fix bug with bufhidden=delete mentioned above
-autocmd BufEnter * if empty(&buftype) | setlocal buflisted | endif
+set nohidden
 
 " jump to the last known cursor position on opening a buffer
 let g:JumpToLastChangeOnBufOpen = 1
@@ -1019,14 +1014,15 @@ autocmd QuitPre * call init#quit_pre_hook()
 autocmd BufUnload * call init#close_last_ancillary_buffers()
 
 " toggle commands for tagbar, mundo, nerdtree and other are also here
-nmap <silent> <C-p>t     :call
-            \ <SID>wintoggle_cmd('TagbarToggle', '__Tagbar__*')<CR>
+nmap <silent> <C-p>o     :if g:OutlineImpl == 'outline' <Bar>
+            \ call <SID>wintoggle_cmd('Outline!', 'OUTLINE_*') <Bar>
+            \ elseif g:OutlineImpl == 'tagbar' <Bar>
+            \ call <SID>wintoggle_cmd('TagbarToggle', '__Tagbar__*') <Bar>
+            \ endif<CR>
 nmap <silent> <C-p>u     :call
             \ <SID>wintoggle_cmd('MundoToggle', '__Mundo__')<CR>
 nmap <silent> <C-p>e     :call
             \ <SID>wintoggle_cmd('NERDTreeToggle', 'NERD_tree_*')<CR>
-nmap <silent> <C-p>o     :call
-            \ <SID>wintoggle_cmd('Outline!', 'OUTLINE_*')<CR>
 " go to bottom-right window (tagbar etc.)
 nmap <silent> <C-p>[     :wincmd b<CR>
 
@@ -1492,6 +1488,7 @@ fun s:refresh_outline(timer_id)
     endif
 endfun
 
+" outline implementation can be 'outline' (preferred) or 'tagbar'
 let g:OutlineImpl = 'outline'
 
 if g:OutlineImpl == 'tagbar'
