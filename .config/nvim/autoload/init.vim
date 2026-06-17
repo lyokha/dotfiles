@@ -74,7 +74,7 @@ fun init#get_title_text()
             let l:icon = b:title_devicon_icon
         endif
     endif
-    let l:text = pathshorten(l:bufname, 1)
+    let l:text = pathshorten(fnamemodify(l:bufname, ':~:.'), 1)
     " NOTE: below is the Unicode En Space!
     return l:icon . ' ' . l:text
 endfun
@@ -220,6 +220,26 @@ fun init#setup_airline(sudo_icon)
         AirlineRefresh
         let s:airline_loaded = 1
     endif
+endfun
+
+fun s:get_title_devicon_icon_by_bufname(bufname)
+    return v:lua.require'nvim-web-devicons'.get_icon(
+                \ fnamemodify(a:bufname, ':t'), fnamemodify(a:bufname, ':e'))
+endfun
+
+fun init#tabline_title_formatter(n)
+    let buflist = tabpagebuflist(a:n)
+    let winnr = tabpagewinnr(a:n)
+    let curbufnr = bufnr()
+    let bufnr = index(buflist, curbufnr) < 0 ? buflist[winnr - 1] : curbufnr
+    let bufname = airline#extensions#tabline#formatters#default#format(
+                \ bufname(bufnr), [])
+    let icon = s:get_title_devicon_icon_by_bufname(bufname)
+    return icon.' '.bufname
+endfun
+
+fun init#tabline_tabnr_formatter(n, bufs)
+    return ''
 endfun
 " }}}
 

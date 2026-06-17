@@ -998,8 +998,8 @@ nmap <silent> <C-left>   :wincmd h<CR>
 nmap <silent> <C-right>  :wincmd l<CR>
 nmap <silent> <C-up>     :wincmd k<CR>
 nmap <silent> <C-down>   :wincmd j<CR>
-nmap <silent> ,<left>    :tabp<CR>
-nmap <silent> ,<right>   :tabn<CR>
+nmap <silent> z<left>    :tabp<CR>
+nmap <silent> z<right>   :tabn<CR>
 nmap <silent> <C-p><C-p> :Telescope file_browser<CR>
 nmap <silent> <C-p>f     :Telescope find_files<CR>
 nmap <silent> <C-p>g     :Telescope live_grep<CR>
@@ -1297,7 +1297,21 @@ let g:airline_detect_iminsert = 1
 let g:airline#extensions#keymap#enabled = 0
 let g:airline#extensions#xkblayout#enabled = 0
 let g:airline#extensions#tagbar#flags = 'f'
-let g:airline#extensions#tabline#enabled = 0
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_tabs = 1
+let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#buffer_nr_show = 0
+let g:airline#extensions#tabline#show_close_button = 0
+let g:airline#extensions#tabline#show_tab_count = 0
+let g:airline#extensions#tabline#tab_min_count = 1
+let g:airline#extensions#tabline#formatter = 'default'
+let g:airline#extensions#tabline#fnamemod = ':~:.'
+let g:airline#extensions#tabline#tabs_label = '󰠷'
+let g:airline#extensions#tabline#tabtitle_formatter =
+            \ 'init#tabline_title_formatter'
+let g:airline#extensions#tabline#tabnr_formatter =
+            \ 'init#tabline_tabnr_formatter'
+
 " see https://github.com/vim-airline/vim-airline/issues/2704
 let g:airline#extensions#whitespace#symbol = ''
 
@@ -1360,12 +1374,12 @@ let g:gutentags_exclude_filetypes = ['svn', 'cvs', 'gitcommit', 'hgcommit']
 
 " ---- Switching to alternative source code files {{{1
 " ----
-nmap ,aa  :FSHere<CR>
-nmap ,as  :FSSplitAbove<CR>
-nmap ,ax  :FSSplitAbove<CR>
-nmap ,av  :FSSplitRight<CR>
-nmap ,aj  :FSSplitRight<CR>
-nmap ,at  :FSTab<CR>
+nmap <silent> ,aa  :FSHere<CR>
+nmap <silent> ,as  :FSSplitAbove<CR>
+nmap <silent> ,ax  :FSSplitAbove<CR>
+nmap <silent> ,av  :FSSplitRight<CR>
+nmap <silent> ,aj  :FSSplitRight<CR>
+nmap <silent> ,at  :FSTab<CR>
 
 " fswitch settings for opening buffers
 augroup fswitch
