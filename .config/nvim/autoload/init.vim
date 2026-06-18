@@ -223,8 +223,13 @@ fun init#setup_airline(sudo_icon)
 endfun
 
 fun s:get_title_devicon_icon_by_bufname(bufname)
-    return v:lua.require'nvim-web-devicons'.get_icon(
+    let icon = v:lua.require'nvim-web-devicons'.get_icon(
                 \ fnamemodify(a:bufname, ':t'), fnamemodify(a:bufname, ':e'))
+    if icon == v:lua.require'nvim-web-devicons'.get_default_icon().icon
+        let icon = v:lua.require'nvim-web-devicons'.get_icon_by_filetype(
+                    \ v:lua.vim.filetype.match({ 'filename': a:bufname }))
+    endif
+    return icon
 endfun
 
 fun init#tabline_title_formatter(n)
