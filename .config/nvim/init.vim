@@ -1317,6 +1317,10 @@ let g:airline#extensions#whitespace#symbol = ''
 
 let g:airline_theme_patch_func = 'init#airline_theme_patch'
 
+" this also affects nerdtree and other plugins which use vim-devicons
+let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol =
+            \ v:lua.require'nvim-web-devicons'.get_default_icon().icon
+
 let s:SudoAdminIcon = g:DisableUnicodeSymbols ? '' : ' '
 
 " load custom g:airline_section_a once at the first BufWinEnter event

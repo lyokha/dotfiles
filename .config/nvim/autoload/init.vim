@@ -222,16 +222,6 @@ fun init#setup_airline(sudo_icon)
     endif
 endfun
 
-fun s:get_title_devicon_icon_by_bufname(bufname)
-    let icon = v:lua.require'nvim-web-devicons'.get_icon(
-                \ fnamemodify(a:bufname, ':t'), fnamemodify(a:bufname, ':e'))
-    if icon == v:lua.require'nvim-web-devicons'.get_default_icon().icon
-        let icon = v:lua.require'nvim-web-devicons'.get_icon_by_filetype(
-                    \ v:lua.vim.filetype.match({ 'filename': a:bufname }))
-    endif
-    return icon
-endfun
-
 fun init#tabline_title_formatter(n)
     let buflist = tabpagebuflist(a:n)
     let winnr = tabpagewinnr(a:n)
@@ -239,8 +229,10 @@ fun init#tabline_title_formatter(n)
     let bufnr = index(buflist, curbufnr) < 0 ? buflist[winnr - 1] : curbufnr
     let bufname = airline#extensions#tabline#formatters#default#format(
                 \ bufname(bufnr), [])
-    let icon = s:get_title_devicon_icon_by_bufname(bufname)
-    return icon.' '.bufname
+    " mirror tabline title contents against the buffer's title
+    return g:WebDevIconsTabAirLineAfterGlyphPadding.
+                \ WebDevIconsGetFileTypeSymbol(bufname).
+                \ g:WebDevIconsTabAirLineBeforeGlyphPadding.bufname
 endfun
 
 fun init#tabline_tabnr_formatter(n, bufs)
