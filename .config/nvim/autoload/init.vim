@@ -50,39 +50,44 @@ EOF
 endfun
 
 fun init#get_title_text()
-    let l:showtagbar = &filetype == 'tagbar' &&
+    let showtagbar = &filetype == 'tagbar' &&
                 \ (!exists('t:wintoggle_tagbar_done') ||
                 \ exists('t:winhidden[t:tagbar_buf_name]'))
-    let l:bufname = l:showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
-    let l:icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
-    if empty(l:icon)
+    let bufname = showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
+    let icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
+    let filetype = &filetype
+    let text = filetype
+    if empty(icon)
         if &filetype == 'nerdtree'
-            let l:icon = ""
+            let icon = ""
         elseif &filetype == 'alpha'
-            let l:icon = "󰀫"
+            let icon = "󰀫"
         elseif &filetype == g:DashboardImpl
-            let l:icon = "󰨝"
-        elseif index(["tagbar", "Outline"], &filetype) != -1 && !l:showtagbar
-            let l:icon = "󰅴"
+            let icon = "󰨝"
+            let text = '[vim]'
+        elseif index(["tagbar", "Outline"], &filetype) != -1 && !showtagbar
+            let icon = "󰅴"
         elseif index(["Mundo", "MundoDiff"], &filetype) != -1
-            let l:icon = ""
+            let icon = ""
         elseif &filetype == 'TelescopePrompt'
-            let l:icon = ""
+            let icon = ""
+            let text = 'Telescope'
         else
-            let b:title_devicon_bufname = l:bufname
+            let b:title_devicon_bufname = bufname
             call s:get_title_devicon_icon()
-            let l:icon = b:title_devicon_icon
+            let icon = b:title_devicon_icon
+            let text = pathshorten(fnamemodify(bufname, ':~:.'), 1)
         endif
     endif
-    let l:text = pathshorten(fnamemodify(l:bufname, ':~:.'), 1)
     " NOTE: below is the Unicode En Space!
-    return l:icon . ' ' . l:text
+    return icon.' '.text
 endfun
 
 fun init#get_title_modified()
-    if &filetype == 'tagbar' &&
+    let showtagbar = &filetype == 'tagbar' &&
                 \ (!exists('t:wintoggle_tagbar_done') ||
                 \ exists('t:winhidden[t:tagbar_buf_name]'))
+    if showtagbar || !&modifiable
         return ''
     endif
     return '%m'
@@ -227,12 +232,26 @@ fun init#tabline_title_formatter(n)
     let winnr = tabpagewinnr(a:n)
     let curbufnr = bufnr()
     let bufnr = index(buflist, curbufnr) < 0 ? buflist[winnr - 1] : curbufnr
-    let bufname = airline#extensions#tabline#formatters#default#format(
-                \ bufname(bufnr), [])
+    let bufname = bufname(bufnr)
+    let filetype = getbufvar(bufnr, '&filetype')
+    let text = filetype
+    if filetype == 'nerdtree'
+        let icon = ""
+    elseif index(["tagbar", "Outline"], &filetype) != -1
+        let icon = "󰅴"
+    elseif index(["Mundo", "MundoDiff"], &filetype) != -1
+        let icon = ""
+    elseif &filetype == 'TelescopePrompt'
+        let icon = ""
+        let text = 'Telescope'
+    else
+        let icon = WebDevIconsGetFileTypeSymbol(bufname)
+        let text = airline#extensions#tabline#formatters#default#format(
+                    \ bufname, [])
+    endif
     " mirror tabline title contents against the buffer's title
-    return g:WebDevIconsTabAirLineAfterGlyphPadding.
-                \ WebDevIconsGetFileTypeSymbol(bufname).
-                \ g:WebDevIconsTabAirLineBeforeGlyphPadding.bufname
+    return g:WebDevIconsTabAirLineAfterGlyphPadding.icon.
+                \ g:WebDevIconsTabAirLineBeforeGlyphPadding.text
 endfun
 
 fun init#tabline_tabnr_formatter(n, bufs)

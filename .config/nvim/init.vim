@@ -174,9 +174,12 @@ set showcmd
 
 " note that setting title causes glitches in terminals using ncurses 6.3,
 " see https://github.com/neovim/neovim/issues/18573
+let s:TitleString = '%{init#get_title_text()}%{%init#get_title_modified()%}'
 set title
-set titlestring=%{init#get_title_text()}%{%init#get_title_modified()%}
+let &titlestring = s:TitleString
 set titlelen=0
+" force redrawing title on FileType events
+autocmd FileType * let &titlestring = s:TitleString
 
 " always show statusline
 set laststatus=2
