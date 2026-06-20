@@ -36,6 +36,17 @@ endfun
 
 " ---- Functions for rendering window titles {{{1
 " ----
+let s:ancillary_buffers_title_map =
+            \ { 'alpha':            { 'icon': '󰀫', 'text': '[vim]' },
+            \   'snacks_dashboard': { 'icon': '󰨝', 'text': '[vim]' },
+            \   'nerdtree':         { 'icon': '', 'text': '[nerdtree]' },
+            \   'Outline':          { 'icon': '󰅴', 'text': '[outline]' },
+            \   'tagbar':           { 'icon': '󰅴', 'text': '[tagbar]' },
+            \   'Mundo':            { 'icon': '', 'text': '[mundo]' },
+            \   'MundoDiff':        { 'icon': '', 'text': '[mundo]' },
+            \   'TelescopePrompt':  { 'icon': '', 'text': '[telescope]' }
+            \ }
+
 fun s:get_title_devicon_icon()
 lua <<EOF
   local devicons = require'nvim-web-devicons'
@@ -55,23 +66,12 @@ fun init#get_title_text()
                 \ exists('t:winhidden[t:tagbar_buf_name]'))
     let bufname = showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
     let icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
-    let filetype = &filetype
-    let text = filetype
     if empty(icon)
-        if &filetype == 'nerdtree'
-            let icon = ""
-        elseif &filetype == 'alpha'
-            let icon = "󰀫"
-        elseif &filetype == g:DashboardImpl
-            let icon = "󰨝"
-            let text = '[vim]'
-        elseif index(["tagbar", "Outline"], &filetype) != -1 && !showtagbar
-            let icon = "󰅴"
-        elseif index(["Mundo", "MundoDiff"], &filetype) != -1
-            let icon = ""
-        elseif &filetype == 'TelescopePrompt'
-            let icon = ""
-            let text = 'Telescope'
+        if index(['alpha', 'snacks_dashboard', 'nerdtree', 'Outline',
+                    \ 'Mundo', 'MundoDiff', 'TelescopePrompt'], &filetype)
+                    \ != -1 || (&filetype == 'tagbar' && !showtagbar)
+            let icon = s:ancillary_buffers_title_map[&filetype]['icon']
+            let text = s:ancillary_buffers_title_map[&filetype]['text']
         else
             let b:title_devicon_bufname = bufname
             call s:get_title_devicon_icon()
@@ -234,16 +234,10 @@ fun init#tabline_title_formatter(n)
     let bufnr = index(buflist, curbufnr) < 0 ? buflist[winnr - 1] : curbufnr
     let bufname = bufname(bufnr)
     let filetype = getbufvar(bufnr, '&filetype')
-    let text = filetype
-    if filetype == 'nerdtree'
-        let icon = ""
-    elseif index(["tagbar", "Outline"], &filetype) != -1
-        let icon = "󰅴"
-    elseif index(["Mundo", "MundoDiff"], &filetype) != -1
-        let icon = ""
-    elseif &filetype == 'TelescopePrompt'
-        let icon = ""
-        let text = 'Telescope'
+    if index(['nerdtree', 'tagbar', 'Outline', 'Mundo', 'MundoDiff',
+                \ 'TelescopePrompt'], filetype) != -1
+        let icon = s:ancillary_buffers_title_map[filetype]['icon']
+        let text = s:ancillary_buffers_title_map[filetype]['text']
     else
         let icon = WebDevIconsGetFileTypeSymbol(bufname)
         let text = airline#extensions#tabline#formatters#default#format(
