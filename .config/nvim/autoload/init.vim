@@ -36,7 +36,7 @@ endfun
 
 " ---- Functions for rendering window titles {{{1
 " ----
-let s:ancillary_buffers_title_map =
+let s:ancillary_buffer_title =
             \ { 'alpha':            { 'icon': '󰀫', 'text': '[vim]' },
             \   'snacks_dashboard': { 'icon': '󰨝', 'text': '[vim]' },
             \   'nerdtree':         { 'icon': '', 'text': '[nerdtree]' },
@@ -70,8 +70,9 @@ fun init#get_title_text()
         if index(['alpha', 'snacks_dashboard', 'nerdtree', 'Outline',
                     \ 'Mundo', 'MundoDiff', 'TelescopePrompt'], &filetype)
                     \ != -1 || (&filetype == 'tagbar' && !showtagbar)
-            let icon = s:ancillary_buffers_title_map[&filetype]['icon']
-            let text = s:ancillary_buffers_title_map[&filetype]['text']
+            let title = s:ancillary_buffer_title[&filetype]
+            let icon = title['icon']
+            let text = title['text']
         else
             let b:title_devicon_bufname = bufname
             call s:get_title_devicon_icon()
@@ -236,8 +237,9 @@ fun init#tabline_title_formatter(n)
     let filetype = getbufvar(bufnr, '&filetype')
     if index(['nerdtree', 'tagbar', 'Outline', 'Mundo', 'MundoDiff',
                 \ 'TelescopePrompt'], filetype) != -1
-        let icon = s:ancillary_buffers_title_map[filetype]['icon']
-        let text = s:ancillary_buffers_title_map[filetype]['text']
+        let title = s:ancillary_buffer_title[filetype]
+        let icon = title['icon']
+        let text = title['text']
     else
         let icon = WebDevIconsGetFileTypeSymbol(bufname)
         let text = airline#extensions#tabline#formatters#default#format(
