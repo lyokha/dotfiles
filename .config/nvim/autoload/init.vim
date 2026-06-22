@@ -39,9 +39,10 @@ endfun
 let s:ancillary_buffer_title =
             \ { 'alpha':            { 'icon': '󰀫', 'text': '[vim]' },
             \   'snacks_dashboard': { 'icon': '󰨝', 'text': '[vim]' },
+            \   'vim-plug':         { 'icon': '󰚰', 'text': '[plugins]' },
             \   'nerdtree':         { 'icon': '', 'text': '[nerdtree]' },
-            \   'Outline':          { 'icon': '󰅴', 'text': '[outline]' },
-            \   'tagbar':           { 'icon': '󰅴', 'text': '[tagbar]' },
+            \   'Outline':          { 'icon': '󰠶', 'text': '[outline]' },
+            \   'tagbar':           { 'icon': '󰠶', 'text': '[tagbar]' },
             \   'Mundo':            { 'icon': '', 'text': '[mundo]' },
             \   'MundoDiff':        { 'icon': '', 'text': '[mundo]' },
             \   'TelescopePrompt':  { 'icon': '', 'text': '[telescope]' }
@@ -67,9 +68,11 @@ fun init#get_title_text()
     let bufname = showtagbar ? bufname(winbufnr(winnr('#'))) : bufname()
     let icon = exists('g:StaticTitleIcon') ? g:StaticTitleIcon : ''
     if empty(icon)
-        if index(['alpha', 'snacks_dashboard', 'nerdtree', 'Outline',
-                    \ 'Mundo', 'MundoDiff', 'TelescopePrompt'], &filetype)
-                    \ != -1 || (&filetype == 'tagbar' && !showtagbar)
+        let ancillary_buffers =
+                    \ ['alpha', 'snacks_dashboard', 'vim-plug', 'nerdtree',
+                    \  'Outline', 'Mundo', 'MundoDiff', 'TelescopePrompt']
+        if index(ancillary_buffers, &filetype) != -1 ||
+                    \ (&filetype == 'tagbar' && !showtagbar)
             let title = s:ancillary_buffer_title[&filetype]
             let icon = title['icon']
             let text = title['text']
@@ -235,8 +238,10 @@ fun init#tabline_title_formatter(n)
     let bufnr = index(buflist, curbufnr) < 0 ? buflist[winnr - 1] : curbufnr
     let bufname = bufname(bufnr)
     let filetype = getbufvar(bufnr, '&filetype')
-    if index(['nerdtree', 'tagbar', 'Outline', 'Mundo', 'MundoDiff',
-                \ 'TelescopePrompt'], filetype) != -1
+    let ancillary_buffers =
+                \ ['nerdtree', 'tagbar', 'Outline', 'Mundo', 'MundoDiff',
+                \  'TelescopePrompt']
+    if index(ancillary_buffers, filetype) != -1
         let title = s:ancillary_buffer_title[filetype]
         let icon = title['icon']
         let text = title['text']
