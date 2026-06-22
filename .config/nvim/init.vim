@@ -247,6 +247,56 @@ nmap <silent> ,Y    "+P
 " }}}
 
 
+" ---- Setup devicons and extra filetype detections {{{1
+" ----
+lua vim.filetype.add { extension = { log = 'log' } }
+
+" nvim-web-devicons
+lua <<EOF
+  local devicons = require'nvim-web-devicons'
+
+  devicons.setup {
+    default = true,
+    strict = true,
+    override = {
+      nginx = { icon = '', color = '#009400', cterm_color = '28',
+        name = 'Nginx'
+      },
+      shellsession = { icon = '', color = '#cbcb41', cterm_color = '185',
+        name = 'ShellSession'
+      }
+    },
+    override_by_extension = {
+      d2 = { icon = '', color = '#b1a8e5', cterm_color = '146',
+        name = 'd2'
+      },
+      dhall = { icon = '󰴓', color = '#8e1f8e', cterm_color = '90',
+        name = 'dhall'
+      },
+      log = { icon = '󰈙', color = '#6b8e23', cterm_color = '64',
+        name = 'log'
+      }
+    }
+  }
+
+  devicons.set_icon_by_filetype {
+    cabal = 'hs', cabalproject = 'hs', latex = 'tex', messages = 'log',
+    nginx = 'nginx', pandoc = 'markdown', requirements = 'txt', rst = 'txt',
+    shelloutput = 'shellsession', shellsession = 'shellsession'
+  }
+EOF
+
+" vim-devicons
+let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol =
+            \ v:lua.require'nvim-web-devicons'.get_default_icon().icon
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols =
+            \ { 'cabal': '', 'd2': '', 'dhall': '󰴓', 'log': '󰈙',
+            \   'svg': '󰜡', 'tex': '' }
+let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols =
+            \ { 'cabal.project': '' }
+" }}}
+
+
 " ---- Setup snacks plugin (dashboard, input, picker etc.) {{{1
 " ----
 let g:DashboardImpl = 'snacks_dashboard'
@@ -428,44 +478,6 @@ lua <<EOF
 
   require'telescope'.load_extension 'file_browser'
 EOF
-" }}}
-
-
-" ---- Setup devicons with extra filetype detections {{{1
-" ----
-" nvim-web-devicons
-lua <<EOF
-  vim.filetype.add { extension = { log = 'log' } }
-
-  local devicons = require'nvim-web-devicons'
-
-  devicons.setup {
-    override = {
-      nginx = { icon = '', color = '#009400', cterm_color = '28',
-        name = 'Nginx'
-      },
-      shellsession = { icon = '', color = '#cbcb41', cterm_color = '185',
-        name = 'ShellSession'
-      }
-    },
-    default = true,
-    strict = true
-  }
-
-  devicons.set_icon_by_filetype {
-    cabal = 'hs', cabalproject = 'hs', latex = 'tex', messages = 'log',
-    nginx = 'nginx', pandoc = 'markdown', requirements = 'txt', rst = 'txt',
-    shellsession = 'shellsession', shelloutput = 'shellsession'
-  }
-EOF
-
-" vim-devicons
-let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol =
-            \ v:lua.require'nvim-web-devicons'.get_default_icon().icon
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols =
-            \ { 'cabal': '', 'tex': '' }
-let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols =
-            \ { 'cabal.project': '' }
 " }}}
 
 
