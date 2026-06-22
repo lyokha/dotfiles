@@ -431,8 +431,9 @@ EOF
 " }}}
 
 
-" ---- Setup nvim-web-devicons and extra filetype detections {{{1
+" ---- Setup devicons with extra filetype detections {{{1
 " ----
+" nvim-web-devicons
 lua <<EOF
   vim.filetype.add { extension = { log = 'log' } }
 
@@ -457,6 +458,14 @@ lua <<EOF
     shellsession = 'shellsession', shelloutput = 'shellsession'
   }
 EOF
+
+" vim-devicons
+let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol =
+            \ v:lua.require'nvim-web-devicons'.get_default_icon().icon
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols =
+            \ { 'cabal': '', 'tex': '' }
+let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols =
+            \ { 'cabal.project': '' }
 " }}}
 
 
@@ -1319,10 +1328,6 @@ let g:airline#extensions#tabline#tabnr_formatter =
 let g:airline#extensions#whitespace#symbol = ''
 
 let g:airline_theme_patch_func = 'init#airline_theme_patch'
-
-" this also affects nerdtree and other plugins which use vim-devicons
-let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol =
-            \ v:lua.require'nvim-web-devicons'.get_default_icon().icon
 
 let s:SudoAdminIcon = g:DisableUnicodeSymbols ? '' : ' '
 
