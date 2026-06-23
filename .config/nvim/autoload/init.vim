@@ -51,8 +51,10 @@ let s:ancillary_buffer_title =
 fun s:get_title_devicon_icon()
 lua <<EOF
   local devicons = require'nvim-web-devicons'
+  local default_icon = devicons.get_default_icon().icon
+  local txt_icon = devicons.get_icon_by_filetype('text')
   local icon = devicons.get_icon_by_filetype(vim.bo.filetype)
-  if icon == devicons.get_default_icon().icon then
+  if icon == default_icon or icon == txt_icon then
     icon = devicons.get_icon(
       vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':t'),
       vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':e'))
