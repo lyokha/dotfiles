@@ -39,7 +39,7 @@ endfun
 let s:ancillary_buffer_title =
             \ { 'alpha':            { 'icon': '󰀫', 'text': '[vim]' },
             \   'snacks_dashboard': { 'icon': '󰨝', 'text': '[vim]' },
-            \   'vim-plug':         { 'icon': '󰚰', 'text': '[plugins]' },
+            \   'vim-plug':         { 'icon': '', 'text': '[plugins]' },
             \   'nerdtree':         { 'icon': '', 'text': '[nerdtree]' },
             \   'Outline':          { 'icon': '󰠶', 'text': '[outline]' },
             \   'tagbar':           { 'icon': '󰠶', 'text': '[tagbar]' },
