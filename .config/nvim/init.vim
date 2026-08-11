@@ -63,6 +63,7 @@ Plug 'folke/snacks.nvim'
 Plug 'preservim/tagbar'
 Plug 'preservim/nerdtree'
 Plug 'preservim/nerdcommenter'
+Plug 'JoosepAlviste/nvim-ts-context-commentstring'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'nvim-lua/popup.nvim'
@@ -1162,8 +1163,26 @@ nmap <silent> ,vt :InspectTree<CR>
 nmap <silent> ,vf :GetFgColorUnderCursor<CR>
 nmap <silent> ,vb :GetBgColorUnderCursor<CR>
 
+lua <<EOF
+require'ts_context_commentstring'.setup {
+  enable_autocmd = false
+}
+EOF
+
+" nerdcommenter settings
 let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
+autocmd VimEnter *
+            \ call init#with_local_commentstring('nx', ',cc',
+            \     'NERDCommenterComment') |
+            \ call init#with_local_commentstring('nx', ',cu',
+            \     'NERDCommenterUncomment') |
+            \ call init#with_local_commentstring('nx', ',ct',
+            \     'NERDCommenterToggle') |
+            \ call init#with_local_commentstring('nx', ',cs',
+            \     'NERDCommenterSexy') |
+            \ call init#with_local_commentstring('n', ',ce',
+            \     'NERDCommenterToEOL')
 
 " beacon settings
 let g:beacon_enable = 0

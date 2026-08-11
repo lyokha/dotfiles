@@ -352,6 +352,20 @@ endfun
 " }}}
 
 
+" ---- Function to make local commentstring aware mappings {{{1
+" ----
+fun init#with_local_commentstring(modes, map, cmd)
+    let commentstr = "lua require'ts_context_commentstring.internal'".
+                \ '.update_commentstring()'
+    let vcount = '(v:count == 0 ? "" : v:count)'
+    for mode in (a:modes ==# '') ? [''] : split(a:modes, '\zs')
+        exe mode.'map <silent> '.a:map.' <Cmd>exe "'.commentstr.
+                    \ '"<Bar>exe "normal! ".'.vcount.'."<Plug>'.a:cmd.'"<CR>'
+    endfor
+endfun
+" }}}
+
+
 " ---- Functions to support mdict functionality {{{1
 " ----
 fun s:mdict_syntax_set_colors(colors)
