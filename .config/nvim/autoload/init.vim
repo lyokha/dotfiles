@@ -355,12 +355,16 @@ endfun
 " ---- Function to make local commentstring aware mappings {{{1
 " ----
 fun init#with_local_commentstring(modes, map, cmd)
-    let commentstr = "lua require'ts_context_commentstring.internal'".
+    let update_commentstring = "lua require'ts_context_commentstring'".
                 \ '.update_commentstring()'
     let vcount = '(v:count == 0 ? "" : v:count)'
     for mode in (a:modes ==# '') ? [''] : split(a:modes, '\zs')
-        exe mode.'map <silent> '.a:map.' <Cmd>exe "'.commentstr.
-                    \ '"<Bar>exe "normal! ".'.vcount.'."<Plug>'.a:cmd.'"<CR>'
+        exe mode.'map <silent> '.a:map.
+                    \ ' <Cmd>let _save_commentstr = &commentstring'.
+                    \ '<Bar>exe "'.update_commentstring.
+                    \ '"<Bar>exe "normal ".'.vcount.'."<Plug>'.a:cmd.
+                    \ '"<Bar>let &l:commentstring = _save_commentstr'.
+                    \ '<Bar>unlet _save_commentstr<CR>'
     endfor
 endfun
 " }}}

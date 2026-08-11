@@ -19,10 +19,11 @@ let g:plug_home = stdpath('data').'/plugged'
 
 if has('nvim-0.12')
     let g:ts_ensure_installed_ft =
-                \ ['c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
-                \  'json', 'lua', 'make', 'markdown', 'nginx', 'perl',
-                \  'python', 'query', 'r', 'regex', 'rst', 'rust', 'sh',
-                \  'tex', 'toml', 'vim', 'vimdoc', 'xml', 'yaml']
+                \ ['c', 'cmake', 'cpp', 'css', 'doxygen', 'go', 'gomod',
+                \  'haskell', 'html', 'javascript', 'json', 'lua', 'make',
+                \  'markdown', 'nginx', 'perl', 'python', 'query', 'r',
+                \  'regex', 'rst', 'rust', 'sh', 'tex', 'toml', 'vim',
+                \  'vimdoc', 'xml', 'yaml']
 endif
 
 call plug#begin()
@@ -551,10 +552,10 @@ lua <<EOF
   else
     require'nvim-treesitter.configs'.setup {
       ensure_installed = {
-        'bash', 'c', 'cmake', 'cpp', 'doxygen', 'go', 'gomod', 'haskell',
-        'json', 'latex', 'lua', 'make', 'markdown', 'nginx', 'perl',
-        'python', 'query', 'r', 'regex', 'rst', 'rust', 'toml', 'vim',
-        'vimdoc', 'xml', 'yaml'
+        'bash', 'c', 'cmake', 'cpp', 'css', 'doxygen', 'go', 'gomod',
+        'haskell', 'html', 'javascript', 'json', 'latex', 'lua', 'make',
+        'markdown', 'nginx', 'perl', 'python', 'query', 'r', 'regex', 'rst',
+        'rust', 'toml', 'vim', 'vimdoc', 'xml', 'yaml'
       },
       highlight = {
         enable = true,
