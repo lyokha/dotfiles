@@ -1138,10 +1138,11 @@ autocmd FileType markdown
             \ endif
 " disable airline in floating windows
 autocmd WinNew *
-            \ let win = nvim_win_get_config(win_getid(expand('<amatch>'))) |
-            \ if !empty(win.relative) |
+            \ let _win = nvim_win_get_config(win_getid(expand('<amatch>'))) |
+            \ if !empty(_win.relative) |
             \     let w:airline_disable_statusline = 1 |
-            \ endif
+            \ endif |
+            \ unlet _win
 " disable airline in snacks windows and cmp menus
 autocmd FileType snacks_dashboard,snacks_input,snacks_notif,cmp_*
             \ let b:airline_disable_statusline = 1
@@ -1174,16 +1175,15 @@ EOF
 let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
 autocmd VimEnter *
-            \ call init#with_local_commentstring('nx', ',cc',
-            \     'NERDCommenterComment') |
-            \ call init#with_local_commentstring('nx', ',cu',
-            \     'NERDCommenterUncomment') |
-            \ call init#with_local_commentstring('nx', ',ct',
-            \     'NERDCommenterToggle') |
-            \ call init#with_local_commentstring('nx', ',cs',
-            \     'NERDCommenterSexy') |
-            \ call init#with_local_commentstring('n', ',ce',
-            \     'NERDCommenterToEOL')
+            \ for [_modes, _map, _cmd] in
+            \         [['nx', ',cc', 'NERDCommenterComment'],
+            \          ['nx', ',cu', 'NERDCommenterUncomment'],
+            \          ['nx', ',ct', 'NERDCommenterToggle'],
+            \          ['nx', ',cs', 'NERDCommenterSexy'],
+            \          ['n',  ',ce', 'NERDCommenterToEOL']] |
+            \     call init#with_local_commentstring(_modes, _map, _cmd) |
+            \ endfor |
+            \ unlet _modes _map _cmd
 
 " beacon settings
 let g:beacon_enable = 0
