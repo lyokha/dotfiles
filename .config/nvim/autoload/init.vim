@@ -361,10 +361,10 @@ fun init#with_local_commentstring(modes, map, cmd)
     for mode in (a:modes ==# '') ? [''] : split(a:modes, '\zs')
         exe mode.'map <silent> '.a:map.
                     \ ' <Cmd>let _save_commentstr = &commentstring'.
-                    \ '<Bar>exe "'.update_commentstring.
-                    \ '"<Bar>exe "normal ".'.vcount.'."<Plug>'.a:cmd.
-                    \ '"<Bar>let &l:commentstring = _save_commentstr'.
-                    \ '<Bar>unlet _save_commentstr<CR>'
+                    \ ' <Bar> exe "'.update_commentstring.
+                    \ '" <Bar> exe "normal ".'.vcount.'."<Plug>'.a:cmd.
+                    \ '" <Bar> let &l:commentstring = _save_commentstr'.
+                    \ ' <Bar> unlet _save_commentstr<CR>'
     endfor
 endfun
 " }}}
