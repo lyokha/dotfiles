@@ -22,7 +22,7 @@ My personal dotfiles collection.
   wrapped in sudo).
 
 - `.bashrc.d/08-hl.sh` &mdash; alias `hlg=hlgrep`, function `hlf` (find files
-  and highlight the search patterns by [hl](https://github.com/lyokha/hl)).
+  and highlight the search patterns with [hl](https://github.com/lyokha/hl)).
 
 - `.config/fourmolu.yaml` &mdash; configuration for
   [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
