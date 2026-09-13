@@ -16,7 +16,13 @@ My personal dotfiles collection.
   The prompt uses the Powerline arrows and requires installation of
   [Nerd fonts](https://github.com/ryanoasis/nerd-fonts).
 
-- `.bashrc.d/04-kitty.sh` &mdash; integration of kitty and bash.
+- `.bashrc.d/04-kitty.sh` &mdash; integration of kitty with bash.
+
+- `.bashrc.d/06-vim.sh` &mdash; aliases `vim=nvim`, `vimdiff`, and `svim` (nvim
+  wrapped in sudo).
+
+- `.bashrc.d/08-hl.sh` &mdash; alias `hlg=hlgrep`, function `hlf` (find files
+  and highlight the search patterns by [hl](https://github.com/lyokha/hl)).
 
 - `.config/fourmolu.yaml` &mdash; configuration for
   [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
