@@ -62,5 +62,5 @@ function prompt_line
 }
 
 prompt_line 167 173 167 140 180 173 196
-unset prompt_line
+unset -f prompt_line
 
