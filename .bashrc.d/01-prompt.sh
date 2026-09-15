@@ -1,6 +1,6 @@
 function prompt_command
 {
-    if [ "$PROMPT_OLDPWD" != "$PWD" ]; then
+    if [[ "$PROMPT_OLDPWD" != "$PWD" ]]; then
         PROMPT_GIT_TOPLEVEL=$(git rev-parse --show-toplevel 2>/dev/null)
         PROMPT_OLDPWD=$PWD
     fi
@@ -8,16 +8,16 @@ function prompt_command
 
 function prompt_gitdir
 {
-    [ -n "$PROMPT_GIT_TOPLEVEL" ] && echo " 󰊢 ${PROMPT_GIT_TOPLEVEL##*/}"
+    [[ -n "$PROMPT_GIT_TOPLEVEL" ]] && echo " 󰊢 ${PROMPT_GIT_TOPLEVEL##*/}"
 }
 
 function prompt_wdir
 {
-    if [ "$PWD" = / ]; then
+    if [[ "$PWD" = / ]]; then
         echo " /"
-    elif [ -z "$PROMPT_GIT_TOPLEVEL" ] || [ "$PROMPT_GIT_TOPLEVEL" != "$PWD" ]
+    elif [[ -z "$PROMPT_GIT_TOPLEVEL" || "$PROMPT_GIT_TOPLEVEL" != "$PWD" ]]
     then
-        [ "$HOME" = "$PWD" ] && echo " ~" || echo " ${PWD##*/}"
+        [[ "$HOME" = "$PWD" ]] && echo " ~" || echo " ${PWD##*/}"
     fi
 }
 
