@@ -21,7 +21,7 @@ My personal dotfiles collection.
 - `.bashrc.d/06-vim.sh` &mdash; aliases `vim=nvim`, `vimdiff`, and `svim` (nvim
   wrapped in sudo).
 
-- `.bashrc.d/08-hl.sh` &mdash; aliases `hlg=hlgrep -gi`, `hla=hlgrep -a`,
+- `.bashrc.d/08-hl.sh` &mdash; aliases `hlg='hlgrep -gi'`, `hla='hlgrep -a'`,
   function `hlf` (find files and highlight the search patterns with
   [hl](https://github.com/lyokha/hl), requires
   [fd-find](https://github.com/sharkdp/fd)).
