@@ -30,7 +30,7 @@ if [ "$TERM" != "linux" ] && [ -n "$HL_ALIASES" ] && [ -f "$HL_ALIASES" ]
 then
     # shellcheck disable=SC1090
     . "$HL_ALIASES"
-    alias hlg=hlgrep
+    alias hlg='hlgrep -gi' hla='hlgrep -a'
     if ! command -v "${FDFIND:-fd}" >/dev/null 2>&1
     then
         unset -f hlf
