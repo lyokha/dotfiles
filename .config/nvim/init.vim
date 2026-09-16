@@ -670,29 +670,30 @@ lua <<EOF
     -- client.server_capabilities.semanticTokensProvider = nil
   end
 
-  local capabilities = require'cmp_nvim_lsp'.default_capabilities()
-  capabilities.textDocument = {
-    foldingRange = {
-      dynamicRegistration = false,
-      lineFoldingOnly = true
-    },
-    semanticTokens = {
-      multilineTokenSupport = true
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  capabilities = require'cmp_nvim_lsp'.default_capabilities(capabilities)
+  capabilities = vim.tbl_deep_extend('force', capabilities, {
+    textDocument = {
+      foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true
+      },
+      semanticTokens = {
+        multilineTokenSupport = true
+      }
     }
-  }
+  })
 
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
   local servers = {
-    'bashls', 'clangd', 'gopls', 'hls', 'lua_ls', 'perlpls', 'rust_analyzer'
+    'bashls', 'clangd', 'gopls', 'hls', 'lua_ls', 'neocmake', 'perlpls',
+    'rust_analyzer'
   }
   for _, lsp in ipairs(servers) do
     local setup = {
       on_attach = on_attach,
-      capabilities = capabilities,
-      flags = {
-        debounce_text_changes = 150
-      }
+      capabilities = vim.deepcopy(capabilities)
     }
     if lsp == 'hls' then
       setup.settings = {
