@@ -1522,28 +1522,40 @@ fun s:open_tagbar(buf_enter)
     call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__*')
 endfun
 
-fun s:open_outline(timer_id)
-    if a:timer_id != -1 && exists('t:open_outline_done')
-        return
+fun s:refresh_outline(timer_id)
+    let lsp = v:lua.require'outline.providers'.find_provider().name == 'lsp'
+    let client_name = lsp ? luaeval(
+                \ '(function() '.
+                \ '  local _, state = '.
+                \ '    require("outline.providers").find_provider(); '.
+                \ '  return (state and state.client and state.client.name) '.
+                \ '    or ""; '.
+                \ 'end)()'
+                \ ) : ''
+    let left_ticks = get(get(timer_info(a:timer_id), 0, {}), 'repeat', 0)
+    " rust_analyzer can be slow, give it more time
+    if client_name != 'rust_analyzer' || left_ticks == 0
+        OutlineRefresh
     endif
-    if &diff || exists('t:open_outline_done') ||
-                \ !v:lua.require'outline.providers'.has_provider()
-        return
-    endif
-    let t:open_outline_done = 1
-    if empty(&buftype)
-        setlocal buflisted
-    endif
+endfun
+
+fun s:open_outline()
     let cursor = &guicursor
     call s:wintoggle_cmd('OutlineOpen!', 'OUTLINE_*')
     " revert to the original cursor as outline can change it due to some bug
     let &guicursor = cursor
+    call timer_start(500, 's:refresh_outline', {'repeat': 4})
 endfun
 
-fun s:refresh_outline(timer_id)
-    if exists('t:open_outline_done')
-        " refresh outline window if a quicker provider has already grabbed it
-        OutlineRefresh
+fun s:schedule_open_outline(ev)
+    if &diff || exists('t:open_outline_scheduled') ||
+                \ !v:lua.require'outline.providers'.has_provider()
+        return
+    endif
+    let lsp = v:lua.require'outline.providers'.find_provider().name == 'lsp'
+    if a:ev == 1 && lsp || a:ev == 0 && !lsp || a:ev == 2
+        let t:open_outline_scheduled = 1
+        call timer_start(200, {-> s:open_outline()})
     endif
 endfun
 
@@ -1559,14 +1571,11 @@ if g:OutlineImpl == 'tagbar'
     " a new file
     autocmd BufWritePost * call s:open_tagbar(0)
 elseif g:OutlineImpl == 'outline'
-    " trying to open outline window within 10 sec, if it fails due to slow
-    " LSP clients, the window can be opened manually with :OutlineOpen! or
-    " <C-p>o
-    autocmd BufEnter * call
-                \ timer_start(500, 's:open_outline', {'repeat': 20})
-    autocmd BufReadPre * call
-                \ timer_start(500, 's:refresh_outline', {'repeat': 20})
-    autocmd BufWritePost * call s:open_outline(-1)
+    " schedule opening the outline window, it can also be opened manually
+    " with :OutlineOpen! or <C-p>o
+    autocmd BufEnter * call s:schedule_open_outline(0)
+    autocmd LspAttach * call s:schedule_open_outline(1)
+    autocmd BufWritePost * call s:schedule_open_outline(2)
 endif
 
 " setting specific ambiwidth prevents from printing garbage in the first two
