@@ -1522,20 +1522,14 @@ fun s:open_tagbar(buf_enter)
     call s:wintoggle_cmd('call tagbar#autoopen(0)', '__Tagbar__*')
 endfun
 
+let s:OutlineNoResponsePattern =
+            \ '^[[:space:]]*(outline) No response from provider '
+
 fun s:refresh_outline(timer_id)
-    let lsp = v:lua.require'outline.providers'.find_provider().name == 'lsp'
-    let client_name = lsp ? luaeval(
-                \ '(function() '.
-                \ '  local _, state = '.
-                \ '    require("outline.providers").find_provider(); '.
-                \ '  return (state and state.client and state.client.name) '.
-                \ '    or ""; '.
-                \ 'end)()'
-                \ ) : ''
-    let left_ticks = get(get(timer_info(a:timer_id), 0, {}), 'repeat', 0)
-    " rust_analyzer can be slow, give it more time
-    if client_name != 'rust_analyzer' || left_ticks == 0
-        OutlineRefresh
+    OutlineRefresh
+    let last_msg = execute('1mess')
+    if last_msg =~ s:OutlineNoResponsePattern
+        lua vim.api.nvim_echo({{ '', '' }}, false, {})
     endif
 endfun
 
@@ -1553,6 +1547,10 @@ fun s:schedule_open_outline(ev)
         return
     endif
     let lsp = v:lua.require'outline.providers'.find_provider().name == 'lsp'
+    let last_msg = execute('1mess')
+    if last_msg =~ s:OutlineNoResponsePattern
+        lua vim.api.nvim_echo({{ '', '' }}, false, {})
+    endif
     if a:ev == 1 && lsp || a:ev == 0 && !lsp || a:ev == 2
         let t:open_outline_scheduled = 1
         call timer_start(200, {-> s:open_outline()})
