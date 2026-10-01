@@ -81,7 +81,6 @@ Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'karb94/neoscroll.nvim'
 Plug 'danilamihailov/beacon.nvim', { 'commit': 'a786c9a' }
-Plug 'bogado/file-line'
 Plug 'lervag/vimtex'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
@@ -221,9 +220,6 @@ endif
 
 let mapleader = ','
 let g:netrw_winsize = 25
-
-" editorconfig clashes with file_line()
-let g:editorconfig = v:false
 " }}}
 
 
@@ -968,11 +964,27 @@ set nohidden
 " jump to the last known cursor position on opening a buffer
 let g:JumpToLastChangeOnBufOpen = 1
 
+fun s:init_cursor_pos()
+lua <<EOF
+  local mark = vim.api.nvim_buf_get_mark(0, '"')
+  local line = mark[1]
+  local col = mark[2]
+  local lcount = vim.api.nvim_buf_line_count(0)
+  if line > 0 and line <= lcount then
+    pcall(vim.api.nvim_win_set_cursor, 0, {line, col})
+    local win_id = vim.api.nvim_get_current_win()
+    local win_height = vim.api.nvim_win_get_height(win_id)
+    local topline = math.max(1, line - math.floor(win_height / 2))
+    vim.fn.winrestview({ topline = topline })
+  end
+EOF
+endfun
+
 autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen
-autocmd BufReadPost *
+autocmd BufWinEnter *
             \ if empty(&buftype) && exists('b:start_jump_done') &&
             \     !b:start_jump_done |
-            \     silent! exe 'normal! g`"' | let b:start_jump_done = 1 |
+            \     call s:init_cursor_pos() | let b:start_jump_done = 1 |
             \ endif
 
 autocmd CmdwinEnter * let w:disable_wintoggle_cmd = 1
@@ -1315,8 +1327,9 @@ fun s:file_line(file)
         endif
         return
     endif
-    let l:bufn = bufnr("%")
+    let l:bufn = bufnr('%')
     exe 'keepalt edit' fnameescape(l:parts[1])
+    lua require'editorconfig'.config(vim.api.nvim_get_current_buf())
     exe 'bwipeout' l:bufn
     filetype detect
     exe l:parts[2]
