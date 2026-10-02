@@ -1329,9 +1329,9 @@ fun s:file_line(file)
     endif
     let l:bufn = bufnr('%')
     exe 'keepalt edit' fnameescape(l:parts[1])
-    lua require'editorconfig'.config(vim.api.nvim_get_current_buf())
     exe 'bwipeout' l:bufn
     filetype detect
+    lua require'editorconfig'.config(vim.api.nvim_get_current_buf())
     exe l:parts[2]
     if foldlevel(l:parts[2]) > 0
         normal! zv
