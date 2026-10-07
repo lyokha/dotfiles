@@ -760,7 +760,7 @@ lua <<EOF
     },
     keymaps = {
       close = {},
-      goto_location = '<CR>',
+      goto_location = { '<CR>', '<LeftRelease>' },
       peek_location = 'o',
       hover_symbol = 'K',
       toggle_preview = 'q',
