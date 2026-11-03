@@ -304,7 +304,9 @@ endfun
 " --------------    --------------       --------------
 "
 fun init#win_occupy_vert_space(altwinbufft)
-    let curwinwidth = winwidth(0)
+    if !empty(a:altwinbufft) && a:altwinbufft == &ft
+        return
+    endif
     let curwin = winnr()
     wincmd l
     if !empty(a:altwinbufft) && a:altwinbufft != &ft
@@ -313,12 +315,10 @@ fun init#win_occupy_vert_space(altwinbufft)
     endif
     let altwinwidth = winwidth(0)
     exe curwin."wincmd w"
-    wincmd L
-    wincmd h
-    wincmd L
+    wincmd L | wincmd h | wincmd L
     exe altwinwidth."wincmd |"
     wincmd h
-    exe curwinwidth."wincmd |"
+    horizontal wincmd =
 endfun
 " }}}
 

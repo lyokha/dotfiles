@@ -1053,7 +1053,7 @@ autocmd QuitPre * call init#quit_pre_hook()
 autocmd BufUnload * call init#close_last_ancillary_buffers()
 
 " toggle commands for tagbar, mundo, nerdtree and other are also here
-nmap <silent> <C-p>o     :if g:OutlineImpl == 'outline' <Bar>
+nmap <silent> <C-p>o     :if g:OutlineImpl == 'Outline' <Bar>
             \ call <SID>wintoggle_cmd('Outline!', 'OUTLINE_*') <Bar>
             \ elseif g:OutlineImpl == 'tagbar' <Bar>
             \ call <SID>wintoggle_cmd('TagbarToggle', '__Tagbar__*') <Bar>
@@ -1423,7 +1423,7 @@ nmap <silent> ,<   :call init#close_tag_win()<CR>
 nmap <silent> ,qo  :botright copen<CR>
 nmap <silent> ,qq  :cclose<CR>
 
-nmap <silent> ,U   :call init#win_occupy_vert_space('tagbar')<CR>
+nmap <silent> ,U   :call init#win_occupy_vert_space(g:OutlineImpl)<CR>
 
 " gutentags settings
 let g:gutentags_exclude_filetypes = ['svn', 'cvs', 'gitcommit', 'hgcommit']
@@ -1514,7 +1514,7 @@ if g:DisableUnicodeSymbols
 endif
 
 " switch to a normal buffer when leaving a tab
-autocmd TabLeave * if &filetype == 'tagbar' | wincmd p | endif
+autocmd TabLeave * if &filetype == g:OutlineImpl | wincmd p | endif
 
 autocmd BufNewFile,BufReadPre *.snippets let b:tagbar_ignore = 1
 
@@ -1571,7 +1571,7 @@ fun s:schedule_open_outline(ev)
 endfun
 
 " outline implementation can be 'outline' (preferred) or 'tagbar'
-let g:OutlineImpl = 'outline'
+let g:OutlineImpl = 'Outline'
 
 if g:OutlineImpl == 'tagbar'
     " automatically open tagbar on vim's start or a new tab is open if
@@ -1581,7 +1581,7 @@ if g:OutlineImpl == 'tagbar'
     " BufWritePost shall trigger tagbar opening on the first write to
     " a new file
     autocmd BufWritePost * call s:open_tagbar(0)
-elseif g:OutlineImpl == 'outline'
+elseif g:OutlineImpl == 'Outline'
     " schedule opening the outline window, it can also be opened manually
     " with :OutlineOpen! or <C-p>o
     autocmd BufEnter * call s:schedule_open_outline(0)
