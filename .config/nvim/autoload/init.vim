@@ -2,20 +2,22 @@
 
 " ---- Helper functions for vim-plug {{{1
 " ----
-fun s:ts_ensure_installed()
 lua <<EOF
-  local ensure_installed = {}
-  for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
-    ensure_installed[i] = vim.treesitter.language.get_lang(ft)
+  local function ts_ensure_installed()
+    local ensure_installed = {}
+    for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
+      ensure_installed[i] = vim.treesitter.language.get_lang(ft)
+    end
+    require'nvim-treesitter'.install(ensure_installed):wait(300000)
+    require'nvim-treesitter'.update(ensure_installed, { summary = true })
   end
-  require'nvim-treesitter'.install(ensure_installed):wait(300000)
-  require'nvim-treesitter'.update(ensure_installed, { summary = true })
+
+  _G.__initvim_ts_ensure_installed = ts_ensure_installed
 EOF
-endfun
 
 fun init#ts_update(...)
     if !a:0 || a:1 == 'new'
-        call s:ts_ensure_installed()
+        call v:lua.__initvim_ts_ensure_installed()
     elseif a:1 == 'old'
         TSUpdate
         let mdhlscm = '/markdown/highlights.scm'
@@ -48,20 +50,22 @@ let s:ancillary_buffer_title =
             \   'TelescopePrompt':  { 'icon': '', 'text': '[telescope]' }
             \ }
 
-fun s:get_title_devicon_icon()
 lua <<EOF
-  local devicons = require'nvim-web-devicons'
-  local default_icon = devicons.get_default_icon().icon
-  local txt_icon = devicons.get_icon_by_filetype('text')
-  local icon = devicons.get_icon_by_filetype(vim.bo.filetype)
-  if icon == default_icon or icon == txt_icon then
-    icon = devicons.get_icon(
-      vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':t'),
-      vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':e'))
+  local function get_title_devicon_icon()
+    local devicons = require'nvim-web-devicons'
+    local default_icon = devicons.get_default_icon().icon
+    local txt_icon = devicons.get_icon_by_filetype('text')
+    local icon = devicons.get_icon_by_filetype(vim.bo.filetype)
+    if icon == default_icon or icon == txt_icon then
+      icon = devicons.get_icon(
+        vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':t'),
+        vim.fn.fnamemodify(vim.b.title_devicon_bufname, ':e'))
+    end
+    vim.b.title_devicon_icon = icon
   end
-  vim.b.title_devicon_icon = icon
+
+  _G.__initvim_get_title_devicon_icon = get_title_devicon_icon
 EOF
-endfun
 
 fun init#get_title_text()
     let showtagbar = &filetype == 'tagbar' &&
@@ -80,7 +84,7 @@ fun init#get_title_text()
             let text = title['text']
         else
             let b:title_devicon_bufname = bufname
-            call s:get_title_devicon_icon()
+            call v:lua.__initvim_get_title_devicon_icon()
             let icon = b:title_devicon_icon
             let text = pathshorten(fnamemodify(bufname, ':~:.'), 1)
         endif

@@ -964,27 +964,30 @@ set nohidden
 " jump to the last known cursor position on opening a buffer
 let g:JumpToLastChangeOnBufOpen = 1
 
-fun s:init_cursor_pos()
 lua <<EOF
-  local mark = vim.api.nvim_buf_get_mark(0, '"')
-  local line = mark[1]
-  local col = mark[2]
-  local lcount = vim.api.nvim_buf_line_count(0)
-  if line > 0 and line <= lcount then
-    pcall(vim.api.nvim_win_set_cursor, 0, {line, col})
-    local win_id = vim.api.nvim_get_current_win()
-    local win_height = vim.api.nvim_win_get_height(win_id)
-    local topline = math.max(1, line - math.floor(win_height / 2))
-    vim.fn.winrestview({ topline = topline })
+  local function init_cursor_pos()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local line = mark[1]
+    local col = mark[2]
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if line > 0 and line <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, {line, col})
+      local win_id = vim.api.nvim_get_current_win()
+      local win_height = vim.api.nvim_win_get_height(win_id)
+      local topline = math.max(1, line - math.floor(win_height / 2))
+      vim.fn.winrestview({ topline = topline })
+    end
   end
+
+  _G.__initvim_init_cursor_pos = init_cursor_pos
 EOF
-endfun
 
 autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen
 autocmd BufWinEnter *
             \ if empty(&buftype) && exists('b:start_jump_done') &&
             \     !b:start_jump_done |
-            \     call s:init_cursor_pos() | let b:start_jump_done = 1 |
+            \     call v:lua.__initvim_init_cursor_pos() |
+            \     let b:start_jump_done = 1 |
             \ endif
 
 autocmd CmdwinEnter * let w:disable_wintoggle_cmd = 1
@@ -1179,9 +1182,9 @@ nmap <silent> ,vf :GetFgColorUnderCursor<CR>
 nmap <silent> ,vb :GetBgColorUnderCursor<CR>
 
 lua <<EOF
-require'ts_context_commentstring'.setup {
-  enable_autocmd = false
-}
+  require'ts_context_commentstring'.setup {
+    enable_autocmd = false
+  }
 EOF
 
 " nerdcommenter settings
