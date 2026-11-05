@@ -965,7 +965,7 @@ set nohidden
 let g:JumpToLastChangeOnBufOpen = 1
 
 lua <<EOF
-  local function init_cursor_pos()
+  _G.__initvim_init_cursor_pos = function()
     local mark = vim.api.nvim_buf_get_mark(0, '"')
     local line = mark[1]
     local col = mark[2]
@@ -978,8 +978,6 @@ lua <<EOF
       vim.fn.winrestview({ topline = topline })
     end
   end
-
-  _G.__initvim_init_cursor_pos = init_cursor_pos
 EOF
 
 autocmd BufReadPre * let b:start_jump_done = !g:JumpToLastChangeOnBufOpen

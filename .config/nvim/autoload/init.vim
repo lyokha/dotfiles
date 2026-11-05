@@ -3,7 +3,7 @@
 " ---- Helper functions for vim-plug {{{1
 " ----
 lua <<EOF
-  local function ts_ensure_installed()
+  _G.__initvim_ts_ensure_installed = function()
     local ensure_installed = {}
     for i, ft in ipairs(vim.g.ts_ensure_installed_ft) do
       ensure_installed[i] = vim.treesitter.language.get_lang(ft)
@@ -11,8 +11,6 @@ lua <<EOF
     require'nvim-treesitter'.install(ensure_installed):wait(300000)
     require'nvim-treesitter'.update(ensure_installed, { summary = true })
   end
-
-  _G.__initvim_ts_ensure_installed = ts_ensure_installed
 EOF
 
 fun init#ts_update(...)
@@ -51,7 +49,7 @@ let s:ancillary_buffer_title =
             \ }
 
 lua <<EOF
-  local function get_title_devicon_icon()
+  _G.__initvim_get_title_devicon_icon = function()
     local devicons = require'nvim-web-devicons'
     local default_icon = devicons.get_default_icon().icon
     local txt_icon = devicons.get_icon_by_filetype('text')
@@ -63,8 +61,6 @@ lua <<EOF
     end
     vim.b.title_devicon_icon = icon
   end
-
-  _G.__initvim_get_title_devicon_icon = get_title_devicon_icon
 EOF
 
 fun init#get_title_text()
@@ -301,10 +297,17 @@ endfun
 " ---- vertical space
 " ----
 " --------------    --------------       --------------
-" |         |tb|    |    | W  |tb|       |    | W  |tb|
+" | a       |tb|    | a  | W  |tb|       | a  | W  |tb|
 " |---------|  | OR |---------|  | === \ |----|    |  |
-" |    | W  |  |    |         |  | === / |    |    |  |
+" | b  | W  |  |    | b       |  | === / | b  |    |  |
 " |    |    |  |    |         |  |       |    |    |  |
+" --------------    --------------       --------------
+"
+" --------------    --------------       --------------
+" | a       |tb|    | W       |tb|       | a  | W  |tb|
+" |---------|  | OR |---------|  | === \ |    |    |  |
+" | W       |  |    | a       |  | === / |    |    |  |
+" |         |  |    |         |  |       |    |    |  |
 " --------------    --------------       --------------
 "
 fun init#win_occupy_vert_space(altwinbufft)
