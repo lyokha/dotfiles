@@ -1,32 +1,31 @@
 function prompt_command
 {
+    # shellcheck disable=SC2034
+    printf -v PROMPT_DATE '%(%d/%m/%y %H:%M)T' -1
     if [[ "$PROMPT_OLDPWD" != "$PWD" ]]; then
-        PROMPT_GIT_TOPLEVEL=$(git rev-parse --show-toplevel 2>/dev/null)
         PROMPT_OLDPWD=$PWD
+        PROMPT_GITDIR=$(git rev-parse --show-toplevel 2>/dev/null)
+        PROMPT_WDIR=
+        if [[ "$PWD" = / ]]; then
+            PROMPT_WDIR=' /'
+        elif [[ -z "$PROMPT_GITDIR" || "$PROMPT_GITDIR" != "$PWD" ]]
+        then
+            if [[ "$HOME" = "$PWD" ]]; then
+                PROMPT_WDIR=' ~'
+            else
+                # shellcheck disable=SC2034
+                PROMPT_WDIR=" ${PWD##*/}"
+            fi
+        fi
+        if [[ -n "$PROMPT_GITDIR" ]]; then
+            PROMPT_GITDIR=" 󰊢 ${PROMPT_GITDIR##*/}"
+        fi
     fi
-}
-
-function prompt_gitdir
-{
-    [[ -n "$PROMPT_GIT_TOPLEVEL" ]] && echo " 󰊢 ${PROMPT_GIT_TOPLEVEL##*/}"
-}
-
-function prompt_gitdir_modified
-{
-    if [[ -n "$PROMPT_GIT_TOPLEVEL" ]]; then
-        local PROMPT_GIT_MODIFIED=
-        ! git diff --quiet HEAD -- 2>/dev/null && PROMPT_GIT_MODIFIED='*'
-        echo "$PROMPT_GIT_MODIFIED"
-    fi
-}
-
-function prompt_wdir
-{
-    if [[ "$PWD" = / ]]; then
-        echo " /"
-    elif [[ -z "$PROMPT_GIT_TOPLEVEL" || "$PROMPT_GIT_TOPLEVEL" != "$PWD" ]]
+    PROMPT_GITDIR_MODIFIED=
+    if [[ -n "$PROMPT_GITDIR" ]] && ! git diff --quiet HEAD -- 2>/dev/null
     then
-        [[ "$HOME" = "$PWD" ]] && echo " ~" || echo " ${PWD##*/}"
+        # shellcheck disable=SC2034
+        PROMPT_GITDIR_MODIFIED='*'
     fi
 }
 
@@ -48,20 +47,20 @@ function prompt_line
     if (( N_COLORS >= 256 )); then
         local PROMPT_LINE="\
 \[\e]0;\u@${HOSTNAME}:\w\a\]\
-\[\e[38;5;${DATE_COLOR}m\]\$(date +%d/%m/%y\ %H:%M) \
+\[\e[38;5;${DATE_COLOR}m\]\${PROMPT_DATE} \
 \[\e[38;5;${USER_COLOR}m\]\u\[\e[38;5;${AT_COLOR}m\]@\
 \[\e[38;5;${HOST_COLOR}m\]${HOSTNAME}\
-\[\e[38;5;${GIT_COLOR}m\]\$(prompt_gitdir)\
-\[\e[38;5;${GIT_MODIFIED_COLOR}m\]\$(prompt_gitdir_modified)\
-\[\e[38;5;${DIR_COLOR}m\]\$(prompt_wdir) \[\e[0m\] "
+\[\e[38;5;${GIT_COLOR}m\]\${PROMPT_GITDIR}\
+\[\e[38;5;${GIT_MODIFIED_COLOR}m\]\${PROMPT_GITDIR_MODIFIED}\
+\[\e[38;5;${DIR_COLOR}m\]\${PROMPT_WDIR} \[\e[0m\] "
         local PROMPT_LINE2="\[\e[38;5;${PS2_COLOR}m\]\[\e[0m\] "
     elif (( N_COLORS >= 8 )); then
         local PROMPT_LINE="\
-\[\e[32m\](\$(date +%d/%m/%y\ %H:%M))\[\e[0m\]\
+\[\e[32m\](\${PROMPT_DATE})\[\e[0m\]\
 [\u\[\e[1;34m\]@${HOSTNAME}\[\e[0m\] \W]\[\e[31m\]$\[\e[0m\] "
         local PROMPT_LINE2='\[\e[31m\]>\[\e[0m\] '
     else
-        local PROMPT_LINE="(\$(date +%d/%m/%y\ %H:%M))[\u@${HOSTNAME} \W]$ "
+        local PROMPT_LINE="(\${PROMPT_DATE})[\u@${HOSTNAME} \W]$ "
         local PROMPT_LINE2='> '
     fi
 
