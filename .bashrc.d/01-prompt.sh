@@ -11,6 +11,15 @@ function prompt_gitdir
     [[ -n "$PROMPT_GIT_TOPLEVEL" ]] && echo " 󰊢 ${PROMPT_GIT_TOPLEVEL##*/}"
 }
 
+function prompt_gitdir_modified
+{
+    if [[ -n "$PROMPT_GIT_TOPLEVEL" ]]; then
+        local PROMPT_GIT_MODIFIED=
+        ! git diff --quiet HEAD -- 2>/dev/null && PROMPT_GIT_MODIFIED='*'
+        echo "$PROMPT_GIT_MODIFIED"
+    fi
+}
+
 function prompt_wdir
 {
     if [[ "$PWD" = / ]]; then
@@ -28,8 +37,9 @@ function prompt_line
     local AT_COLOR=$3
     local HOST_COLOR=$4
     local GIT_COLOR=$5
-    local DIR_COLOR=$6
-    local PS2_COLOR=$7
+    local GIT_MODIFIED_COLOR=$6
+    local DIR_COLOR=$7
+    local PS2_COLOR=$8
 
     local N_COLORS
     N_COLORS=$(tput colors 2>/dev/null)
@@ -42,6 +52,7 @@ function prompt_line
 \[\e[38;5;${USER_COLOR}m\]\u\[\e[38;5;${AT_COLOR}m\]@\
 \[\e[38;5;${HOST_COLOR}m\]${HOSTNAME}\
 \[\e[38;5;${GIT_COLOR}m\]\$(prompt_gitdir)\
+\[\e[38;5;${GIT_MODIFIED_COLOR}m\]\$(prompt_gitdir_modified)\
 \[\e[38;5;${DIR_COLOR}m\]\$(prompt_wdir) \[\e[0m\] "
         local PROMPT_LINE2="\[\e[38;5;${PS2_COLOR}m\]\[\e[0m\] "
     elif (( N_COLORS >= 8 )); then
@@ -61,6 +72,6 @@ function prompt_line
     PROMPT_COMMAND=prompt_command
 }
 
-prompt_line 167 173 167 140 180 173 196
+prompt_line 167 173 167 140 180 167 173 196
 unset -f prompt_line
 
