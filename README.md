@@ -16,6 +16,9 @@ My personal dotfiles collection.
   The prompt uses the Powerline arrows and requires installation of
   [Nerd fonts](https://github.com/ryanoasis/nerd-fonts).
 
+- `.bashrc.d/02-git.sh` &mdash; function `git` to let `git init` notify the bash
+  prompt about the new git repository.
+
 - `.bashrc.d/04-kitty.sh` &mdash; integration of kitty with bash.
 
 - `.bashrc.d/06-vim.sh` &mdash; aliases `vim=nvim`, `vimdiff`, and `svim` (nvim
