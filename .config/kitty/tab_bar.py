@@ -10,7 +10,8 @@ from kitty.tab_bar import (DrawData, TabAccessor, TabBarData, ExtraData,
                            draw_tab_with_powerline)
 from kitty.types import run_once
 
-_WORKING_FRAMES = ('󰪞', '󰪟', '󰪠', '󰪡', '󰪢', '󰪣', '󰪤', '󰪥')
+#  _WORKING_FRAMES = ('󰪞', '󰪟', '󰪠', '󰪡', '󰪢', '󰪣', '󰪤', '󰪥')
+_WORKING_FRAMES = ('', '', '', '', '', '')
 _WORKING_SYMBOL = '\uf110'
 _FRAME_INTERVAL = 0.1
 _frame_idx = 0
