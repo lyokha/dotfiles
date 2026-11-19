@@ -38,9 +38,6 @@ def _animation_timer(timer_id: int | None) -> None:
     _frame_idx = (_frame_idx + 1) % len(_WORKING_FRAMES)
     for tm in animated_tab_managers:
         tm.mark_tab_bar_dirty()
-    # Dirty tab data is rebuilt on the next render pass. Wake kitty even when
-    # the foreground command is idle and has produced no terminal output.
-    wakeup_main_loop()
 
 
 def _stop_timer() -> None:
@@ -61,7 +58,7 @@ def _replacements():
     hostname = socket.gethostname()
     user_home = os.environ['USER'] + '@' + hostname
     root_home = 'root@' + hostname
-    if version >= (0, 50, 0):
+    if version >= (0, 51, 0):
         prog_status = (
             f"tab.program_status.replace('{_WORKING_SYMBOL}', '$ANIM_FRAME')",
             'tab.program_status',
@@ -97,7 +94,7 @@ def draw_tab(
 ) -> int:
     _clear_previous_timer()
     if (
-        version >= (0, 50, 0)
+        version >= (0, 51, 0)
         and not hasattr(sys, '_kitty_spinner_timer_id')
         and _WORKING_SYMBOL in TabAccessor(tab.tab_id).program_status
     ):
