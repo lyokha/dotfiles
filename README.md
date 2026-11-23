@@ -29,6 +29,11 @@ My personal dotfiles collection.
   [hl](https://github.com/lyokha/hl), requires
   [fd-find](https://github.com/sharkdp/fd)).
 
+- `.bashrc.d/20-history.sh` &mdash; shell history settings.
+
+- `.bashrc.d/30-misc.sh` &mdash; miscellaneous settings (environment variables
+  `PAGER`, `LESS`, `JQ_COLORS` etc.).
+
 - `.config/fourmolu.yaml` &mdash; configuration for
   [fourmolu](https://github.com/fourmolu/fourmolu), a Haskell source code
   formatter.
