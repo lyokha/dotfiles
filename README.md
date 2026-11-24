@@ -27,7 +27,8 @@ My personal dotfiles collection.
 - `.bashrc.d/08-hl.sh` &mdash; aliases `hlg='hlgrep -gi'`, `hla='hlgrep -a'`,
   function `hlf` (find files and highlight the search patterns with
   [hl](https://github.com/lyokha/hl), requires
-  [fd-find](https://github.com/sharkdp/fd)).
+  [fd-find](https://github.com/sharkdp/fd)). Additionally, the script loads hl
+  environment by sourcing `$HOME/.hl_env`.
 
 - `.bashrc.d/20-history.sh` &mdash; shell history settings.
 
@@ -41,6 +42,9 @@ My personal dotfiles collection.
 - `.config/kitty/kitty.conf` &mdash; configuration for
   [kitty](https://github.com/kovidgoyal/kitty) which includes custom fonts and
   tab titles.
+
+- `.config/kitty/tab_bar.py` &mdash; function `draw_tab` to render the tab bar
+  in kitty.
 
 - `.config/nvim/` &mdash; configuration files for Neovim.
 
